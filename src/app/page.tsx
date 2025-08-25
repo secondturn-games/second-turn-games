@@ -1,103 +1,78 @@
-import Image from "next/image";
+import Link from 'next/link';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-light-beige py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto text-center">
+        {/* Hero Section */}
+        <div className="mb-16">
+          <h1 className="text-5xl md:text-6xl font-display font-bold text-dark-green-600 mb-6">
+            Welcome to Second Turn Games
+          </h1>
+          <p className="text-xl md:text-2xl text-dark-green-500 mb-8 max-w-3xl mx-auto">
+            Give your games a second life. Buy and sell used board games, card games, and more in the Baltics.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link 
+              href="/games" 
+              className="px-8 py-4 rounded-2xl bg-vibrant-orange-500 text-white text-lg font-semibold hover:bg-vibrant-orange-600 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium"
+            >
+              Browse Games
+            </Link>
+            <Link 
+              href="/sell" 
+              className="px-8 py-4 rounded-2xl border-2 border-dark-green-300 text-dark-green-600 text-lg font-semibold hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-700 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium bg-white"
+            >
+              Sell a Game
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Features Section */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="bg-white rounded-2xl shadow-soft p-6 hover:shadow-medium transition-shadow duration-200">
+            <div className="w-16 h-16 bg-vibrant-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-vibrant-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-dark-green-600 mb-2">Find Great Games</h3>
+            <p className="text-dark-green-500">Discover amazing board games, card games, and more from local sellers.</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-soft p-6 hover:shadow-medium transition-shadow duration-200">
+            <div className="w-16 h-16 bg-warm-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-warm-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-dark-green-600 mb-2">Sell Your Games</h3>
+            <p className="text-dark-green-500">Turn your unused games into cash. Easy listing and secure transactions.</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-soft p-6 hover:shadow-medium transition-shadow duration-200">
+            <div className="w-16 h-16 bg-dark-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-dark-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-dark-green-600 mb-2">Community Driven</h3>
+            <p className="text-dark-green-500">Join a community of game enthusiasts in the Baltics.</p>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="bg-gradient-to-r from-vibrant-orange-500 to-warm-yellow-400 rounded-2xl p-8 text-white">
+          <h2 className="text-3xl font-display font-bold mb-4">Ready to Get Started?</h2>
+          <p className="text-xl mb-6 opacity-90">Join thousands of gamers buying and selling in the Baltics.</p>
+          <Link 
+            href="/games" 
+            className="inline-block px-8 py-4 bg-white text-vibrant-orange-600 rounded-2xl font-semibold hover:bg-gray-50 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium"
+          >
+            Start Browsing Games
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

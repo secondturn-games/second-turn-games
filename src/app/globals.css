@@ -1,26 +1,59 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-light-beige: #E6EAD7;
+  --color-light-beige-50: #F7F8F4;
+  --color-light-beige-100: #F0F2E9;
+  --color-light-beige-200: #E6EAD7;
+  --color-light-beige-300: #D8DCC8;
+  --color-vibrant-orange: #D95323;
+  --color-vibrant-orange-50: #FEF2F0;
+  --color-vibrant-orange-100: #FDE4E0;
+  --color-vibrant-orange-200: #FBC7BC;
+  --color-vibrant-orange-300: #F8A395;
+  --color-vibrant-orange-400: #F47A66;
+  --color-vibrant-orange-500: #D95323;
+  --color-vibrant-orange-600: #C44A1F;
+  --color-warm-yellow: #F2C94C;
+  --color-warm-yellow-50: #FFFBEB;
+  --color-warm-yellow-100: #FEF3C7;
+  --color-warm-yellow-200: #FDE68A;
+  --color-warm-yellow-300: #FCD34D;
+  --color-warm-yellow-400: #F2C94C;
+  --color-warm-yellow-500: #EAB308;
+  --color-dark-green: #29432B;
+  --color-dark-green-50: #F0F4F0;
+  --color-dark-green-100: #E1E9E1;
+  --color-dark-green-200: #C3D3C3;
+  --color-dark-green-300: #A5BDA5;
+  --color-dark-green-400: #87A787;
+  --color-dark-green-500: #29432B;
+  --color-dark-green-600: #1F331F;
+  
+  --font-sans: var(--font-roboto), sans-serif;
+  --font-display: var(--font-righteous), sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--color-light-beige);
+    color: var(--color-dark-green);
+    font-family: var(--font-sans);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Clerk Modal Styling */
+:root {
+  --clerk-primary: var(--color-vibrant-orange-500);
+  --clerk-primary-hover: var(--color-vibrant-orange-600);
+  --clerk-primary-text: white;
+  --clerk-border: var(--color-light-beige-200);
+  --clerk-background: var(--color-light-beige-50);
+  --clerk-text: var(--color-dark-green-600);
+  --clerk-text-secondary: var(--color-dark-green-500);
+  --clerk-input-background: var(--color-light-beige-50);
+  --clerk-input-border: var(--color-light-beige-200);
+  --clerk-input-focus-border: var(--color-vibrant-orange-300);
+  --clerk-input-focus-ring: var(--color-vibrant-orange-200);
 }

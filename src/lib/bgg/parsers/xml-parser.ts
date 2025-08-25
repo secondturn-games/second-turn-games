@@ -1,0 +1,765 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// XML Parser for BGG Service
+// Handles parsing BGG XML responses with focus on accurate type classification
+
+import type { BGGAPISearchItem, BGGAPIMetadata, BGGGameVersion, LanguageMatchedVersion } from '../types'
+
+/**
+ * Parse XML string to JavaScript object
+ */
+export function parseXML(xmlText: string): any {
+  if (!xmlText || typeof xmlText !== 'string') {
+    return null
+  }
+
+  try {
+    // Use DOMParser for browser environments
+    if (typeof DOMParser !== 'undefined') {
+      const parser = new DOMParser()
+      const xmlDoc = parser.parseFromString(xmlText, 'text/xml')
+      
+      // Check for parsing errors
+      const parseError = xmlDoc.getElementsByTagName('parsererror')
+      if (parseError.length > 0) {
+        console.warn('XML parsing warning:', parseError[0].textContent)
+      }
+      
+      return xmlToObject(xmlDoc.documentElement)
+    }
+    
+    // Fallback for Node.js environments
+    return fallbackXMLParser(xmlText)
+  } catch (error) {
+    console.error('XML parsing failed:', error)
+    return null
+  }
+}
+
+/**
+ * Convert XML DOM element to JavaScript object
+ */
+function xmlToObject(element: Element): any {
+  const result: any = {}
+  
+  // Handle attributes
+  if (element.attributes.length > 0) {
+    for (let i = 0; i < element.attributes.length; i++) {
+      const attr = element.attributes[i]
+      result[`@${attr.name}`] = attr.value
+    }
+  }
+  
+  // Handle child nodes
+  for (let i = 0; i < element.childNodes.length; i++) {
+    const child = element.childNodes[i]
+    
+    if (child.nodeType === Node.TEXT_NODE) {
+      const text = child.textContent?.trim()
+      if (text) {
+        result.value = text
+      }
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      const childElement = child as Element
+      const childName = childElement.tagName
+      const childData = xmlToObject(childElement)
+      
+      if (result[childName]) {
+        // Convert to array if multiple elements with same name
+        if (!Array.isArray(result[childName])) {
+          result[childName] = [result[childName]]
+        }
+        result[childName].push(childData)
+      } else {
+        result[childName] = childData
+      }
+    }
+  }
+  
+  return result
+}
+
+/**
+ * Fallback XML parser for Node.js environments
+ */
+function fallbackXMLParser(xmlText: string): any {
+  // Simple regex-based parser for basic XML structure
+  const result: any = {}
+  
+  // Extract root element
+  const rootMatch = xmlText.match(/<(\w+)[^>]*>([\s\S]*)<\/\1>/)
+  if (rootMatch) {
+    result[rootMatch[1]] = parseXMLContent(rootMatch[2])
+  }
+  
+  return result
+}
+
+/**
+ * Parse XML content recursively
+ */
+function parseXMLContent(content: string): any {
+  const result: any = {}
+  
+  // Extract all elements
+  const elementRegex = /<(\w+)([^>]*)>([^<]*(?:<[^>]*>[^<]*<\/[^>]*>[^<]*)*)<\/\1>/g
+  let match
+  
+  while ((match = elementRegex.exec(content)) !== null) {
+    const tagName = match[1]
+    const attributes = match[2]
+    const innerContent = match[3]
+    
+    let elementData: any = {}
+    
+    // Parse attributes
+    if (attributes) {
+      const attrRegex = /(\w+)="([^"]*)"/g
+      let attrMatch
+      while ((attrMatch = attrRegex.exec(attributes)) !== null) {
+        elementData[`@${attrMatch[1]}`] = attrMatch[2]
+      }
+    }
+    
+    // Parse inner content
+    if (innerContent && !innerContent.includes('<')) {
+      elementData.value = innerContent.trim()
+    } else if (innerContent) {
+      elementData = parseXMLContent(innerContent)
+    }
+    
+    // Handle multiple elements with same name
+    if (result[tagName]) {
+      if (!Array.isArray(result[tagName])) {
+        result[tagName] = [result[tagName]]
+      }
+      result[tagName].push(elementData)
+    } else {
+      result[tagName] = elementData
+    }
+  }
+  
+  return result
+}
+
+/**
+ * Extract search items from XML
+ */
+export function extractSearchItems(xmlText: string): BGGAPISearchItem[] {
+  console.log('🔍 Parsing XML for search items:', xmlText.substring(0, 200) + '...')
+  
+  const parsed = parseXML(xmlText)
+  console.log('📊 Parsed XML result:', parsed)
+  console.log('📊 Parsed XML structure:', JSON.stringify(parsed, null, 2))
+  
+  // Check for items at the root level (since BGG returns <items> as root)
+  let items = parsed?.item
+  
+  if (!items) {
+    console.log('❌ No items found in parsed XML')
+    console.log('❌ parsed:', parsed)
+    console.log('❌ parsed.item:', parsed?.item)
+    return []
+  }
+  
+  // Ensure items is an array
+  if (!Array.isArray(items)) {
+    items = [items]
+  }
+  
+  console.log('📋 Raw items found:', items.length)
+  
+  const result = items
+    .filter((item: any) => item && (item.id || item['@id']) && item.name)
+    .map((item: any) => {
+      // Helper function to safely extract values from BGG XML structure
+      const extractValue = (field: any): string => {
+        if (!field) return ''
+        if (typeof field === 'string') return field
+        if (field.value) return String(field.value)
+        if (field['@value']) return String(field['@value'])
+        return ''
+      }
+
+      // Extract primary name properly
+      let name = 'Unknown'
+      if (item.name) {
+        if (Array.isArray(item.name)) {
+          // Find the primary name (type="primary")
+          const primaryName = item.name.find((n: any) => n['@type'] === 'primary')
+          if (primaryName) {
+            name = String(primaryName['@value'] || primaryName.value || '')
+          } else {
+            // Fallback to first name with a value
+            for (const n of item.name) {
+              const value = n['@value'] || n.value
+              if (value) {
+                name = String(value)
+                break
+              }
+            }
+          }
+        } else {
+          // Single name object
+          name = String(item.name['@value'] || item.name.value || item.name || 'Unknown')
+        }
+      }
+      
+      return {
+        id: String(item.id || item['@id']),
+        name,
+        type: String(item.type || item['@type'] || 'boardgame'),
+        yearpublished: extractValue(item.yearpublished)
+      }
+    })
+  
+  console.log('✅ Final search items:', result)
+  return result
+}
+
+/**
+ * Extract metadata from XML with enhanced type classification
+ */
+export function extractMetadata(xmlText: string): BGGAPIMetadata[] {
+  console.log('🔍 extractMetadata called with XML length:', xmlText.length)
+  
+  const parsed = parseXML(xmlText)
+  console.log('🔍 Parsed XML result:', parsed)
+  
+  // Check for items at the root level (since BGG returns <items> as root)
+  let items = parsed?.item
+  
+  if (!items) {
+    console.log('❌ No items found in parsed XML')
+    console.log('❌ parsed:', parsed)
+    console.log('❌ parsed.item:', parsed?.item)
+    return []
+  }
+  
+  // Ensure items is an array
+  if (!Array.isArray(items)) {
+    items = [items]
+  }
+  
+  console.log('🔍 Items found:', items.length)
+  
+  const result = items
+    .filter((item: any) => item && (item.id || item['@id']) && item.name && (item.type || item['@type']))
+    .map((item: any) => {
+      console.log('🔍 Processing item:', item)
+      const metadata = extractBasicMetadata(item)
+      console.log('🔍 Basic metadata:', metadata)
+      const enhancedMetadata = enhanceWithInboundLinks(item, metadata)
+      console.log('🔍 Enhanced metadata:', enhancedMetadata)
+      return enhancedMetadata
+    })
+    .filter(Boolean) as BGGAPIMetadata[]
+  
+  console.log('🔍 Final metadata result:', result)
+  return result
+}
+
+/**
+ * Extract basic metadata from item
+ */
+function extractBasicMetadata(item: any): Partial<BGGAPIMetadata> {
+  // Helper function to safely extract values from BGG XML structure
+  const extractValue = (field: any): string => {
+    if (!field) return ''
+    if (typeof field === 'string') return field
+    if (field.value) return String(field.value)
+    if (field['@value']) return String(field['@value'])
+    return ''
+  }
+
+  const extractArrayValue = (field: any): string[] => {
+    if (!field) return []
+    if (Array.isArray(field)) {
+      return field.map(extractValue).filter(Boolean)
+    }
+    return [extractValue(field)].filter(Boolean)
+  }
+
+  // Special handling for name field - find primary name
+  const extractPrimaryName = (nameField: any): string => {
+    if (!nameField) return ''
+    
+    if (Array.isArray(nameField)) {
+      // Find the primary name (type="primary")
+      const primaryName = nameField.find((n: any) => n['@type'] === 'primary')
+      if (primaryName) {
+        return extractValue(primaryName)
+      }
+      // Fallback to first name with a value
+      for (const name of nameField) {
+        const value = extractValue(name)
+        if (value) return value
+      }
+    } else {
+      return extractValue(nameField)
+    }
+    
+    return ''
+  }
+
+  return {
+    id: String(item.id || item['@id'] || ''),
+    name: extractPrimaryName(item.name),
+    type: String(item.type || item['@type'] || 'boardgame'),
+    yearpublished: extractValue(item.yearpublished),
+    rank: extractRank(item),
+    bayesaverage: extractBayesAverage(item),
+    average: extractAverage(item),
+    thumbnail: extractValue(item.thumbnail),
+    image: extractValue(item.image),
+    alternateNames: extractAlternateNamesFromItem(item),
+    minplayers: extractValue(item.minplayers),
+    maxplayers: extractValue(item.maxplayers),
+    playingtime: extractValue(item.playingtime),
+    minage: extractValue(item.minage),
+    description: extractValue(item.description),
+    weight: extractWeight(item),
+    mechanics: extractLinksFromItem(item, 'boardgamemechanic'),
+    categories: extractLinksFromItem(item, 'boardgamecategory'),
+    versions: extractVersionsFromItem(item),
+    hasInboundExpansionLink: false,
+    inboundExpansionLinks: []
+  }
+}
+
+/**
+ * Enhance metadata with inbound link analysis for accurate type classification
+ */
+function enhanceWithInboundLinks(item: any, metadata: Partial<BGGAPIMetadata>): BGGAPIMetadata | null {
+  if (!metadata.id || !metadata.name || !metadata.type) {
+    return null
+  }
+  
+  // Extract all inbound links
+  const inboundLinks = extractInboundLinks(item)
+  const hasInboundExpansion = inboundLinks.some(link => 
+    link.type === 'boardgameexpansion' || link.type === 'boardgameintegration'
+  )
+  
+  // Determine true type based on inbound link analysis
+  let trueType = metadata.type as 'boardgame' | 'boardgameexpansion'
+  
+  if (hasInboundExpansion) {
+    trueType = 'boardgameexpansion'
+  } else if (metadata.type === 'boardgameexpansion') {
+    // If BGG says it's an expansion but no inbound links, double-check
+    trueType = 'boardgameexpansion'
+  } else {
+    trueType = 'boardgame'
+  }
+  
+  return {
+    ...metadata,
+    type: trueType,
+    hasInboundExpansionLink: hasInboundExpansion,
+    inboundExpansionLinks: inboundLinks.filter(link => 
+      link.type === 'boardgameexpansion' || link.type === 'boardgameintegration'
+    )
+  } as BGGAPIMetadata
+}
+
+/**
+ * Extract inbound links for type classification
+ */
+function extractInboundLinks(item: any): Array<{ id: string; type: string; value: string }> {
+  const links: Array<{ id: string; type: string; value: string }> = []
+  
+  if (!item.link) return links
+  
+  const linkElements = Array.isArray(item.link) ? item.link : [item.link]
+  
+  linkElements.forEach((link: any) => {
+    if (link && link['@inbound'] === 'true') {
+      links.push({
+        id: String(link['@id'] || link.id || ''),
+        type: String(link['@type'] || link.type || ''),
+        value: String(link['@value'] || link.value || '')
+      })
+    }
+  })
+  
+  return links
+}
+
+/**
+ * Extract links from item object by type
+ */
+function extractLinksFromItem(item: any, type: string): string[] {
+  const links: string[] = []
+  
+  if (!item.link) return links
+  
+  const linkElements = Array.isArray(item.link) ? item.link : [item.link]
+  
+  linkElements.forEach((link: any) => {
+    if (link && (link['@type'] === type || link.type === type) && (link['@value'] || link.value)) {
+      const linkValue = link['@value'] || link.value
+      if (linkValue) {
+        links.push(String(linkValue))
+      }
+    }
+  })
+  
+  return [...new Set(links)] // Remove duplicates
+}
+
+/**
+ * Extract versions from item object
+ */
+function extractVersionsFromItem(item: any): BGGGameVersion[] {
+  console.log(`🔍 extractVersionsFromItem called with item:`, item)
+  const versions: BGGGameVersion[] = []
+  
+  // Look for version elements within the game item
+  if (item.versions?.version) {
+    console.log(`✅ Found versions.version:`, item.versions.version)
+    const versionElements = Array.isArray(item.versions.version) 
+      ? item.versions.version 
+      : [item.versions.version]
+    
+    console.log(`📊 Processing ${versionElements.length} version elements`)
+    
+    versionElements.forEach((versionItem: any, index: number) => {
+      console.log(`🔍 Processing version ${index}:`, versionItem)
+      if (versionItem && (versionItem.id || versionItem['@id'])) {
+        const version = extractVersionData(versionItem)
+        console.log(`✅ Extracted version ${index}:`, version)
+        if (version) {
+          versions.push(version)
+        }
+      } else {
+        console.log(`❌ Version ${index} missing ID:`, versionItem)
+      }
+    })
+  } else {
+    console.log(`❌ No versions.version found in item`)
+  }
+  
+  // Check for version links (this is how BGG typically stores versions)
+  if (item.link) {
+    console.log(`🔍 Checking for version links in item.link:`, item.link)
+    const linkElements = Array.isArray(item.link) ? item.link : [item.link]
+    
+    linkElements.forEach((link: any) => {
+      if (link && link['@type'] === 'boardgameversion' && (link['@id'] || link.id)) {
+        console.log(`✅ Found version link:`, link)
+        
+        // Create a version entry from the link data
+        const version: BGGGameVersion = {
+          id: String(link['@id'] || link.id || ''),
+          name: String(link['@value'] || link.value || 'Unknown Version'),
+          yearpublished: '',
+          publishers: [],
+          languages: [],
+          productcode: '',
+          thumbnail: '',
+          image: '',
+          width: '',
+          length: '',
+          depth: '',
+          weight: '',
+          primaryLanguage: undefined,
+          isMultilingual: false,
+          languageCount: 0
+        }
+        versions.push(version)
+      }
+    })
+  }
+  
+  console.log(`📊 Final versions array:`, versions)
+  return versions
+}
+
+/**
+ * Extract publishers from item object
+ */
+function extractPublishersFromItem(item: any): string[] {
+  if (!item.publishers?.publisher) return []
+  
+  const publishers = Array.isArray(item.publishers.publisher) 
+    ? item.publishers.publisher 
+    : [item.publishers.publisher]
+  
+  return publishers
+    .filter((pub: any) => pub && (pub['@value'] || pub.value))
+    .map((pub: any) => String(pub['@value'] || pub.value))
+}
+
+/**
+ * Extract languages from item object
+ */
+function extractLanguagesFromItem(item: any): string[] {
+  if (!item.languages?.language) return []
+  
+  const languages = Array.isArray(item.languages.language) 
+    ? item.languages.language 
+    : [item.languages.language]
+  
+  return languages
+    .filter((lang: any) => lang && (lang['@value'] || lang.value))
+    .map((lang: any) => String(lang['@value'] || lang.value))
+}
+
+/**
+ * Extract version data from item
+ */
+function extractVersionData(item: any): BGGGameVersion | null {
+  if (!(item.id || item['@id']) || !(item.name || item.name?.value || item.name?.['@value'])) return null
+  
+  // Extract languages with better analysis
+  const languages = extractLanguagesFromItem(item)
+  const primaryLanguage = languages.length > 0 ? languages[0] : undefined
+  const isMultilingual = languages.length > 1
+  const languageCount = languages.length
+  
+  return {
+    id: String(item.id || item['@id'] || ''),
+    name: String(item.name?.['@value'] || item.name?.value || item.name || 'Unknown'),
+    yearpublished: String(item.yearpublished?.['@value'] || item.yearpublished?.value || item.yearpublished || ''),
+    publishers: extractPublishersFromItem(item),
+    languages,
+    productcode: String(item.productcode?.['@value'] || item.productcode || ''),
+    thumbnail: String(item.thumbnail?.['@value'] || item.thumbnail || ''),
+    image: String(item.image?.['@value'] || item.image || ''),
+    width: String(item.width?.['@value'] || item.width || ''),
+    length: String(item.length?.['@value'] || item.length || ''),
+    depth: String(item.depth?.['@value'] || item.depth || ''),
+    weight: String(item.weight?.['@value'] || item.weight || ''),
+    // Enhanced language information
+    primaryLanguage,
+    isMultilingual,
+    languageCount
+  }
+}
+
+/**
+ * Extract alternate names from item
+ */
+function extractAlternateNamesFromItem(item: any): string[] {
+  if (!item.name) return []
+  
+  const names = Array.isArray(item.name) ? item.name : [item.name]
+  const alternates: string[] = []
+  
+  names.forEach((name: any) => {
+    if (name && name['@type'] === 'alternate' && (name['@value'] || name.value)) {
+      const nameValue = name['@value'] || name.value
+      if (nameValue) {
+        alternates.push(String(nameValue))
+      }
+    }
+  })
+  
+  return alternates
+}
+
+/**
+ * Extract rank from item
+ */
+function extractRank(item: any): string | undefined {
+  if (!item.statistics?.ratings?.ranks?.rank) return undefined
+  
+  const ranks = Array.isArray(item.statistics.ratings.ranks.rank) 
+    ? item.statistics.ratings.ranks.rank 
+    : [item.statistics.ratings.ranks.rank]
+  
+  const boardgameRank = ranks.find((r: any) => r['@name'] === 'boardgame' || r.name === 'boardgame')
+  if (!boardgameRank) return undefined
+  
+  const rankValue = boardgameRank['@value'] || boardgameRank.value
+  return rankValue === 'Not Ranked' ? undefined : String(rankValue || '')
+}
+
+/**
+ * Extract Bayes average from item
+ */
+function extractBayesAverage(item: any): string | undefined {
+  const value = item.statistics?.ratings?.bayesaverage?.['@value'] || item.statistics?.ratings?.bayesaverage?.value
+  return value ? String(value) : undefined
+}
+
+/**
+ * Extract average rating from item
+ */
+function extractAverage(item: any): string | undefined {
+  const value = item.statistics?.ratings?.average?.['@value'] || item.statistics?.ratings?.average?.value
+  return value ? String(value) : undefined
+}
+
+/**
+ * Extract weight from item
+ */
+function extractWeight(item: any): string | undefined {
+  const value = item.statistics?.ratings?.averageweight?.['@value'] || item.statistics?.ratings?.averageweight?.value
+  return value ? String(value) : undefined
+}
+
+/**
+ * Validate XML structure
+ */
+export function validateXML(xmlText: string): boolean {
+  if (!xmlText || typeof xmlText !== 'string') {
+    return false
+  }
+  
+  const trimmed = xmlText.trim()
+  
+  // Check for basic XML structure
+  if (!trimmed.startsWith('<?xml') && !trimmed.startsWith('<')) {
+    return false
+  }
+  
+  // Check for opening and closing tags
+  const hasOpeningTag = /<[^>]+>/.test(trimmed)
+  const hasClosingTag = /<\/[^>]+>/.test(trimmed)
+  
+  return hasOpeningTag && hasClosingTag
+}
+
+/**
+ * Clean XML text for parsing
+ */
+export function cleanXML(xmlText: string): string {
+  if (!xmlText) return ''
+  
+  return xmlText
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
+    .replace(/&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;') // Fix unescaped ampersands
+    .trim()
+}
+
+/**
+ * Smart language matching for versions and alternate names
+ */
+export function matchLanguageToAlternateName(
+  version: BGGGameVersion,
+  alternateNames: string[]
+): LanguageMatchedVersion {
+  const result: LanguageMatchedVersion = {
+    version,
+    languageMatch: 'none',
+    confidence: 0,
+    reasoning: 'No language match found'
+  }
+
+  if (!version.primaryLanguage || alternateNames.length === 0) {
+    return result
+  }
+
+  // Try to find exact language matches
+  const exactMatches = findExactLanguageMatches(version, alternateNames)
+  if (exactMatches.length > 0) {
+    result.suggestedAlternateName = exactMatches[0].name
+    result.languageMatch = 'exact'
+    result.confidence = exactMatches[0].confidence
+    result.reasoning = `Exact ${version.primaryLanguage} language match found`
+    return result
+  }
+
+  // Try partial matches (e.g., multilingual versions)
+  const partialMatches = findPartialLanguageMatches(version, alternateNames)
+  if (partialMatches.length > 0) {
+    result.suggestedAlternateName = partialMatches[0].name
+    result.languageMatch = 'partial'
+    result.confidence = partialMatches[0].confidence
+    result.reasoning = `Partial language match in ${version.primaryLanguage} version`
+    return result
+  }
+
+  // Fallback: suggest primary name if available
+  if (alternateNames.length > 0) {
+    result.suggestedAlternateName = alternateNames[0]
+    result.languageMatch = 'none'
+    result.confidence = 0.1
+    result.reasoning = 'Fallback to primary name (no language match)'
+  }
+
+  return result
+}
+
+/**
+ * Find exact language matches between version and alternate names
+ */
+function findExactLanguageMatches(
+  version: BGGGameVersion,
+  alternateNames: string[]
+): Array<{ name: string; confidence: number }> {
+  const matches: Array<{ name: string; confidence: number }> = []
+  
+  // This is a simplified version - in practice, we'd use more sophisticated
+  // language detection based on BGG's explicit language tags
+  for (const name of alternateNames) {
+    let confidence = 0
+    
+    // Check if name contains language-specific characters or patterns
+    if (version.primaryLanguage === 'German' && containsGermanCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'French' && containsFrenchCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Spanish' && containsSpanishCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'English' && isEnglishName(name)) {
+      confidence = 0.8
+    }
+    
+    if (confidence > 0) {
+      matches.push({ name, confidence })
+    }
+  }
+  
+  return matches.sort((a, b) => b.confidence - a.confidence)
+}
+
+/**
+ * Find partial language matches (e.g., multilingual versions)
+ */
+function findPartialLanguageMatches(
+  version: BGGGameVersion,
+  alternateNames: string[]
+): Array<{ name: string; confidence: number }> {
+  if (!version.isMultilingual) return []
+  
+  const matches: Array<{ name: string; confidence: number }> = []
+  
+  for (const name of alternateNames) {
+    // For multilingual versions, we can be less strict
+    let confidence = 0.3 // Base confidence for multilingual
+    
+    // Boost confidence if name seems to match any of the version languages
+    if (version.languages.some(lang => name.toLowerCase().includes(lang.toLowerCase()))) {
+      confidence += 0.2
+    }
+    
+    if (confidence > 0) {
+      matches.push({ name, confidence })
+    }
+  }
+  
+  return matches.sort((a, b) => b.confidence - a.confidence)
+}
+
+/**
+ * Simple language detection helpers
+ */
+function containsGermanCharacters(text: string): boolean {
+  return /[äöüßÄÖÜ]/.test(text)
+}
+
+function containsFrenchCharacters(text: string): boolean {
+  return /[àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ]/.test(text)
+}
+
+function containsSpanishCharacters(text: string): boolean {
+  return /[áéíóúñüÁÉÍÓÚÑÜ]/.test(text)
+}
+
+function isEnglishName(text: string): boolean {
+  // Simple heuristic: English names typically don't have special characters
+  // and are usually shorter than translations
+  return !/[àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇäöüßÄÖÜáéíóúñüÁÉÍÓÚÑÜ]/.test(text) && text.length < 30
+}

@@ -100,7 +100,7 @@ export class BGGAPIClient {
    */
   async getGameDetails(
     gameId: string, 
-    gameType: 'boardgame' | 'boardgameexpansion' = 'boardgame'
+    _gameType: 'boardgame' | 'boardgameexpansion' = 'boardgame'
   ): Promise<string> {
     const params: Record<string, string> = {
       id: gameId,
@@ -173,7 +173,7 @@ export class BGGAPIClient {
 
     // Check hourly limit
     if (this.requestCount >= 800) {
-      const waitTime = 60 * 60 * 1000 - (now - this.lastResetTime)
+      // const waitTime = 60 * 60 * 1000 - (now - this.lastResetTime) // Unused variable
       throw new Error(BGG_ERROR_MESSAGES.RATE_LIMIT_EXCEEDED)
     }
 

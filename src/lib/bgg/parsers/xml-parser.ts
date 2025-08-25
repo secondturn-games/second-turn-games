@@ -271,13 +271,7 @@ function extractBasicMetadata(item: any): Partial<BGGAPIMetadata> {
     return ''
   }
 
-  const extractArrayValue = (field: any): string[] => {
-    if (!field) return []
-    if (Array.isArray(field)) {
-      return field.map(extractValue).filter(Boolean)
-    }
-    return [extractValue(field)].filter(Boolean)
-  }
+
 
   // Special handling for name field - find primary name
   const extractPrimaryName = (nameField: any): string => {

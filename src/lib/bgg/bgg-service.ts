@@ -440,7 +440,7 @@ export class BGGService {
   /**
    * Get expired cache results as fallback
    */
-  private getExpiredCacheResults(query: string, filters?: SearchFilters): BGGSearchResult[] {
+  private getExpiredCacheResults(_query: string, _filters?: SearchFilters): BGGSearchResult[] {
     // This would check for expired cache entries
     // For now, return empty array
     return []

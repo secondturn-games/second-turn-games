@@ -119,11 +119,7 @@ export function BGGTest() {
     setShowVersionSelection(false)
   }
 
-  const resetVersionSelection = () => {
-    setSelectedVersion(null)
-    setVersions([])
-    setShowVersionSelection(false)
-  }
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-soft">
@@ -385,7 +381,7 @@ export function BGGTest() {
             Manually Fetch Versions
           </button>
           <p className="text-xs text-dark-green-500 mt-1">
-            Use this button if versions don't appear automatically
+            Use this button if versions don&apos;t appear automatically
           </p>
         </div>
       )}

@@ -432,17 +432,25 @@ function extractVersionsFromItem(item: any): BGGGameVersion[] {
   const versions: BGGGameVersion[] = []
   
   // Look for version elements within the game item
-  if (item.versions?.version) {
-    console.log(`✅ Found versions.version:`, item.versions.version)
-    const versionElements = Array.isArray(item.versions.version) 
-      ? item.versions.version 
-      : [item.versions.version]
+  if (item.versions?.item) {
+    console.log(`✅ Found versions.item:`, item.versions.item)
+    const versionElements = Array.isArray(item.versions.item) 
+      ? item.versions.item 
+      : [item.versions.item]
     
     console.log(`📊 Processing ${versionElements.length} version elements`)
     
     versionElements.forEach((versionItem: any, index: number) => {
       console.log(`🔍 Processing version ${index}:`, versionItem)
       if (versionItem && (versionItem.id || versionItem['@id'])) {
+        console.log(`🔍 Version ${index} structure:`, {
+          id: versionItem.id || versionItem['@id'],
+          name: versionItem.name,
+          yearpublished: versionItem.yearpublished,
+          hasLinks: !!versionItem.link,
+          linkCount: versionItem.link ? (Array.isArray(versionItem.link) ? versionItem.link.length : 1) : 0
+        })
+        
         const version = extractVersionData(versionItem)
         console.log(`✅ Extracted version ${index}:`, version)
         if (version) {
@@ -453,7 +461,7 @@ function extractVersionsFromItem(item: any): BGGGameVersion[] {
       }
     })
   } else {
-    console.log(`❌ No versions.version found in item`)
+    console.log(`❌ No versions.item found in item`)
   }
   
   // Check for version links (this is how BGG typically stores versions)

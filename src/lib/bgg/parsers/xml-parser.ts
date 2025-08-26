@@ -801,12 +801,36 @@ export function matchLanguageToAlternateName(
     return result
   }
 
+  // Special handling for English versions - always use primary game name
+  if (version.primaryLanguage === 'English') {
+    if (primaryGameName) {
+      result.suggestedAlternateName = primaryGameName
+      result.languageMatch = 'none'
+      result.confidence = 0.1
+      result.reasoning = 'English version - using primary game name'
+      return result
+    }
+  }
+
   // Try to find exact language matches
   const exactMatches = findExactLanguageMatches(version, alternateNames)
   if (exactMatches.length > 0) {
-    result.suggestedAlternateName = exactMatches[0].name
+    const bestMatch = exactMatches[0]
+    
+    // If confidence is below 85%, use primary game name instead
+    if (bestMatch.confidence < 0.85) {
+      if (primaryGameName) {
+        result.suggestedAlternateName = primaryGameName
+        result.languageMatch = 'none'
+        result.confidence = 0.1
+        result.reasoning = `Low confidence match (${(bestMatch.confidence * 100).toFixed(0)}%) - using primary game name`
+        return result
+      }
+    }
+    
+    result.suggestedAlternateName = bestMatch.name
     result.languageMatch = 'exact'
-    result.confidence = exactMatches[0].confidence
+    result.confidence = bestMatch.confidence
     result.reasoning = `Exact ${version.primaryLanguage} language match found`
     return result
   }
@@ -814,9 +838,22 @@ export function matchLanguageToAlternateName(
   // Try partial matches (e.g., multilingual versions)
   const partialMatches = findPartialLanguageMatches(version, alternateNames)
   if (partialMatches.length > 0) {
-    result.suggestedAlternateName = partialMatches[0].name
+    const bestPartialMatch = partialMatches[0]
+    
+    // If confidence is below 85%, use primary game name instead
+    if (bestPartialMatch.confidence < 0.85) {
+      if (primaryGameName) {
+        result.suggestedAlternateName = primaryGameName
+        result.languageMatch = 'none'
+        result.confidence = 0.1
+        result.reasoning = `Low confidence partial match (${(bestPartialMatch.confidence * 100).toFixed(0)}%) - using primary game name`
+        return result
+      }
+    }
+    
+    result.suggestedAlternateName = bestPartialMatch.name
     result.languageMatch = 'partial'
-    result.confidence = partialMatches[0].confidence
+    result.confidence = bestPartialMatch.confidence
     result.reasoning = `Partial language match in ${version.primaryLanguage} version`
     return result
   }
@@ -866,6 +903,14 @@ function findExactLanguageMatches(
     } else if (version.primaryLanguage === 'Japanese' && containsJapaneseCharacters(name)) {
       confidence = 0.9
     } else if (version.primaryLanguage === 'Korean' && containsKoreanCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Latvian' && containsLatvianCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Lithuanian' && containsLithuanianCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Estonian' && containsEstonianCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Russian' && containsRussianCharacters(name)) {
       confidence = 0.9
     }
     
@@ -935,8 +980,28 @@ function containsKoreanCharacters(text: string): boolean {
   return /[\uac00-\ud7af]/.test(text)
 }
 
+function containsLatvianCharacters(text: string): boolean {
+  // Latvian characters (ā, ē, ī, ū, ķ, ļ, ņ, ģ, š, ž, č)
+  return /[āēīūķļņģšžčĀĒĪŪĶĻŅĢŠŽČ]/.test(text)
+}
+
+function containsLithuanianCharacters(text: string): boolean {
+  // Lithuanian characters (ą, ę, į, ų, ū, č, š, ž)
+  return /[ąęįųūčšžĄĘĮŲŪČŠŽ]/.test(text)
+}
+
+function containsEstonianCharacters(text: string): boolean {
+  // Estonian characters (ä, ö, ü, õ, š, ž)
+  return /[äöüõšžÄÖÜÕŠŽ]/.test(text)
+}
+
+function containsRussianCharacters(text: string): boolean {
+  // Russian characters (Cyrillic script)
+  return /[\u0400-\u04FF]/.test(text)
+}
+
 function isEnglishName(text: string): boolean {
   // Simple heuristic: English names typically don't have special characters
   // and are usually shorter than translations
-  return !/[àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇäöüßÄÖÜáéíóúñüÁÉÍÓÚÑÜ\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(text) && text.length < 30
+  return !/[àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇäöüßÄÖÜáéíóúñüÁÉÍÓÚÑÜ\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7afāēīūķļņģšžčĀĒĪŪĶĻŅĢŠŽČąęįųūčšžĄĘĮŲŪČŠŽäöüõšžÄÖÜÕŠŽ\u0400-\u04FF]/.test(text) && text.length < 30
 }

@@ -455,12 +455,28 @@ function extractVersionsFromItem(item: any): BGGGameVersion[] {
         console.log(`📊 Version ${index} ALL fields:`, Object.keys(versionItem))
         console.log(`📊 Version ${index} FULL data:`, versionItem)
         
+        // Deep dive into specific fields that should contain data
+        console.log(`🔍 Version ${index} deep analysis:`)
+        console.log(`  - name:`, versionItem.name)
+        console.log(`  - publishers:`, versionItem.publishers)
+        console.log(`  - languages:`, versionItem.languages)
+        console.log(`  - productcode:`, versionItem.productcode)
+        console.log(`  - thumbnail:`, versionItem.thumbnail)
+        console.log(`  - image:`, versionItem.image)
+        console.log(`  - link:`, versionItem.link ? `Array(${Array.isArray(versionItem.link) ? versionItem.link.length : 1})` : 'None')
+        
         // Specifically look for language-related fields
         if (versionItem.link && Array.isArray(versionItem.link)) {
           const languageLinks = versionItem.link.filter((link: any) => 
             link?.['@type'] === 'language' || link?.type === 'language'
           )
           console.log(`🌐 Version ${index} language links:`, languageLinks)
+          
+          // Also check for publisher links
+          const publisherLinks = versionItem.link.filter((link: any) => 
+            link?.['@type'] === 'boardgamepublisher' || link?.type === 'boardgamepublisher'
+          )
+          console.log(`🏢 Version ${index} publisher links:`, publisherLinks)
         }
         
         const version = extractVersionData(versionItem)
@@ -535,30 +551,98 @@ function extractVersionsFromItem(item: any): BGGGameVersion[] {
  * Extract publishers from item object
  */
 function extractPublishersFromItem(item: any): string[] {
-  if (!item.publishers?.publisher) return []
+  // First try direct publishers field
+  if (item.publishers?.publisher) {
+    const publishers = Array.isArray(item.publishers.publisher) 
+      ? item.publishers.publisher 
+      : [item.publishers.publisher]
+    
+    const directPublishers = publishers
+      .filter((pub: any) => pub && (pub['@value'] || pub.value))
+      .map((pub: any) => String(pub['@value'] || pub.value))
+    
+    if (directPublishers.length > 0) {
+      return directPublishers
+    }
+  }
   
-  const publishers = Array.isArray(item.publishers.publisher) 
-    ? item.publishers.publisher 
-    : [item.publishers.publisher]
+  // Fallback: look for publisher links
+  if (item.link && Array.isArray(item.link)) {
+    const publisherLinks = item.link
+      .filter((link: any) => link?.['@type'] === 'boardgamepublisher' || link?.type === 'boardgamepublisher')
+      .map((link: any) => String(link?.['@value'] || link?.value || ''))
+      .filter(Boolean)
+    
+    if (publisherLinks.length > 0) {
+      return publisherLinks
+    }
+  }
   
-  return publishers
-    .filter((pub: any) => pub && (pub['@value'] || pub.value))
-    .map((pub: any) => String(pub['@value'] || pub.value))
+  return []
+}
+
+/**
+ * Extract product code from item object
+ */
+function extractProductCode(productcode: any): string {
+  if (!productcode) return ''
+  
+  // Handle string values
+  if (typeof productcode === 'string') return productcode
+  
+  // Handle object with @value or value attributes
+  if (productcode['@value']) return String(productcode['@value'])
+  if (productcode.value) return String(productcode.value)
+  
+  // Handle object with direct value property
+  if (productcode.productcode) return String(productcode.productcode)
+  
+  // Fallback: try to stringify and extract meaningful content
+  try {
+    const str = JSON.stringify(productcode)
+    if (str && str !== '{}' && str !== '[]') {
+      // Remove quotes and braces
+      return str.replace(/[{}"[\]]/g, '')
+    }
+  } catch (e) {
+    // Ignore JSON errors
+  }
+  
+  return ''
 }
 
 /**
  * Extract languages from item object
  */
 function extractLanguagesFromItem(item: any): string[] {
-  if (!item.languages?.language) return []
+  // First try direct languages field
+  if (item.languages?.language) {
+    const languages = Array.isArray(item.languages.language) 
+      ? item.languages.language 
+      : [item.languages.language]
+    
+    const directLanguages = languages
+      .filter((lang: any) => lang && (lang['@value'] || lang.value))
+      .map((lang: any) => String(lang['@value'] || lang.value))
+    
+    if (directLanguages.length > 0) {
+      return directLanguages
+    }
+  }
   
-  const languages = Array.isArray(item.languages.language) 
-    ? item.languages.language 
-    : [item.languages.language]
+  // Fallback: look for language links
+  if (item.link && Array.isArray(item.link)) {
+    const languageLinks = item.link
+      .filter((link: any) => link?.['@type'] === 'language' || link?.type === 'language')
+      .map((link: any) => String(link?.['@value'] || link?.value || ''))
+      .filter(Boolean)
+    
+    if (languageLinks.length > 0) {
+      return languageLinks
+    }
+  }
   
-  return languages
-    .filter((lang: any) => lang && (lang['@value'] || lang.value))
-    .map((lang: any) => String(lang['@value'] || lang.value))
+  return []
 }
 
 /**
@@ -579,13 +663,13 @@ function extractVersionData(item: any): BGGGameVersion | null {
     yearpublished: String(item.yearpublished?.['@value'] || item.yearpublished?.value || item.yearpublished || ''),
     publishers: extractPublishersFromItem(item),
     languages,
-    productcode: String(item.productcode?.['@value'] || item.productcode || ''),
-    thumbnail: String(item.thumbnail?.['@value'] || item.thumbnail || ''),
-    image: String(item.image?.['@value'] || item.image || ''),
-    width: String(item.width?.['@value'] || item.width || ''),
-    length: String(item.length?.['@value'] || item.length || ''),
-    depth: String(item.depth?.['@value'] || item.depth || ''),
-    weight: String(item.weight?.['@value'] || item.weight || ''),
+    productcode: extractProductCode(item.productcode),
+    thumbnail: String(item.thumbnail?.['@value'] || item.thumbnail?.value || item.thumbnail || ''),
+    image: String(item.image?.['@value'] || item.image?.value || item.image || ''),
+    width: String(item.width?.['@value'] || item.width?.value || item.width || ''),
+    length: String(item.length?.['@value'] || item.length?.value || item.length || ''),
+    depth: String(item.depth?.['@value'] || item.depth?.value || item.depth || ''),
+    weight: String(item.weight?.['@value'] || item.weight?.value || item.weight || ''),
     // Enhanced language information
     primaryLanguage,
     isMultilingual,
@@ -696,7 +780,8 @@ export function cleanXML(xmlText: string): string {
  */
 export function matchLanguageToAlternateName(
   version: BGGGameVersion,
-  alternateNames: string[]
+  alternateNames: string[],
+  primaryGameName?: string
 ): LanguageMatchedVersion {
   const result: LanguageMatchedVersion = {
     version,
@@ -706,6 +791,13 @@ export function matchLanguageToAlternateName(
   }
 
   if (!version.primaryLanguage || alternateNames.length === 0) {
+    // If no language info, suggest primary game name
+    if (primaryGameName) {
+      result.suggestedAlternateName = primaryGameName
+      result.languageMatch = 'none'
+      result.confidence = 0.1
+      result.reasoning = 'Fallback to primary game name (no language info)'
+    }
     return result
   }
 
@@ -729,16 +821,22 @@ export function matchLanguageToAlternateName(
     return result
   }
 
-  // Fallback: suggest primary name if available
-  if (alternateNames.length > 0) {
-    result.suggestedAlternateName = alternateNames[0]
+  // Fallback: use primary game name instead of first alternate name
+  if (primaryGameName) {
+    result.suggestedAlternateName = primaryGameName
     result.languageMatch = 'none'
     result.confidence = 0.1
-    result.reasoning = 'Fallback to primary name (no language match)'
+    result.reasoning = 'Fallback to primary game name (no language match)'
+  } else if (alternateNames.length > 0) {
+    // Only use alternate names if no primary name available
+    result.suggestedAlternateName = alternateNames[0]
+    result.languageMatch = 'none'
+    result.confidence = 0.05
+    result.reasoning = 'Fallback to first alternate name (no primary name available)'
   }
 
   return result
-}
+ }
 
 /**
  * Find exact language matches between version and alternate names
@@ -763,6 +861,12 @@ function findExactLanguageMatches(
       confidence = 0.9
     } else if (version.primaryLanguage === 'English' && isEnglishName(name)) {
       confidence = 0.8
+    } else if (version.primaryLanguage === 'Chinese' && containsChineseCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Japanese' && containsJapaneseCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Korean' && containsKoreanCharacters(name)) {
+      confidence = 0.9
     }
     
     if (confidence > 0) {
@@ -816,8 +920,23 @@ function containsSpanishCharacters(text: string): boolean {
   return /[áéíóúñüÁÉÍÓÚÑÜ]/.test(text)
 }
 
+function containsChineseCharacters(text: string): boolean {
+  // Chinese characters (Simplified and Traditional)
+  return /[\u4e00-\u9fff]/.test(text)
+}
+
+function containsJapaneseCharacters(text: string): boolean {
+  // Japanese characters (Hiragana, Katakana, and Kanji)
+  return /[\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fff]/.test(text)
+}
+
+function containsKoreanCharacters(text: string): boolean {
+  // Korean characters (Hangul)
+  return /[\uac00-\ud7af]/.test(text)
+}
+
 function isEnglishName(text: string): boolean {
   // Simple heuristic: English names typically don't have special characters
   // and are usually shorter than translations
-  return !/[àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇäöüßÄÖÜáéíóúñüÁÉÍÓÚÑÜ]/.test(text) && text.length < 30
+  return !/[àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇäöüßÄÖÜáéíóúñüÁÉÍÓÚÑÜ\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]/.test(text) && text.length < 30
 }

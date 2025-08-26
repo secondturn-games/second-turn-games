@@ -439,27 +439,50 @@ export function BGGTest() {
                   </div>
                 </div>
 
-                {/* Language Info */}
-                <div className="mb-3 space-y-2">
-                  <div className="flex items-center gap-2 text-xs">
-                    <Languages className="w-3 h-3 text-dark-green-500" />
-                    <span className="text-dark-green-600">
-                      {versionMatch.version.isMultilingual ? 'Multilingual' : versionMatch.version.primaryLanguage}
-                    </span>
-                    {versionMatch.version.isMultilingual && (
-                      <span className="text-xs text-dark-green-400">
-                        ({versionMatch.version.languageCount} languages)
-                      </span>
-                    )}
-                  </div>
-                  
-                  {versionMatch.version.yearpublished && (
-                    <div className="flex items-center gap-2 text-xs">
-                      <Calendar className="w-3 h-3 text-dark-green-500" />
-                      <span className="text-dark-green-600">{versionMatch.version.yearpublished}</span>
-                    </div>
-                  )}
-                </div>
+                                 {/* Version Image */}
+                 {versionMatch.version.thumbnail && (
+                   <div className="mb-3 aspect-[4/3] rounded-lg overflow-hidden bg-dark-green-100">
+                     <img
+                       src={versionMatch.version.thumbnail}
+                       alt={versionMatch.version.name}
+                       className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                       onError={(e) => {
+                         // Hide image on error
+                         (e.target as HTMLImageElement).style.display = 'none'
+                       }}
+                     />
+                   </div>
+                 )}
+                 
+                 {/* Language Info */}
+                 <div className="mb-3 space-y-2">
+                   <div className="flex items-center gap-2 text-xs">
+                     <Languages className="w-3 h-3 text-dark-green-500" />
+                     <span className="text-dark-green-600">
+                       {versionMatch.version.isMultilingual ? 'Multilingual' : versionMatch.version.primaryLanguage}
+                     </span>
+                     {versionMatch.version.isMultilingual && (
+                       <span className="text-xs text-dark-green-400">
+                         ({versionMatch.version.languageCount} languages)
+                       </span>
+                     )}
+                   </div>
+                   
+                   {versionMatch.version.yearpublished && (
+                     <div className="flex items-center gap-2 text-xs">
+                       <Calendar className="w-3 h-3 text-dark-green-500" />
+                       <span className="text-dark-green-600">{versionMatch.version.yearpublished}</span>
+                     </div>
+                   )}
+                   
+                   {/* Product Code */}
+                   {versionMatch.version.productcode && (
+                     <div className="flex items-center gap-2 text-xs">
+                       <Hash className="w-3 h-3 text-dark-green-500" />
+                       <span className="text-dark-green-600 font-mono">{versionMatch.version.productcode}</span>
+                     </div>
+                   )}
+                 </div>
 
                 {/* Smart Name Suggestion */}
                 {versionMatch.suggestedAlternateName && (

@@ -430,7 +430,7 @@ export class BGGService {
     }
 
     const languageMatchedVersions = versions.map((version: any) => 
-      matchLanguageToAlternateName(version, alternateNames)
+      matchLanguageToAlternateName(version, alternateNames, gameDetails.name)
     ).sort((a: LanguageMatchedVersion, b: LanguageMatchedVersion) => b.confidence - a.confidence)
 
     console.log(`✅ Language-matched versions created:`, languageMatchedVersions.length)

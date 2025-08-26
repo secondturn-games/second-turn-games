@@ -451,6 +451,18 @@ function extractVersionsFromItem(item: any): BGGGameVersion[] {
           linkCount: versionItem.link ? (Array.isArray(versionItem.link) ? versionItem.link.length : 1) : 0
         })
         
+        // Log ALL available fields in this version item
+        console.log(`📊 Version ${index} ALL fields:`, Object.keys(versionItem))
+        console.log(`📊 Version ${index} FULL data:`, versionItem)
+        
+        // Specifically look for language-related fields
+        if (versionItem.link && Array.isArray(versionItem.link)) {
+          const languageLinks = versionItem.link.filter((link: any) => 
+            link?.['@type'] === 'language' || link?.type === 'language'
+          )
+          console.log(`🌐 Version ${index} language links:`, languageLinks)
+        }
+        
         const version = extractVersionData(versionItem)
         console.log(`✅ Extracted version ${index}:`, version)
         if (version) {

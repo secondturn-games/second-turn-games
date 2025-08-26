@@ -393,6 +393,17 @@ export function BGGTest() {
             <Globe className="w-5 h-5" />
             Select Version ({versions.length} available)
           </h3>
+          
+          {/* Raw Version Data for Debugging */}
+          <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h4 className="font-medium text-yellow-800 mb-2">🔍 Raw Version Data (Debug)</h4>
+            <details className="text-sm text-yellow-700">
+              <summary className="cursor-pointer hover:text-yellow-800">Click to expand raw data</summary>
+              <pre className="mt-2 p-2 bg-white rounded border overflow-auto max-h-96 text-xs">
+                {JSON.stringify(versions, null, 2)}
+              </pre>
+            </details>
+          </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {versions.map((versionMatch) => (
               <div

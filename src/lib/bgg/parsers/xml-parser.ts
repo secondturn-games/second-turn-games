@@ -583,31 +583,10 @@ function extractPublishersFromItem(item: any): string[] {
 
 /**
  * Extract product code from item object
+ * Note: This field is not used in the marketplace, so we return empty string
  */
 function extractProductCode(productcode: any): string {
-  if (!productcode) return ''
-  
-  // Handle string values
-  if (typeof productcode === 'string') return productcode
-  
-  // Handle object with @value or value attributes
-  if (productcode['@value']) return String(productcode['@value'])
-  if (productcode.value) return String(productcode.value)
-  
-  // Handle object with direct value property
-  if (productcode.productcode) return String(productcode.productcode)
-  
-  // Fallback: try to stringify and extract meaningful content
-  try {
-    const str = JSON.stringify(productcode)
-    if (str && str !== '{}' && str !== '[]') {
-      // Remove quotes and braces
-      return str.replace(/[{}"[\]]/g, '')
-    }
-  } catch (e) {
-    // Ignore JSON errors
-  }
-  
+  // Product code is not needed for marketplace functionality
   return ''
 }
 
@@ -781,13 +760,25 @@ export function cleanXML(xmlText: string): string {
 export function matchLanguageToAlternateName(
   version: BGGGameVersion,
   alternateNames: string[],
-  primaryGameName?: string
+  primaryGameName?: string,
+  totalVersions: number = 1
 ): LanguageMatchedVersion {
   const result: LanguageMatchedVersion = {
     version,
     languageMatch: 'none',
     confidence: 0,
     reasoning: 'No language match found'
+  }
+
+  // If only one version available, use primary game name directly
+  if (totalVersions === 1) {
+    if (primaryGameName) {
+      result.suggestedAlternateName = primaryGameName
+      result.languageMatch = 'none'
+      result.confidence = 0.1
+      result.reasoning = 'Single version - using primary game name'
+      return result
+    }
   }
 
   if (!version.primaryLanguage || alternateNames.length === 0) {

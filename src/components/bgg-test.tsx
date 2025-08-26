@@ -475,13 +475,7 @@ export function BGGTest() {
                      </div>
                    )}
                    
-                   {/* Product Code */}
-                   {versionMatch.version.productcode && (
-                     <div className="flex items-center gap-2 text-xs">
-                       <Hash className="w-3 h-3 text-dark-green-500" />
-                       <span className="text-dark-green-600 font-mono">{versionMatch.version.productcode}</span>
-                     </div>
-                   )}
+                                         {/* Product Code - Not displayed in marketplace */}
                  </div>
 
                 {/* Smart Name Suggestion */}

@@ -24,7 +24,14 @@ export function parseXML(xmlText: string): any {
         console.warn('XML parsing warning:', parseError[0].textContent)
       }
       
-      return xmlToObject(xmlDoc.documentElement)
+      // Log the raw XML structure for debugging
+      console.log('🔍 Raw XML document structure:')
+      console.log('📊 Root element:', xmlDoc.documentElement.tagName)
+      console.log('📊 Root attributes:', Array.from(xmlDoc.documentElement.attributes).map(attr => `${attr.name}="${attr.value}"`))
+      
+      const result = xmlToObject(xmlDoc.documentElement)
+      console.log('📊 Parsed result structure:', result)
+      return result
     }
     
     // Fallback for Node.js environments
@@ -224,6 +231,22 @@ export function extractMetadata(xmlText: string): BGGAPIMetadata[] {
   
   const parsed = parseXML(xmlText)
   console.log('🔍 Parsed XML result:', parsed)
+  
+  // Log the raw XML structure for debugging
+  console.log('🔍 Raw XML structure analysis:')
+  if (parsed?.item) {
+    const item = parsed.item
+    console.log('📊 Item structure keys:', Object.keys(item))
+    console.log('📊 Item link structure:', item.link ? {
+      isArray: Array.isArray(item.link),
+      length: Array.isArray(item.link) ? item.link.length : 1,
+      sampleLink: Array.isArray(item.link) ? item.link[0] : item.link
+    } : 'No links found')
+    
+    if (item.link && Array.isArray(item.link)) {
+      console.log('📊 Link types found:', item.link.map((link: any) => link?.['@type'] || link?.type).filter(Boolean))
+    }
+  }
   
   // Check for items at the root level (since BGG returns <items> as root)
   let items = parsed?.item
@@ -438,7 +461,17 @@ function extractVersionsFromItem(item: any): BGGGameVersion[] {
     console.log(`🔍 Checking for version links in item.link:`, item.link)
     const linkElements = Array.isArray(item.link) ? item.link : [item.link]
     
-    linkElements.forEach((link: any) => {
+    console.log(`📊 Total link elements found:`, linkElements.length)
+    
+    linkElements.forEach((link: any, index: number) => {
+      console.log(`🔍 Examining link ${index}:`, {
+        type: link?.['@type'] || link?.type,
+        id: link?.['@id'] || link?.id,
+        value: link?.['@value'] || link?.value,
+        inbound: link?.['@inbound'] || link?.inbound,
+        fullLink: link
+      })
+      
       if (link && link['@type'] === 'boardgameversion' && (link['@id'] || link.id)) {
         console.log(`✅ Found version link:`, link)
         
@@ -461,8 +494,17 @@ function extractVersionsFromItem(item: any): BGGGameVersion[] {
           languageCount: 0
         }
         versions.push(version)
+      } else {
+        console.log(`❌ Link ${index} is not a version link:`, {
+          hasType: !!link?.['@type'] || !!link?.type,
+          typeValue: link?.['@type'] || link?.type,
+          isVersionType: (link?.['@type'] || link?.type) === 'boardgameversion',
+          hasId: !!(link?.['@id'] || link?.id)
+        })
       }
     })
+  } else {
+    console.log(`❌ No link elements found in item`)
   }
   
   console.log(`📊 Final versions array:`, versions)
@@ -626,6 +668,8 @@ export function cleanXML(xmlText: string): string {
     .replace(/&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;') // Fix unescaped ampersands
     .trim()
 }
+
+
 
 /**
  * Smart language matching for versions and alternate names

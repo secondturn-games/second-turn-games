@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Users, Clock, Cake, Star, Euro, MapPin, Truck, Package, Ruler, Weight, Languages, Building2, Tag, Camera } from 'lucide-react'
+import { Calendar, Users, Star, MapPin, Truck, Package, Tag, Camera } from 'lucide-react'
 import type { ListingFormData } from './listing-wizard'
 
 interface ListingPreviewProps {
@@ -138,7 +138,7 @@ export function ListingPreview({ formData }: ListingPreviewProps) {
                   <span className="font-medium text-dark-green">Photos ({formData.photos.length})</span>
                 </div>
                 <div className="ml-4 flex space-x-1">
-                  {formData.photos.slice(0, 4).map((photo, index) => (
+                  {formData.photos.slice(0, 4).map((_, index) => (
                     <div key={index} className="w-6 h-6 bg-blue-50 border border-blue-200 rounded flex items-center justify-center">
                       <Camera className="w-3 h-3 text-blue-400" />
                     </div>

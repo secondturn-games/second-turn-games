@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Euro, Gavel, Package, RefreshCw, Gift, Heart } from 'lucide-react'
+import { Euro, Gavel, Package, RefreshCw, Gift } from 'lucide-react'
 import type { ListingFormData } from '../listing-wizard'
 
 interface ListingTypeStepProps {
@@ -66,7 +66,7 @@ export function ListingTypeStep({ formData, updateFormData, onNext }: ListingTyp
     <Card>
       <CardHeader>
         <CardTitle className="text-dark-green text-lg lg:text-xl">Choose Listing Type</CardTitle>
-        <p className="text-sm text-gray-600">Set the stage for your game's next adventure</p>
+        <p className="text-sm text-gray-600">Set the stage for your game&apos;s next adventure</p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 gap-4">

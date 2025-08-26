@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
@@ -18,7 +18,7 @@ interface GameSelectionStepProps {
   onBack: () => void
 }
 
-export function GameSelectionStep({ formData, updateFormData, onNext, onBack }: GameSelectionStepProps) {
+export function GameSelectionStep({ updateFormData, onNext, onBack }: GameSelectionStepProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [gameType, setGameType] = useState<'base-game' | 'expansion'>('base-game')
   const [searchResults, setSearchResults] = useState<BGGSearchResult[]>([])
@@ -119,7 +119,7 @@ export function GameSelectionStep({ formData, updateFormData, onNext, onBack }: 
     <Card>
       <CardHeader>
         <CardTitle className="text-dark-green text-lg lg:text-xl">Find Your Game</CardTitle>
-        <p className="text-sm text-gray-600">Choose whether you're looking for a Base Game or an Expansion, and we'll pull in the official details from BGG</p>
+        <p className="text-sm text-gray-600">Choose whether you&apos;re looking for a Base Game or an Expansion, and we&apos;ll pull in the official details from BGG</p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Game Type Switch */}
@@ -330,13 +330,19 @@ export function GameSelectionStep({ formData, updateFormData, onNext, onBack }: 
                       </div>
                       <div className="flex items-center gap-1">
                         {version.languageMatch === 'exact' && (
-                          <CheckCircle className="w-4 h-4 text-green-600" title="Exact language match" />
+                          <span title="Exact language match">
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                          </span>
                         )}
                         {version.languageMatch === 'partial' && (
-                          <AlertCircle className="w-4 h-4 text-yellow-600" title="Partial language match" />
+                          <span title="Partial language match">
+                            <AlertCircle className="w-4 h-4 text-yellow-600" />
+                          </span>
                         )}
                         {version.languageMatch === 'none' && (
-                          <Info className="w-4 h-4 text-gray-400" title="No language match" />
+                          <span title="No language match">
+                            <Info className="w-4 h-4 text-gray-400" />
+                          </span>
                         )}
                       </div>
                     </div>

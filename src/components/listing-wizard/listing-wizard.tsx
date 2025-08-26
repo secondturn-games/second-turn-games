@@ -7,7 +7,6 @@ import { ConditionPhotosStep } from './steps/condition-photos-step'
 import { PriceDeliveryStep } from './steps/price-delivery-step'
 import { ListingPreview } from './listing-preview'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react'
 
 export type ListingStep = 'listing-type' | 'game-selection' | 'condition-photos' | 'price-delivery'

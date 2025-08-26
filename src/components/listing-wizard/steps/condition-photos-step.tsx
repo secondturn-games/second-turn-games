@@ -3,11 +3,9 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Star, Camera, Upload, X, Plus, Check } from 'lucide-react'
+import { Star, Camera, Upload, X } from 'lucide-react'
 import type { ListingFormData } from '../listing-wizard'
 
 interface ConditionPhotosStepProps {

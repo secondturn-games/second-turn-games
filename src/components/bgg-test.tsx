@@ -454,29 +454,59 @@ export function BGGTest() {
                     </div>
                   )}
                  
-                 {/* Language Info */}
-                 <div className="mb-3 space-y-2">
-                   <div className="flex items-center gap-2 text-xs">
-                     <Languages className="w-3 h-3 text-dark-green-500" />
-                     <span className="text-dark-green-600">
-                       {versionMatch.version.isMultilingual ? 'Multilingual' : versionMatch.version.primaryLanguage}
-                     </span>
-                     {versionMatch.version.isMultilingual && (
-                       <span className="text-xs text-dark-green-400">
-                         ({versionMatch.version.languageCount} languages)
-                       </span>
-                     )}
-                   </div>
-                   
-                   {versionMatch.version.yearpublished && (
-                     <div className="flex items-center gap-2 text-xs">
-                       <Calendar className="w-3 h-3 text-dark-green-500" />
-                       <span className="text-dark-green-600">{versionMatch.version.yearpublished}</span>
-                     </div>
-                   )}
-                   
-                                         {/* Product Code - Not displayed in marketplace */}
-                 </div>
+                                   {/* Language Info */}
+                  <div className="mb-3 space-y-2">
+                    <div className="flex items-center gap-2 text-xs">
+                      <Languages className="w-3 h-3 text-dark-green-500" />
+                      <span className="text-dark-green-600">
+                        {versionMatch.version.isMultilingual ? 'Multilingual' : versionMatch.version.primaryLanguage}
+                      </span>
+                      {versionMatch.version.isMultilingual && (
+                        <span className="text-xs text-dark-green-400">
+                          ({versionMatch.version.languageCount} languages)
+                        </span>
+                      )}
+                    </div>
+                    
+                    {versionMatch.version.yearpublished && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <Calendar className="w-3 h-3 text-dark-green-500" />
+                        <span className="text-dark-green-600">{versionMatch.version.yearpublished}</span>
+                      </div>
+                    )}
+                    
+                    {/* Dimensions */}
+                    {versionMatch.version.dimensions?.hasDimensions && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className="w-3 h-3 text-dark-green-500">📏</div>
+                        <div className="text-dark-green-600">
+                          <div className="font-medium">Dimensions:</div>
+                          <div className="text-dark-green-500">
+                            {versionMatch.version.dimensions.metric}
+                          </div>
+                          <div className="text-dark-green-400 text-xs">
+                            ({versionMatch.version.dimensions.imperial})
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Weight */}
+                    {versionMatch.version.weightInfo?.rawValue && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className="w-3 h-3 text-dark-green-500">⚖️</div>
+                        <div className="text-dark-green-600">
+                          <div className="font-medium">Weight:</div>
+                          <div className="text-dark-green-500">
+                            {versionMatch.version.weightInfo.metric}
+                          </div>
+                          <div className="text-dark-green-400 text-xs">
+                            ({versionMatch.version.weightInfo.imperial})
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                 {/* Smart Name Suggestion */}
                 {versionMatch.suggestedAlternateName && (
@@ -516,17 +546,27 @@ export function BGGTest() {
                 Selected Version
               </h4>
               <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-vibrant-orange-700">
-                    <span className="font-medium">Version:</span> {selectedVersion.version.name}
-                  </p>
-                  <p className="text-sm text-vibrant-orange-700">
-                    <span className="font-medium">Language:</span> {selectedVersion.version.isMultilingual ? 'Multilingual' : selectedVersion.version.primaryLanguage}
-                  </p>
-                  <p className="text-sm text-vibrant-orange-700">
-                    <span className="font-medium">Year:</span> {selectedVersion.version.yearpublished}
-                  </p>
-                </div>
+                                 <div>
+                   <p className="text-sm text-vibrant-orange-700">
+                     <span className="font-medium">Version:</span> {selectedVersion.version.name}
+                   </p>
+                   <p className="text-sm text-vibrant-orange-700">
+                     <span className="font-medium">Language:</span> {selectedVersion.version.isMultilingual ? 'Multilingual' : selectedVersion.version.primaryLanguage}
+                   </p>
+                   <p className="text-sm text-vibrant-orange-700">
+                     <span className="font-medium">Year:</span> {selectedVersion.version.yearpublished}
+                   </p>
+                   {selectedVersion.version.dimensions?.hasDimensions && (
+                     <p className="text-sm text-vibrant-orange-700">
+                       <span className="font-medium">Dimensions:</span> {selectedVersion.version.dimensions.metric}
+                     </p>
+                   )}
+                   {selectedVersion.version.weightInfo?.rawValue && (
+                     <p className="text-sm text-vibrant-orange-700">
+                       <span className="font-medium">Weight:</span> {selectedVersion.version.weightInfo.metric}
+                     </p>
+                   )}
+                 </div>
                 <div>
                   {selectedVersion.suggestedAlternateName && (
                     <p className="text-sm text-vibrant-orange-700">

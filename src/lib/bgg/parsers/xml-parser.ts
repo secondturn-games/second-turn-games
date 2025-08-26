@@ -3,6 +3,7 @@
 // Handles parsing BGG XML responses with focus on accurate type classification
 
 import type { BGGAPISearchItem, BGGAPIMetadata, BGGGameVersion, LanguageMatchedVersion } from '../types'
+import { formatDimensions, parseAndConvertWeight } from '../utils/dimensions'
 
 /**
  * Parse XML string to JavaScript object
@@ -636,6 +637,11 @@ function extractVersionData(item: any): BGGGameVersion | null {
   const isMultilingual = languages.length > 1
   const languageCount = languages.length
   
+  const width = String(item.width?.['@value'] || item.width?.value || item.width || '')
+  const length = String(item.length?.['@value'] || item.length?.value || item.length || '')
+  const depth = String(item.depth?.['@value'] || item.depth?.value || item.depth || '')
+  const weight = String(item.weight?.['@value'] || item.weight?.value || item.weight || '')
+
   return {
     id: String(item.id || item['@id'] || ''),
     name: String(item.name?.['@value'] || item.name?.value || item.name || 'Unknown'),
@@ -645,14 +651,17 @@ function extractVersionData(item: any): BGGGameVersion | null {
     productcode: extractProductCode(item.productcode),
     thumbnail: String(item.thumbnail?.['@value'] || item.thumbnail?.value || item.thumbnail || ''),
     image: String(item.image?.['@value'] || item.image?.value || item.image || ''),
-    width: String(item.width?.['@value'] || item.width?.value || item.width || ''),
-    length: String(item.length?.['@value'] || item.length?.value || item.length || ''),
-    depth: String(item.depth?.['@value'] || item.depth?.value || item.depth || ''),
-    weight: String(item.weight?.['@value'] || item.weight?.value || item.weight || ''),
+    width,
+    length,
+    depth,
+    weight,
     // Enhanced language information
     primaryLanguage,
     isMultilingual,
-    languageCount
+    languageCount,
+    // Enhanced dimension information
+    dimensions: formatDimensions(width, length, depth),
+    weightInfo: parseAndConvertWeight(weight)
   }
 }
 

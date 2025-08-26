@@ -8,13 +8,19 @@
  */
 export async function extractTextFromImage(imageUrl: string): Promise<string | null> {
   try {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined') {
+      console.warn('OCR not available during server-side rendering')
+      return null
+    }
+    
     // Check if Shape Detection API is available (Chrome/Edge)
     if ('TextDetector' in window) {
       return await extractTextWithShapeDetection(imageUrl)
     }
     
     // Fallback: try to use Tesseract.js if available
-    if (typeof window !== 'undefined' && (window as any).Tesseract) {
+    if ((window as any).Tesseract) {
       return await extractTextWithTesseract(imageUrl)
     }
     
@@ -32,6 +38,11 @@ export async function extractTextFromImage(imageUrl: string): Promise<string | n
  */
 async function extractTextWithShapeDetection(imageUrl: string): Promise<string | null> {
   try {
+    // Ensure we're in a browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return null
+    }
+    
     const response = await fetch(imageUrl)
     const blob = await response.blob()
     
@@ -102,6 +113,11 @@ async function extractTextWithTesseract(imageUrl: string): Promise<string | null
  */
 async function extractTextWithImageAnalysis(imageUrl: string): Promise<string | null> {
   try {
+    // Ensure we're in a browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return null
+    }
+    
     const response = await fetch(imageUrl)
     const blob = await response.blob()
     
@@ -214,9 +230,11 @@ export function enhanceLanguageMatchingWithOCR(
  * Check if OCR is available in the current environment
  */
 export function isOCRAvailable(): boolean {
+  if (typeof window === 'undefined') return false
+  
   return (
     'TextDetector' in window ||
-    (typeof window !== 'undefined' && !!(window as any).Tesseract)
+    !!(window as any).Tesseract
   )
 }
 
@@ -226,13 +244,19 @@ export function isOCRAvailable(): boolean {
 export function getOCRRecommendations(): string[] {
   const recommendations = []
   
+  if (typeof window === 'undefined') {
+    recommendations.push('⚠️ Server-side rendering - OCR not available')
+    recommendations.push('💡 OCR will be available on the client side')
+    return recommendations
+  }
+  
   if ('TextDetector' in window) {
     recommendations.push('✅ Shape Detection API available (Chrome/Edge)')
   } else {
     recommendations.push('⚠️ Shape Detection API not available')
   }
   
-  if (typeof window !== 'undefined' && (window as any).Tesseract) {
+  if ((window as any).Tesseract) {
     recommendations.push('✅ Tesseract.js available')
   } else {
     recommendations.push('💡 Consider adding Tesseract.js for better OCR support')

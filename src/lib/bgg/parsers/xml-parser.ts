@@ -903,6 +903,32 @@ function findExactLanguageMatches(
       confidence = 0.9
     } else if (version.primaryLanguage === 'Russian' && containsRussianCharacters(name)) {
       confidence = 0.9
+    } else if (version.primaryLanguage === 'Bulgarian' && containsBulgarianCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Ukrainian' && containsUkrainianCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Italian' && containsItalianCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Portuguese' && containsPortugueseCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Dutch' && containsDutchCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Swedish' && containsSwedishCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Norwegian' && containsNorwegianCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Danish' && containsDanishCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Polish' && containsPolishCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Czech' && containsCzechCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Slovak' && containsSlovakCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Hungarian' && containsHungarianCharacters(name)) {
+      confidence = 0.9
+    } else if (version.primaryLanguage === 'Romanian' && containsRomanianCharacters(name)) {
+      confidence = 0.9
     }
     
     if (confidence > 0) {
@@ -991,8 +1017,73 @@ function containsRussianCharacters(text: string): boolean {
   return /[\u0400-\u04FF]/.test(text)
 }
 
+function containsBulgarianCharacters(text: string): boolean {
+  // Bulgarian characters (Cyrillic script, similar to Russian but with some unique letters)
+  return /[\u0400-\u04FF]/.test(text)
+}
+
+function containsUkrainianCharacters(text: string): boolean {
+  // Ukrainian characters (Cyrillic script, similar to Russian but with some unique letters)
+  return /[\u0400-\u04FF]/.test(text)
+}
+
+function containsItalianCharacters(text: string): boolean {
+  // Italian characters (à, è, é, ì, ò, ù)
+  return /[àèéìòùÀÈÉÌÒÙ]/.test(text)
+}
+
+function containsPortugueseCharacters(text: string): boolean {
+  // Portuguese characters (ã, õ, ç, á, é, í, ó, ú)
+  return /[ãõçáéíóúÃÕÇÁÉÍÓÚ]/.test(text)
+}
+
+function containsDutchCharacters(text: string): boolean {
+  // Dutch characters (ij, ë, ï)
+  return /[ëïËÏ]/.test(text) || /ij|IJ/.test(text)
+}
+
+function containsSwedishCharacters(text: string): boolean {
+  // Swedish characters (å, ä, ö)
+  return /[åäöÅÄÖ]/.test(text)
+}
+
+function containsNorwegianCharacters(text: string): boolean {
+  // Norwegian characters (å, æ, ø)
+  return /[åæøÅÆØ]/.test(text)
+}
+
+function containsDanishCharacters(text: string): boolean {
+  // Danish characters (å, æ, ø)
+  return /[åæøÅÆØ]/.test(text)
+}
+
+function containsPolishCharacters(text: string): boolean {
+  // Polish characters (ą, ć, ę, ł, ń, ó, ś, ź, ż)
+  return /[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(text)
+}
+
+function containsCzechCharacters(text: string): boolean {
+  // Czech characters (á, č, ď, é, ě, í, ň, ó, ř, š, ť, ú, ů, ý, ž)
+  return /[áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/.test(text)
+}
+
+function containsSlovakCharacters(text: string): boolean {
+  // Slovak characters (á, ä, č, ď, é, í, ĺ, ľ, ň, ó, ô, ŕ, š, ť, ú, ý, ž)
+  return /[áäčďéíĺľňóôŕšťúýžÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽ]/.test(text)
+}
+
+function containsHungarianCharacters(text: string): boolean {
+  // Hungarian characters (á, é, í, ó, ö, ő, ú, ü, ű)
+  return /[áéíóöőúüűÁÉÍÓÖŐÚÜŰ]/.test(text)
+}
+
+function containsRomanianCharacters(text: string): boolean {
+  // Romanian characters (ă, â, î, ș, ț)
+  return /[ăâîșțĂÂÎȘȚ]/.test(text)
+}
+
 function isEnglishName(text: string): boolean {
   // Simple heuristic: English names typically don't have special characters
   // and are usually shorter than translations
-  return !/[àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇäöüßÄÖÜáéíóúñüÁÉÍÓÚÑÜ\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7afāēīūķļņģšžčĀĒĪŪĶĻŅĢŠŽČąęįųūčšžĄĘĮŲŪČŠŽäöüõšžÄÖÜÕŠŽ\u0400-\u04FF]/.test(text) && text.length < 30
+  return !/[àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇäöüßÄÖÜáéíóúñüÁÉÍÓÚÑÜ\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7afāēīūķļņģšžčĀĒĪŪĶĻŅĢŠŽČąęįųūčšžĄĘĮŲŪČŠŽäöüõšžÄÖÜÕŠŽ\u0400-\u04FFăâîșțĂÂÎȘȚáčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽáäčďéíĺľňóôŕšťúýžÁÄČĎÉÍĹĽŇÓÔŔŠŤÚÝŽáéíóöőúüűÁÉÍÓÖŐÚÜŰåæøÅÆØãõçÃÕÇëïËÏ]/.test(text) && text.length < 30
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { bggService } from '@/lib/bgg'
 import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion } from '@/lib/bgg'
+import { extractTextFromImage, isOCRAvailable, getOCRRecommendations } from '@/lib/bgg/utils/image-ocr'
 import { 
   Search, 
   Calendar, 
@@ -439,20 +440,45 @@ export function BGGTest() {
                   </div>
                 </div>
 
-                                 {/* Version Image */}
-                 {versionMatch.version.thumbnail && (
-                   <div className="mb-3 aspect-[4/3] rounded-lg overflow-hidden bg-dark-green-100">
-                     <img
-                       src={versionMatch.version.thumbnail}
-                       alt={versionMatch.version.name}
-                       className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
-                       onError={(e) => {
-                         // Hide image on error
-                         (e.target as HTMLImageElement).style.display = 'none'
-                       }}
-                     />
-                   </div>
-                 )}
+                                                   {/* Version Image with OCR */}
+                  {versionMatch.version.thumbnail && (
+                    <div className="mb-3 aspect-[4/3] rounded-lg overflow-hidden bg-dark-green-100 relative group">
+                      <img
+                        src={versionMatch.version.thumbnail}
+                        alt={versionMatch.version.name}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-200"
+                        onError={(e) => {
+                          // Hide image on error
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }}
+                      />
+                      
+                      {/* OCR Button Overlay */}
+                      {isOCRAvailable() && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            try {
+                              const ocrText = await extractTextFromImage(versionMatch.version.thumbnail)
+                              if (ocrText) {
+                                console.log('🔍 OCR Result for version:', versionMatch.version.name, 'Text:', ocrText)
+                                alert(`OCR Result: "${ocrText}"`)
+                              } else {
+                                alert('No text detected in image')
+                              }
+                            } catch (error) {
+                              console.error('OCR failed:', error)
+                              alert('OCR failed. Check console for details.')
+                            }
+                          }}
+                          className="absolute top-2 right-2 bg-vibrant-orange-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-vibrant-orange-600"
+                          title="Extract text from image (OCR)"
+                        >
+                          <Search className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  )}
                  
                  {/* Language Info */}
                  <div className="mb-3 space-y-2">
@@ -546,8 +572,26 @@ export function BGGTest() {
         </div>
       )}
 
-      {/* Cache Statistics */}
-      {cacheStats && (
+             {/* OCR Status */}
+       <div className="mb-8">
+         <h3 className="text-xl font-righteous text-dark-green-800 mb-4">🔍 OCR Status</h3>
+         <div className="bg-light-green-50 border-2 border-dark-green-200 rounded-xl p-4">
+           <div className="space-y-2">
+             {getOCRRecommendations().map((rec, index) => (
+               <p key={index} className="text-sm text-dark-green-700">{rec}</p>
+             ))}
+           </div>
+           <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+             <p className="text-sm text-blue-800">
+               <strong>💡 OCR Tip:</strong> Hover over version images to see the OCR button. 
+               This can help extract the exact game title from the image for better language matching.
+             </p>
+           </div>
+         </div>
+       </div>
+
+       {/* Cache Statistics */}
+       {cacheStats && (
         <div className="mb-8">
           <h3 className="text-xl font-righteous text-dark-green-800 mb-4">Cache Statistics</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

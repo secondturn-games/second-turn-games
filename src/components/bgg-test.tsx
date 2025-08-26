@@ -253,122 +253,161 @@ export function BGGTest() {
         </div>
       )}
 
-      {/* Selected Game Details */}
-      {selectedGame && (
-        <div className="mb-8">
-          <h3 className="text-xl font-righteous text-dark-green-800 mb-4 flex items-center gap-2">
-            <Info className="w-5 h-5" />
-            Game Details
-          </h3>
-          <div className="bg-light-green-50 border-2 border-dark-green-200 rounded-xl p-6">
-            <div className="flex items-start justify-between mb-4">
-              <h4 className="text-2xl font-righteous text-dark-green-800">
-                {selectedGame.name}
-              </h4>
-              <span className={`text-sm px-3 py-1 rounded-full ${
-                selectedGame.type === 'boardgame' 
-                  ? 'bg-dark-green-100 text-dark-green-700' 
-                  : 'bg-vibrant-orange-100 text-vibrant-orange-700'
-              }`}>
-                {selectedGame.type === 'boardgame' ? 'Base Game' : 'Expansion'}
-              </span>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                {selectedGame.yearpublished && (
-                  <p className="text-dark-green-600 flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    <span className="font-medium">Year:</span> {selectedGame.yearpublished}
-                  </p>
-                )}
-                {selectedGame.rank && (
-                  <p className="text-dark-green-600 flex items-center gap-2">
-                    <Trophy className="w-4 h-4" />
-                    <span className="font-medium">Rank:</span> #{selectedGame.rank}
-                  </p>
-                )}
-                {selectedGame.rating && (
-                  <p className="text-dark-green-600 flex items-center gap-2">
-                    <Star className="w-4 h-4" />
-                    <span className="font-medium">Average Rating:</span> {selectedGame.rating}
-                  </p>
-                )}
-                {selectedGame.bayesaverage && (
-                  <p className="text-dark-green-600 flex items-center gap-2">
-                    <Info className="w-4 h-4" />
-                    <span className="font-medium">Geek Rating:</span> {selectedGame.bayesaverage}
-                    <span className="text-xs text-dark-green-500 ml-1" title="BGG's Bayesian average rating system that factors in the number of ratings">
-                      ⓘ
-                    </span>
-                  </p>
-                )}
-                {selectedGame.weight && (
-                  <p className="text-dark-green-600 flex items-center gap-2">
-                    <Info className="w-4 h-4" />
-                    <span className="font-medium">Weight:</span> {selectedGame.weight}
-                  </p>
-                )}
-                {selectedGame.minplayers && selectedGame.maxplayers && (
-                  <p className="text-dark-green-600 flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span className="font-medium">Players:</span> {selectedGame.minplayers}-{selectedGame.maxplayers}
-                  </p>
-                )}
-                {selectedGame.playingtime && (
-                  <p className="text-dark-green-600 flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span className="font-medium">Playing Time:</span> {selectedGame.playingtime} min
-                  </p>
-                )}
-              </div>
-              
-              <div>
-                {selectedGame.description && (
-                  <div className="mb-4">
-                    <h5 className="font-medium text-dark-green-800 mb-2">Description</h5>
-                    <p className="text-dark-green-600 text-sm line-clamp-4">
-                      {selectedGame.description}
-                    </p>
-                  </div>
-                )}
-                
-                {selectedGame.mechanics && selectedGame.mechanics.length > 0 && (
-                  <div className="mb-4">
-                    <h5 className="font-medium text-dark-green-800 mb-2">Mechanics</h5>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedGame.mechanics.slice(0, 5).map((mechanic, index) => (
-                        <span
-                          key={index}
-                          className="text-xs bg-vibrant-orange-100 text-vibrant-orange-700 px-2 py-1 rounded-full"
-                        >
-                          {mechanic}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {selectedGame.categories && selectedGame.categories.length > 0 && (
-                  <div>
-                    <h5 className="font-medium text-dark-green-800 mb-2">Categories</h5>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedGame.categories.slice(0, 5).map((category, index) => (
-                        <span
-                          key={index}
-                          className="text-xs bg-dark-green-100 text-dark-green-700 px-2 py-1 rounded-full"
-                        >
-                          {category}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+             {/* Selected Game Details */}
+       {selectedGame && (
+         <div className="mb-8">
+           <h3 className="text-xl font-righteous text-dark-green-800 mb-4 flex items-center gap-2">
+             <Info className="w-5 h-5" />
+             Game Details
+           </h3>
+           <div className="bg-light-green-50 border-2 border-dark-green-200 rounded-xl p-6">
+             <div className="flex items-start justify-between mb-4">
+               <h4 className="text-2xl font-righteous text-dark-green-800">
+                 {selectedGame.name}
+               </h4>
+               <span className={`text-sm px-3 py-1 rounded-full ${
+                 selectedGame.type === 'boardgame' 
+                   ? 'bg-dark-green-100 text-dark-green-700' 
+                   : 'bg-vibrant-orange-100 text-vibrant-orange-700'
+               }`}>
+                 {selectedGame.type === 'boardgame' ? 'Base Game' : 'Expansion'}
+               </span>
+             </div>
+             
+             <div className="grid md:grid-cols-2 gap-6">
+               <div className="space-y-3">
+                 {selectedGame.yearpublished && (
+                   <p className="text-dark-green-600 flex items-center gap-2">
+                     <Calendar className="w-4 h-4" />
+                     <span className="font-medium">Year:</span> {selectedGame.yearpublished}
+                   </p>
+                 )}
+                 {selectedGame.rank && (
+                   <p className="text-dark-green-600 flex items-center gap-2">
+                     <Trophy className="w-4 h-4" />
+                     <span className="font-medium">Rank:</span> #{selectedGame.rank}
+                   </p>
+                 )}
+                 {selectedGame.rating && (
+                   <p className="text-dark-green-600 flex items-center gap-2">
+                     <Star className="w-4 h-4" />
+                     <span className="font-medium">Average Rating:</span> {selectedGame.rating}
+                   </p>
+                 )}
+                 {selectedGame.bayesaverage && (
+                   <p className="text-dark-green-600 flex items-center gap-2">
+                     <Info className="w-4 h-4" />
+                     <span className="font-medium">Geek Rating:</span> {selectedGame.bayesaverage}
+                     <span className="text-xs text-dark-green-500 ml-1" title="BGG's Bayesian average rating system that factors in the number of ratings">
+                       ⓘ
+                     </span>
+                   </p>
+                 )}
+                 {selectedGame.weight && (
+                   <p className="text-dark-green-600 flex items-center gap-2">
+                     <Info className="w-4 h-4" />
+                     <span className="font-medium">Weight:</span> {selectedGame.weight}
+                   </p>
+                 )}
+                 {selectedGame.minplayers && selectedGame.maxplayers && (
+                   <p className="text-dark-green-600 flex items-center gap-2">
+                     <Users className="w-4 h-4" />
+                     <span className="font-medium">Players:</span> {selectedGame.minplayers}-{selectedGame.maxplayers}
+                   </p>
+                 )}
+                 {selectedGame.playingtime && (
+                   <p className="text-dark-green-600 flex items-center gap-2">
+                     <Clock className="w-4 h-4" />
+                     <span className="font-medium">Playing Time:</span> {selectedGame.playingtime} min
+                   </p>
+                 )}
+               </div>
+               
+               <div>
+                 {selectedGame.description && (
+                   <div className="mb-4">
+                     <h5 className="font-medium text-dark-green-800 mb-2">Description</h5>
+                     <p className="text-dark-green-600 text-sm line-clamp-4">
+                       {selectedGame.description}
+                     </p>
+                   </div>
+                 )}
+                 
+                 {selectedGame.mechanics && selectedGame.mechanics.length > 0 && (
+                   <div className="mb-4">
+                     <h5 className="font-medium text-dark-green-800 mb-2">Mechanics</h5>
+                     <div className="flex flex-wrap gap-2">
+                       {selectedGame.mechanics.slice(0, 5).map((mechanic, index) => (
+                         <span
+                           key={index}
+                           className="text-xs bg-vibrant-orange-100 text-vibrant-orange-700 px-2 py-1 rounded-full"
+                         >
+                           {mechanic}
+                         </span>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+                 
+                 {selectedGame.categories && selectedGame.categories.length > 0 && (
+                   <div>
+                     <h5 className="font-medium text-dark-green-800 mb-2">Categories</h5>
+                     <div className="flex flex-wrap gap-2">
+                       {selectedGame.categories.slice(0, 5).map((category, index) => (
+                         <span
+                           key={index}
+                           className="text-xs bg-dark-green-100 text-dark-green-700 px-2 py-1 rounded-full"
+                         >
+                           {category}
+                         </span>
+                       ))}
+                     </div>
+                   </div>
+                 )}
+               </div>
+             </div>
+           </div>
+         </div>
+       )}
+
+       {/* All Available Alternate Names - For Testing */}
+       {selectedGame && selectedGame.alternateNames && selectedGame.alternateNames.length > 0 && (
+         <div className="mb-8">
+           <h3 className="text-xl font-righteous text-dark-green-800 mb-4 flex items-center gap-2">
+             <Globe className="w-5 h-5" />
+             All Available Alternate Names ({selectedGame.alternateNames.length})
+           </h3>
+           <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+             <div className="mb-4">
+               <h4 className="font-medium text-blue-800 mb-2">Primary Name:</h4>
+               <p className="text-lg font-semibold text-blue-900 bg-blue-100 px-3 py-2 rounded-lg">
+                 {selectedGame.name}
+               </p>
+             </div>
+             
+             <div>
+               <h4 className="font-medium text-blue-800 mb-2">Alternate Names:</h4>
+               <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+                 {selectedGame.alternateNames.map((name, index) => (
+                   <div
+                     key={index}
+                     className="bg-white border border-blue-200 rounded-lg px-3 py-2 text-sm text-blue-800"
+                   >
+                     {name}
+                   </div>
+                 ))}
+               </div>
+             </div>
+             
+             <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+               <p className="text-xs text-blue-700">
+                 <strong>Note:</strong> These are all the names available from BGG. The language matching system will use these 
+                 to suggest the best name for each version based on language detection and confidence scoring.
+               </p>
+             </div>
+           </div>
+         </div>
+       )}
 
       {/* Manual Version Fetch Button */}
       {selectedGame && (

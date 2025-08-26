@@ -19,7 +19,10 @@ import {
   Languages,
   CheckCircle,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Ruler,
+  Weight,
+  Building2
 } from 'lucide-react'
 
 export function BGGTest() {
@@ -495,17 +498,30 @@ export function BGGTest() {
                  
                                    {/* Language Info */}
                   <div className="mb-3 space-y-2">
-                    <div className="flex items-center gap-2 text-xs">
-                      <Languages className="w-3 h-3 text-dark-green-500" />
-                      <span className="text-dark-green-600">
-                        {versionMatch.version.isMultilingual ? 'Multilingual' : versionMatch.version.primaryLanguage}
-                      </span>
-                      {versionMatch.version.isMultilingual && (
-                        <span className="text-xs text-dark-green-400">
-                          ({versionMatch.version.languageCount} languages)
-                        </span>
-                      )}
-                    </div>
+                                         <div className="flex items-start gap-2 text-xs">
+                       <Languages className="w-3 h-3 text-dark-green-500 mt-0.5" />
+                       <div className="text-dark-green-600">
+                         <div className="font-medium">Languages:</div>
+                         {versionMatch.version.isMultilingual ? (
+                           <div className="text-dark-green-500">
+                             <div className="text-dark-green-400 text-xs mb-1">
+                               Multilingual ({versionMatch.version.languageCount} languages)
+                             </div>
+                             <div className="space-y-1">
+                               {versionMatch.version.languages.map((lang, index) => (
+                                 <div key={index} className="text-xs bg-dark-green-100 px-2 py-1 rounded">
+                                   {lang}
+                                 </div>
+                               ))}
+                             </div>
+                           </div>
+                         ) : (
+                           <div className="text-dark-green-500">
+                             {versionMatch.version.primaryLanguage}
+                           </div>
+                         )}
+                       </div>
+                     </div>
                     
                     {versionMatch.version.yearpublished && (
                       <div className="flex items-center gap-2 text-xs">
@@ -517,7 +533,7 @@ export function BGGTest() {
                                          {/* Dimensions */}
                      {versionMatch.version.dimensions?.hasDimensions && (
                        <div className="flex items-center gap-2 text-xs">
-                         <div className="w-3 h-3 text-dark-green-500">📏</div>
+                         <Ruler className="w-3 h-3 text-dark-green-500" />
                          <div className="text-dark-green-600">
                            <div className="font-medium">Dimensions:</div>
                            <div className="text-dark-green-500">
@@ -530,7 +546,7 @@ export function BGGTest() {
                      {/* Weight */}
                      {versionMatch.version.weightInfo?.rawValue && (
                        <div className="flex items-center gap-2 text-xs">
-                         <div className="w-3 h-3 text-dark-green-500">⚖️</div>
+                         <Weight className="w-3 h-3 text-dark-green-500" />
                          <div className="text-dark-green-600">
                            <div className="font-medium">Weight:</div>
                            <div className="text-dark-green-500">
@@ -561,11 +577,21 @@ export function BGGTest() {
                   <span className="text-dark-green-500">
                     Confidence: {(versionMatch.confidence * 100).toFixed(0)}%
                   </span>
-                  {versionMatch.version.publishers.length > 0 && (
-                    <span className="text-dark-green-600">
-                      {versionMatch.version.publishers[0]}
-                    </span>
-                  )}
+                                     {versionMatch.version.publishers.length > 0 && (
+                     <div className="text-dark-green-600">
+                       <div className="flex items-center gap-1 mb-1">
+                         <Building2 className="w-3 h-3" />
+                         <span className="text-xs font-medium">Publishers:</span>
+                       </div>
+                       <div className="space-y-1">
+                         {versionMatch.version.publishers.map((publisher, index) => (
+                           <div key={index} className="text-xs bg-dark-green-100 px-2 py-1 rounded">
+                             {publisher}
+                           </div>
+                         ))}
+                       </div>
+                     </div>
+                   )}
                 </div>
               </div>
             ))}

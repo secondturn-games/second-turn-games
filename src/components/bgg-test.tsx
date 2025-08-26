@@ -475,37 +475,31 @@ export function BGGTest() {
                       </div>
                     )}
                     
-                    {/* Dimensions */}
-                    {versionMatch.version.dimensions?.hasDimensions && (
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-3 h-3 text-dark-green-500">📏</div>
-                        <div className="text-dark-green-600">
-                          <div className="font-medium">Dimensions:</div>
-                          <div className="text-dark-green-500">
-                            {versionMatch.version.dimensions.metric}
-                          </div>
-                          <div className="text-dark-green-400 text-xs">
-                            ({versionMatch.version.dimensions.imperial})
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Weight */}
-                    {versionMatch.version.weightInfo?.rawValue && (
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-3 h-3 text-dark-green-500">⚖️</div>
-                        <div className="text-dark-green-600">
-                          <div className="font-medium">Weight:</div>
-                          <div className="text-dark-green-500">
-                            {versionMatch.version.weightInfo.metric}
-                          </div>
-                          <div className="text-dark-green-400 text-xs">
-                            ({versionMatch.version.weightInfo.imperial})
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                                         {/* Dimensions */}
+                     {versionMatch.version.dimensions?.hasDimensions && (
+                       <div className="flex items-center gap-2 text-xs">
+                         <div className="w-3 h-3 text-dark-green-500">📏</div>
+                         <div className="text-dark-green-600">
+                           <div className="font-medium">Dimensions:</div>
+                           <div className="text-dark-green-500">
+                             {versionMatch.version.dimensions.metric}
+                           </div>
+                         </div>
+                       </div>
+                     )}
+                     
+                     {/* Weight */}
+                     {versionMatch.version.weightInfo?.rawValue && (
+                       <div className="flex items-center gap-2 text-xs">
+                         <div className="w-3 h-3 text-dark-green-500">⚖️</div>
+                         <div className="text-dark-green-600">
+                           <div className="font-medium">Weight:</div>
+                           <div className="text-dark-green-500">
+                             {versionMatch.version.weightInfo.metric}
+                           </div>
+                         </div>
+                       </div>
+                     )}
                   </div>
 
                 {/* Smart Name Suggestion */}

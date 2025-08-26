@@ -62,12 +62,10 @@ export interface BGGGameVersion {
   languageCount: number
   // Enhanced dimension information
   dimensions?: {
-    imperial: string
     metric: string
     hasDimensions: boolean
   }
   weightInfo?: {
-    imperial: string
     metric: string
     rawValue: number | null
   }

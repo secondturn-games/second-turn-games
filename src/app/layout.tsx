@@ -90,26 +90,46 @@ export default function RootLayout({
         baseTheme: undefined,
         variables: {
           colorPrimary: '#D95323',
-          colorText: '#29432B',
-          colorTextSecondary: '#87A787',
+          colorText: '#1B1B1B',
+          colorTextSecondary: '#29432B',
           colorBackground: '#F7F8F4',
-          colorInputBackground: '#F7F8F4',
-          colorBorder: '#E6EAD7',
-          borderRadius: '1rem',
+          colorInputBackground: '#FFFFFF',
+          colorBorder: '#29432B',
+          borderRadius: '0.5rem',
           fontFamily: 'var(--font-manrope), sans-serif',
         },
         elements: {
-          formButtonPrimary: 'bg-vibrant-orange hover:bg-vibrant-orange-600 text-white font-medium rounded-lg px-4 py-2 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg',
-          formButtonSecondary: 'border-2 border-dark-green-300 text-dark-green-600 hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-600 font-medium rounded-lg px-4 py-2 transition-all duration-200 hover:scale-105 shadow-sm hover:shadow-md bg-white',
-          formInput: 'rounded-lg border border-light-beige-200 bg-light-beige-50 text-dark-green-600 placeholder-dark-green-400 focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange transition-colors duration-200',
-          formLabel: 'text-sm font-medium text-dark-green-500',
+          formButtonPrimary: 'bg-vibrant-orange hover:bg-vibrant-orange-600 text-white font-medium rounded-md px-4 py-2.5 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium',
+          formButtonSecondary: 'border-2 border-dark-green-300 text-dark-green-600 hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-600 font-medium rounded-md px-4 py-2.5 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium bg-white',
+          formInput: 'rounded-md border-2 border-dark-green-300 bg-white text-dark-green-600 placeholder-dark-green-400 focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange transition-all duration-200 px-3 py-2.5 text-sm shadow-medium',
+          formLabel: 'text-sm font-semibold text-dark-green-600 mb-2 block',
+          formFieldInput: 'w-full',
+          formField: 'mb-4',
+          formFieldLabel: 'text-sm font-semibold text-dark-green-600 mb-2 block',
+          formFieldInputRow: 'flex items-center gap-2',
+          formFieldInputShowPasswordButton: 'text-dark-green-400 hover:text-dark-green-600 transition-colors duration-200',
+          formFieldInputShowPasswordIcon: 'w-4 h-4',
+          formHeaderTitle: 'text-2xl font-bold text-dark-green-600 mb-2',
+          formHeaderSubtitle: 'text-sm text-dark-green-600 mb-6',
+          formResendCodeLink: 'text-vibrant-orange hover:text-vibrant-orange-600 font-medium transition-colors duration-200',
+          formFooterAction: 'text-sm text-dark-green-600',
+          formFooterActionLink: 'text-vibrant-orange hover:text-vibrant-orange-600 font-medium transition-colors duration-200',
+          card: 'bg-white rounded-lg shadow-lg border-2 border-dark-green-200 p-6',
+          headerTitle: 'text-2xl font-bold text-dark-green-600',
+          headerSubtitle: 'text-sm text-dark-green-600',
+          socialButtonsBlockButton: 'border-2 border-dark-green-300 bg-white text-dark-green-600 hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-600 font-medium rounded-md px-4 py-2.5 transition-all duration-200 hover:scale-105 shadow-medium hover:shadow-lg',
+          socialButtonsBlockButtonText: 'text-dark-green-600',
+          dividerLine: 'bg-light-beige-200',
+          dividerText: 'text-dark-green-500 font-medium text-sm',
+          footerAction: 'text-sm text-dark-green-600',
+          footerActionLink: 'text-vibrant-orange hover:text-vibrant-orange-600 font-medium transition-colors duration-200',
         }
       }}
     >
       <html lang="en" className={`${righteous.variable} ${manrope.variable} ${bebasNeue.variable}`}>
         <body className="bg-light-beige text-dark-green font-sans min-h-screen">
           <header className="border-b border-dark-green/10 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-            <div className="mx-auto max-w-6xl px-3 md:px-4 py-3 md:py-4 flex items-center justify-between">
+            <div className="mx-auto max-w-6xl px-3 md:px-4 py-2.5 md:py-3 flex items-center justify-between">
               {/* Logo / Brand */}
               <div className="flex items-center gap-3 group">
                 <Link href="/" className="relative" aria-label="Second Turn Games - Home">
@@ -117,14 +137,14 @@ export default function RootLayout({
                   <img 
                     src="/nav-logo-mobile.svg" 
                     alt="Second Turn Games" 
-                    className="h-10 w-10 md:hidden transition-transform duration-300 group-hover:scale-105"
+                    className="h-8 w-8 md:hidden transition-transform duration-300 group-hover:scale-105"
                   />
                   
                   {/* Desktop: Full logo with text */}
                   <img 
                     src="/nav-logo.svg" 
                     alt="Second Turn Games" 
-                    className="hidden md:block h-12 lg:h-16 transition-transform duration-300 group-hover:scale-105"
+                    className="hidden md:block h-10 lg:h-12 transition-transform duration-300 group-hover:scale-105"
                   />
                   
                   <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-vibrant-orange-500 to-warm-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" aria-hidden="true" />

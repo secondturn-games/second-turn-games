@@ -6,7 +6,7 @@ export async function GET() {
     const supabase = await createClient()
     
     // Test basic connection by querying the user_profiles table
-    const { data, error } = await supabase
+    const { data: _data, error } = await supabase
       .from('user_profiles')
       .select('count')
       .limit(1)
@@ -24,7 +24,7 @@ export async function GET() {
     }
     
     // Test if we can access the listings table
-    const { data: listingsData, error: listingsError } = await supabase
+    const { data: _listingsData, error: listingsError } = await supabase
       .from('listings')
       .select('count')
       .limit(1)

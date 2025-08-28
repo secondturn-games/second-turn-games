@@ -1,7 +1,7 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { createClient } from '@/lib/supabase/server';
 
-export async function POST(req: Request) {
+export async function POST(_req: Request) {
   try {
     const { userId } = await auth();
     

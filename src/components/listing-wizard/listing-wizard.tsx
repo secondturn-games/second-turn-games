@@ -180,45 +180,71 @@ export function ListingWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-light-beige">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Step Indicator */}
-        <div className="mb-8">
+         <div className="min-h-screen bg-light-beige">
+       <div className="container mx-auto px-4 py-6 max-w-7xl">
+         {/* Step Indicator */}
+         <div className="mb-6">
           <div className="flex justify-center">
-            <div className="flex items-center space-x-2 lg:space-x-4">
-              {steps.map((step, index) => (
-                <div key={step.key}>
-                  <div 
-                    className={`flex items-center ${
-                      currentStep === step.key ? 'text-vibrant-orange' : 'text-gray-400'
-                    } ${canProceedToStep(step.key) || canGoBackToStep(step.key) ? 'cursor-pointer' : 'cursor-default'}`}
-                    onClick={() => handleStepClick(step.key)}
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                      currentStep === step.key 
-                        ? 'bg-vibrant-orange text-white' 
-                        : canProceedToStep(step.key) || canGoBackToStep(step.key)
-                          ? 'bg-gray-200 hover:bg-gray-300'
-                          : 'bg-gray-200'
-                    }`}>
-                      {index + 1}
-                    </div>
-                    <span className="ml-2 text-sm hidden lg:inline">{step.title}</span>
+            <div className="flex items-center">
+              {steps.map((step, index) => {
+                const isCurrent = currentStep === step.key
+                const isCompleted = steps.findIndex(s => s.key === currentStep) > index
+                const isAccessible = canProceedToStep(step.key) || canGoBackToStep(step.key)
+                
+                return (
+                  <div key={step.key} className="flex items-center">
+                                         {/* Step Circle */}
+                     <div 
+                       className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 font-bold text-sm cursor-pointer ${
+                         isCurrent 
+                           ? 'bg-vibrant-orange text-white shadow-medium scale-105' 
+                           : isCompleted
+                             ? 'bg-vibrant-orange text-white shadow-soft'
+                             : isAccessible
+                               ? 'bg-light-beige-200 hover:bg-light-beige-300 hover:scale-105 text-dark-green-600'
+                               : 'bg-light-beige-100 text-dark-green-400'
+                       }`}
+                       onClick={() => isAccessible && handleStepClick(step.key)}
+                     >
+                       {isCompleted ? '✓' : index + 1}
+                     </div>
+                     
+                     {/* Step Title */}
+                     <span className={`ml-1 lg:ml-2 text-xs font-medium hidden sm:inline transition-colors duration-200 ${
+                       isCurrent 
+                         ? 'text-vibrant-orange' 
+                         : isCompleted
+                           ? 'text-dark-green-600'
+                           : 'text-dark-green-400'
+                     }`}>
+                       {step.title}
+                     </span>
+                     
+                     {/* Progress Bar */}
+                     {index < steps.length - 1 && (
+                       <div className="w-8 sm:w-12 lg:w-16 h-1.5 mx-2 lg:mx-3 rounded-full bg-light-beige-200 overflow-hidden">
+                         <div 
+                           className={`h-full rounded-full transition-all duration-500 ease-out ${
+                             isCompleted 
+                               ? 'bg-vibrant-orange' 
+                               : 'bg-light-beige-300'
+                           }`}
+                           style={{ 
+                             width: isCompleted ? '100%' : '0%',
+                             transitionDelay: `${index * 100}ms`
+                           }}
+                         />
+                       </div>
+                     )}
                   </div>
-                  
-                  {index < steps.length - 1 && (
-                    <div className={`w-4 lg:w-8 h-1 ${
-                      steps.findIndex(s => s.key === currentStep) > index ? 'bg-vibrant-orange' : 'bg-gray-200'
-                    }`}></div>
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
 
-        {/* Main Content Layout */}
-        <div className="lg:flex lg:gap-8">
+                 {/* Main Content Layout */}
+         <div className="lg:flex lg:gap-6">
           {/* Left Column - Form Content */}
           <div className="lg:flex-1 lg:max-w-4xl">
             {/* Step Content */}

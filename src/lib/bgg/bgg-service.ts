@@ -449,7 +449,7 @@ export class BGGService {
   /**
    * Create search error with proper error codes
    */
-  private createSearchError(error: any, query: string): BGGSearchError {
+  private createSearchError(error: any, _query: string): BGGSearchError {
     let code: BGGSearchError['code'] = 'NETWORK_ERROR'
     let message = 'An unexpected error occurred during search'
 
@@ -490,8 +490,8 @@ export class BGGService {
   /**
    * Clear cache for specific query
    */
-  clearCacheForQuery(query: string, filters?: SearchFilters): void {
-    this.cacheManager.clearSearchCacheForQuery(query, filters)
+  clearCacheForQuery(_query: string, filters?: SearchFilters): void {
+    this.cacheManager.clearSearchCacheForQuery(_query, filters)
   }
 
   /**

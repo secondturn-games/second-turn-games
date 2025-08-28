@@ -138,8 +138,8 @@ export function ListingPreview({ formData }: ListingPreviewProps) {
                   <span className="font-medium text-dark-green">Photos ({formData.photos.length})</span>
                 </div>
                 <div className="ml-4 flex space-x-1">
-                  {formData.photos.slice(0, 4).map((_, index) => (
-                    <div key={index} className="w-6 h-6 bg-blue-50 border border-blue-200 rounded flex items-center justify-center">
+                  {formData.photos.slice(0, 4).map((_, _index) => (
+                    <div key={_index} className="w-6 h-6 bg-blue-50 border border-blue-200 rounded flex items-center justify-center">
                       <Camera className="w-3 h-3 text-blue-400" />
                     </div>
                   ))}

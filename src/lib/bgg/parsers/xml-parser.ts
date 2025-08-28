@@ -586,7 +586,7 @@ function extractPublishersFromItem(item: any): string[] {
  * Extract product code from item object
  * Note: This field is not used in the marketplace, so we return empty string
  */
-function extractProductCode(productcode: any): string {
+function extractProductCode(_productcode: any): string {
   // Product code is not needed for marketplace functionality
   return ''
 }

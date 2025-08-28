@@ -1,59 +1,188 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@theme {
-  --color-light-beige: #E6EAD7;
-  --color-light-beige-50: #F7F8F4;
-  --color-light-beige-100: #F0F2E9;
-  --color-light-beige-200: #E6EAD7;
-  --color-light-beige-300: #D8DCC8;
-  --color-vibrant-orange: #D95323;
-  --color-vibrant-orange-50: #FEF2F0;
-  --color-vibrant-orange-100: #FDE4E0;
-  --color-vibrant-orange-200: #FBC7BC;
-  --color-vibrant-orange-300: #F8A395;
-  --color-vibrant-orange-400: #F47A66;
-  --color-vibrant-orange-500: #D95323;
-  --color-vibrant-orange-600: #C44A1F;
-  --color-warm-yellow: #F2C94C;
-  --color-warm-yellow-50: #FFFBEB;
-  --color-warm-yellow-100: #FEF3C7;
-  --color-warm-yellow-200: #FDE68A;
-  --color-warm-yellow-300: #FCD34D;
-  --color-warm-yellow-400: #F2C94C;
-  --color-warm-yellow-500: #EAB308;
-  --color-dark-green: #29432B;
-  --color-dark-green-50: #F0F4F0;
-  --color-dark-green-100: #E1E9E1;
-  --color-dark-green-200: #C3D3C3;
-  --color-dark-green-300: #A5BDA5;
-  --color-dark-green-400: #87A787;
-  --color-dark-green-500: #29432B;
-  --color-dark-green-600: #1F331F;
-  
-  --font-sans: var(--font-roboto), sans-serif;
-  --font-display: var(--font-righteous), sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
+  :root {
+    /* Font Variables */
+    --font-manrope: 'Manrope', sans-serif;
+    --font-righteous: 'Righteous', sans-serif;
+    --font-bebas-neue: 'Bebas Neue', sans-serif;
+  }
+
   body {
-    background-color: var(--color-light-beige);
-    color: var(--color-dark-green);
-    font-family: var(--font-sans);
+    background-color: #E6EAD7;
+    color: #1B1B1B;
+    font-family: var(--font-manrope), sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Typography Scale */
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--font-righteous), sans-serif;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: var(--font-righteous), sans-serif;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  h5 {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .game-title {
+    font-family: var(--font-bebas-neue), sans-serif;
+    font-weight: 400;
+  }
+
+  .logo-text {
+    font-family: var(--font-righteous), sans-serif;
+    font-weight: 400;
+  }
+}
+
+@layer components {
+  /* Button Components */
+  .btn-primary {
+    @apply px-4 py-2 rounded-md bg-vibrant-orange text-white font-medium text-sm hover:bg-vibrant-orange-600 transition-all duration-200 shadow-soft hover:shadow-medium;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded-md border-2 border-dark-green-300 text-dark-green-600 font-medium text-sm hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-600 transition-all duration-200 shadow-soft hover:shadow-medium bg-white;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 rounded-md text-dark-green-600 font-medium text-sm hover:bg-dark-green-50 transition-all duration-200;
+  }
+
+  /* Card Components */
+  .card-standard {
+    @apply bg-white rounded-lg shadow-soft border border-light-beige-200 p-4 transition-all duration-200;
+  }
+
+  .card-elevated {
+    @apply bg-white rounded-lg shadow-medium border-0 p-4 hover:shadow-lg transition-all duration-200;
+  }
+
+  .card-interactive {
+    @apply bg-white rounded-lg shadow-soft border-2 border-transparent p-4 hover:border-vibrant-orange-300/20 hover:shadow-medium transition-all duration-200 cursor-pointer;
+  }
+
+  /* Form Components */
+  .input-standard {
+    @apply px-3 py-2 rounded-md border-2 border-light-beige-200 focus:border-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 transition-all duration-200 bg-white text-sm;
+  }
+
+  .select-standard {
+    @apply px-3 py-2 rounded-md border-2 border-light-beige-200 focus:border-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 transition-all duration-200 bg-white text-sm;
+  }
+
+  .checkbox-standard {
+    @apply rounded-sm border-2 border-light-beige-200 text-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 transition-all duration-200;
+  }
+
+  /* Badge Components */
+  .badge-primary {
+    @apply px-2 py-1 rounded-sm bg-dark-green-100 text-dark-green-700 text-xs font-medium;
+  }
+
+  .badge-accent {
+    @apply px-2 py-1 rounded-sm bg-vibrant-orange-100 text-vibrant-orange-600 text-xs font-medium;
+  }
+
+  /* Empty State Components */
+  .empty-state {
+    @apply text-center py-8 px-4;
+  }
+
+  .empty-state-icon {
+    @apply w-12 h-12 mx-auto mb-3 text-text-muted;
+  }
+
+  .empty-state-title {
+    @apply text-base font-semibold text-text mb-2;
+  }
+
+  .empty-state-description {
+    @apply text-sm text-text-secondary;
+  }
+}
+
+@layer utilities {
+  /* Loading States */
+  .loading-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Dice Roll Animation */
+  .dice-roll {
+    animation: diceRoll 0.6s ease-out;
+  }
+
+  @keyframes diceRoll {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.1); }
+    50% { transform: rotate(180deg) scale(0.9); }
+    75% { transform: rotate(270deg) scale(1.05); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+
+  /* Hover Effects */
+  .hover-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+
+  /* Focus States */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-vibrant-orange/50 focus:ring-offset-2 focus:ring-offset-white;
   }
 }
 
 /* Clerk Modal Styling */
 :root {
-  --clerk-primary: var(--color-vibrant-orange-500);
-  --clerk-primary-hover: var(--color-vibrant-orange-600);
+  --clerk-primary: #D95323;
+  --clerk-primary-hover: #C44A1F;
   --clerk-primary-text: white;
-  --clerk-border: var(--color-light-beige-200);
-  --clerk-background: var(--color-light-beige-50);
-  --clerk-text: var(--color-dark-green-600);
-  --clerk-text-secondary: var(--color-dark-green-500);
-  --clerk-input-background: var(--color-light-beige-50);
-  --clerk-input-border: var(--color-light-beige-200);
-  --clerk-input-focus-border: var(--color-vibrant-orange-300);
-  --clerk-input-focus-ring: var(--color-vibrant-orange-200);
+  --clerk-border: #E6EAD7;
+  --clerk-background: #F7F8F4;
+  --clerk-text: #1F331F;
+  --clerk-text-secondary: #29432B;
+  --clerk-input-background: #F7F8F4;
+  --clerk-input-border: #E6EAD7;
+  --clerk-input-focus-border: #F8A395;
+  --clerk-input-focus-ring: #FBC7BC;
 }

@@ -22,12 +22,12 @@ export default async function SellPage() {
         </div>
 
         {/* Sell Form */}
-        <div className="bg-white rounded-2xl shadow-soft p-8 hover:shadow-medium transition-shadow duration-200">
+        <div className="bg-white rounded-lg shadow-soft p-6 hover:shadow-medium transition-shadow duration-200">
           <div className="space-y-8">
             {/* Game Information */}
             <div>
               <h3 className="text-xl font-semibold text-dark-green-600 mb-4">Game Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark-green-500 mb-2">Game Title *</label>
                   <input
@@ -98,7 +98,7 @@ export default async function SellPage() {
             {/* Location & Contact */}
             <div>
               <h3 className="text-xl font-semibold text-dark-green-600 mb-4">Location & Contact</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-dark-green-500 mb-2">City *</label>
                   <select className="w-full px-3 py-2 rounded-lg border border-light-beige-200 bg-light-beige-50 text-dark-green-600 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200">
@@ -122,7 +122,7 @@ export default async function SellPage() {
 
             {/* Submit Button */}
             <div className="text-center pt-6">
-              <button className="px-8 py-4 rounded-2xl bg-vibrant-orange-500 text-white text-lg font-semibold hover:bg-vibrant-orange-600 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium">
+              <button className="btn-primary px-6 py-3 text-base font-semibold">
                 List Your Game
               </button>
               <p className="text-sm text-dark-green-400 mt-3">

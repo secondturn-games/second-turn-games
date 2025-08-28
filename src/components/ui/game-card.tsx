@@ -32,7 +32,7 @@ const conditionLabels = {
 export function GameCard({ id, title, price, condition, imageUrl, seller, location, category }: GameCardProps) {
   return (
     <Link href={`/games/${id}`} className="group">
-      <div className="bg-white rounded-2xl shadow-soft hover:shadow-medium transition-all duration-200 hover:scale-[1.02] overflow-hidden border border-light-beige-200">
+      <div className="bg-white rounded-lg shadow-soft hover:shadow-medium transition-all duration-200 hover:scale-[1.02] overflow-hidden border border-light-beige-200">
         {/* Image Section */}
         <div className="relative h-48 bg-light-beige-100 overflow-hidden">
           {imageUrl ? (

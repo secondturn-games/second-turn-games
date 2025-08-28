@@ -1,552 +1,378 @@
-# Design System Documentation
+# Second Turn Games - Design System
 
-## 🎯 Overview
+## Overview and Design Principles
 
-The Second Turn Games design system provides consistent, accessible, and beautiful UI components that reflect our brand identity. This system ensures visual consistency across all pages and components while maintaining excellent user experience.
+Our design system prioritizes **compact efficiency** and **clean precision** over excessive whitespace and rounded aesthetics. We focus on:
 
----
+- **Compact Layouts**: Minimal padding and margins for efficient use of space
+- **Sharp Edges**: Reduced border radius for a more professional, less playful appearance
+- **Tight Spacing**: 4px grid system for consistent, space-efficient layouts
+- **Clear Hierarchy**: Strong visual separation without excessive breathing room
+- **Modern Minimalism**: Clean lines and precise spacing for a trustworthy marketplace feel
 
-## 🎨 Brand Identity
+## Typography
 
-### Core Values
+### Font Stack
 
-- **Trustworthy** - Professional, reliable appearance
-- **Community-Focused** - Welcoming, inclusive design
-- **Game-Oriented** - Fun, engaging visual elements
-- **Baltic Heritage** - Local, authentic feel
+- **Primary (Body)**: Manrope - Clean, readable, professional
+- **Display (Headings)**: Righteous - Distinctive brand identity
+- **Game Titles**: Bebas Neue - Strong, impactful for game names
 
-### Brand Personality
+### Scale (Compact)
 
-- **Friendly** - Warm colors, approachable typography
-- **Professional** - Clean layouts, consistent spacing
-- **Creative** - Playful accents, smooth animations
-- **Accessible** - High contrast, readable text
+- **h1**: 2rem (32px) - Page titles
+- **h2**: 1.5rem (24px) - Section headers
+- **h3**: 1.25rem (20px) - Subsection headers
+- **h4**: 1.125rem (18px) - Card titles
+- **h5**: 1rem (16px) - Small headers
+- **h6**: 0.875rem (14px) - Captions
+- **Body**: 0.875rem (14px) - Default text size
+- **Small**: 0.75rem (12px) - Secondary text
 
----
+## Color Palette
 
-## 🌈 Color Palette
+### Core Brand Colors
 
-### Primary Colors
+- **Dark Green** `#29432B` - Primary actions, navigation, text
+- **Vibrant Orange** `#D95323` - CTAs, highlights, accents
+- **Warm Yellow** `#F2C94C` - Warnings, trending indicators
 
-```css
-/* Dark Green - Primary Brand Color */
---dark-green-50: #F0F4F0    /* Lightest background */
---dark-green-100: #E1E9E1   /* Light background */
---dark-green-200: #C3D3C3   /* Border, subtle background */
---dark-green-300: #A5BDA5   /* Medium border, hover */
---dark-green-400: #87A787   /* Strong border, focus */
---dark-green-500: #29432B   /* Primary text, main brand */
---dark-green-600: #1F331F   /* Strong text, headings */
-```
+### Extended Accent Colors
 
-### Accent Colors
+- **Teal** `#2DB7A3` - Success states, new features
+- **Coral** `#FF6B6B` - Error states, destructive actions
+- **Lavender** `#A78BFA` - Info, secondary actions
 
-```css
-/* Vibrant Orange - Call-to-Action */
---vibrant-orange-50: #FEF2F0    /* Lightest background */
---vibrant-orange-100: #FDE4E0   /* Light background */
---vibrant-orange-200: #FBC7BC   /* Border, subtle */
---vibrant-orange-300: #F8A395   /* Medium border */
---vibrant-orange-400: #F47A66   /* Strong border */
---vibrant-orange-500: #D95323   /* Primary CTA, buttons */
---vibrant-orange-600: #C44A1F   /* Hover state, focus */
-```
+### Background & Surface
 
-### Supporting Colors
+- **Background** `#E6EAD7` - Main page background
+- **Surface** `#FFFFFF` - Cards, modals, inputs
+- **Surface-50** `#F7F8F4` - Subtle backgrounds
+- **Surface-100** `#F0F2E9` - Hover states
 
-```css
-/* Warm Yellow - Highlights & Gradients */
---warm-yellow-50: #FFFBEB     /* Lightest background */
---warm-yellow-100: #FEF3C7    /* Light background */
---warm-yellow-200: #FDE68A    /* Border, subtle */
---warm-yellow-300: #FCD34D    /* Medium border */
---warm-yellow-400: #F2C94C    /* Primary highlight */
---warm-yellow-500: #EAB308    /* Strong highlight */
+### Text Colors
 
-/* Light Beige - Backgrounds & Cards */
---light-beige-50: #F7F8F4     /* Lightest background */
---light-beige-100: #F0F2E9    /* Light background */
---light-beige-200: #E6EAD7    /* Primary background */
---light-beige-300: #D8DCC8    /* Border, subtle */
-```
+- **Primary** `#1B1B1B` - Main text content
+- **Secondary** `#6B7280` - Secondary text
+- **Muted** `#9CA3AF` - Disabled, placeholder text
 
-### Usage Guidelines
+### Border Colors
 
-- **Primary Text**: `text-dark-green-600` for headings, `text-dark-green-500` for body
-- **Call-to-Actions**: `bg-vibrant-orange-500` for primary buttons
-- **Backgrounds**: `bg-light-beige` for main backgrounds, `bg-white` for cards
-- **Accents**: `text-warm-yellow-400` for highlights, ratings
-- **Borders**: `border-light-beige-200` for subtle borders, `border-dark-green-300` for strong borders
+- **Primary** `#E5E7EB` - Standard borders
+- **Light** `#F3F4F6` - Subtle borders
+- **Accent** `#D95323` - Focus states
 
----
+## Spacing System (4px Grid - Compact)
 
-## 🔤 Typography
+### Base Units
 
-### Font Families
+- **xs**: 0.25rem (4px) - Minimal spacing
+- **sm**: 0.5rem (8px) - Tight spacing
+- **md**: 0.75rem (12px) - Standard spacing
+- **lg**: 1rem (16px) - Comfortable spacing
+- **xl**: 1.5rem (24px) - Section spacing
+- **2xl**: 2rem (32px) - Page spacing
 
-```css
-/* Display Font - Headings */
---font-display: "Righteous", cursive;
-/* Used for: Page titles, hero text, brand elements */
+### Component Spacing
 
-/* Body Font - Content */
---font-sans: "Roboto", sans-serif;
-/* Used for: Body text, buttons, navigation, forms */
-```
+- **Button Padding**: `px-4 py-2` (16px × 8px)
+- **Card Padding**: `p-4` (16px)
+- **Input Padding**: `px-3 py-2` (12px × 8px)
+- **Section Margins**: `my-6` (24px vertical)
+- **Element Gaps**: `gap-3` (12px)
 
-### Font Weights
+## Border Radius (Reduced)
 
-```css
-/* Roboto Weights */
---font-light: 300      /* Subtle text, captions */
---font-normal: 400     /* Body text, labels */
---font-medium: 500     /* Emphasis, buttons */
---font-semibold: 600   /* Subheadings, strong text */
---font-bold: 700       /* Headings, important text */
+### Radius Scale
 
-/* Righteous Weight */
---font-display: 400    /* All display text */
-```
+- **xs**: 0.125rem (2px) - Subtle rounding
+- **sm**: 0.25rem (4px) - Minimal rounding
+- **md**: 0.375rem (6px) - Standard rounding
+- **lg**: 0.5rem (8px) - Comfortable rounding
+- **xl**: 0.75rem (12px) - Prominent rounding
 
-### Type Scale
+### Component Radius
 
-```css
-/* Heading Sizes */
---text-h1: 4rem/5rem/6rem     /* 64px/80px/96px */
---text-h2: 3rem/4rem          /* 48px/64px */
---text-h3: 2rem/3rem          /* 32px/48px */
---text-h4: 1.25rem/2rem       /* 20px/32px */
+- **Buttons**: `rounded-md` (6px) - Clean, professional
+- **Cards**: `rounded-lg` (8px) - Subtle depth
+- **Inputs**: `rounded-md` (6px) - Consistent with buttons
+- **Badges**: `rounded-sm` (4px) - Sharp, compact
 
-/* Body Sizes */
---text-body: 1rem/1.125rem    /* 16px/18px */
---text-large: 1.125rem/1.25rem /* 18px/20px */
---text-small: 0.875rem        /* 14px */
-```
+## Shadows (Subtle)
 
-### Usage Examples
+### Shadow Scale
 
-```typescript
-// Page Headings
-<h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-dark-green-600">
-  Welcome to Second Turn Games
-</h1>
+- **xs**: `0 1px 2px 0 rgb(0 0 0 / 0.05)` - Minimal depth
+- **sm**: `0 1px 3px 0 rgb(0 0 0 / 0.1)` - Subtle elevation
+- **md**: `0 4px 6px -1px rgb(0 0 0 / 0.1)` - Standard depth
+- **lg**: `0 10px 15px -3px rgb(0 0 0 / 0.1)` - Prominent depth
+- **soft**: `0 2px 4px 0 rgb(0 0 0 / 0.06)` - Gentle elevation
+- **medium**: `0 4px 8px 0 rgb(0 0 0 / 0.08)` - Moderate depth
 
-// Section Headings
-<h2 className="text-2xl md:text-3xl font-semibold text-dark-green-600">
-  Browse Games
-</h2>
+## Transitions & Animations
 
-// Body Text
-<p className="text-base md:text-lg text-dark-green-500">
-  Give your games a second life.
-</p>
+### Timing
 
-// Button Text
-<button className="text-lg font-semibold">
-  Get Started
-</button>
-```
+- **Fast**: 150ms - Hover states, quick feedback
+- **Normal**: 200ms - Standard interactions
+- **Slow**: 300ms - Page transitions, loading states
 
----
+### Easing
 
-## 🎭 Shadows & Depth
+- **Standard**: `ease-out` - Natural, responsive feel
+- **Hover**: `ease-out` - Quick, immediate feedback
 
-### Shadow System
+## Component Library
+
+### Buttons
+
+#### Primary Button
 
 ```css
-/* Shadow Utilities */
---shadow-soft: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)
---shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)
---shadow-strong: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)
+.btn-primary {
+  @apply px-4 py-2 rounded-md bg-vibrant-orange-500 
+         text-white font-medium text-sm
+         hover:bg-vibrant-orange-600 
+         transition-all duration-200
+         shadow-soft hover:shadow-medium;
+}
 ```
 
-### Usage Guidelines
+#### Secondary Button
 
-- **Cards**: `shadow-soft` by default, `hover:shadow-medium` on hover
-- **Buttons**: `shadow-soft` by default, `hover:shadow-medium` on hover
-- **Modals**: `shadow-strong` for elevated content
-- **Navigation**: `shadow-soft` for subtle depth
-
-### Implementation
-
-```typescript
-// Card with hover effect
-<div className="bg-white rounded-2xl shadow-soft hover:shadow-medium transition-shadow duration-200">
-  {/* Card content */}
-</div>
-
-// Button with shadow
-<button className="shadow-soft hover:shadow-medium transition-shadow duration-200">
-  Action Button
-</button>
+```css
+.btn-secondary {
+  @apply px-4 py-2 rounded-md border-2 border-dark-green-300 
+         text-dark-green-600 font-medium text-sm
+         hover:bg-dark-green-50 hover:border-dark-green-400 
+         hover:text-dark-green-700 transition-all duration-200
+         shadow-soft hover:shadow-medium bg-white;
+}
 ```
 
----
+#### Ghost Button
 
-## 🔘 Buttons
-
-### Button Variants
-
-```typescript
-// Primary Button (Orange)
-const primaryButton =
-  "px-6 py-3 rounded-2xl bg-vibrant-orange-500 text-white hover:bg-vibrant-orange-600 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium font-medium";
-
-// Secondary Button (Dark Green Border)
-const secondaryButton =
-  "px-6 py-3 rounded-2xl border-2 border-dark-green-300 text-dark-green-600 hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-700 transition-all duration-200 hover:scale-105 font-medium shadow-soft hover:shadow-medium bg-white";
-
-// Large Button (Hero sections)
-const largeButton = "px-8 py-4 rounded-2xl font-semibold text-lg";
+```css
+.btn-ghost {
+  @apply px-4 py-2 rounded-md text-dark-green-600 
+         font-medium text-sm hover:bg-dark-green-50 
+         transition-all duration-200;
+}
 ```
 
-### Button Sizes
+### Cards
 
-- **Small**: `px-4 py-2` - For inline actions, form buttons
-- **Medium**: `px-6 py-3` - For navigation, primary actions
-- **Large**: `px-8 py-4` - For hero sections, main CTAs
+#### Standard Card
 
-### Button States
-
-```typescript
-// Default state
-<button className="px-6 py-3 rounded-2xl bg-vibrant-orange-500 text-white font-medium shadow-soft">
-  Default Button
-</button>
-
-// Hover state (automatic with Tailwind)
-<button className="px-6 py-3 rounded-2xl bg-vibrant-orange-500 hover:bg-vibrant-orange-600 text-white font-medium shadow-soft hover:shadow-medium transition-all duration-200 hover:scale-105">
-  Hover Button
-</button>
-
-// Focus state
-<button className="px-6 py-3 rounded-2xl bg-vibrant-orange-500 text-white font-medium shadow-soft focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:ring-offset-2">
-  Focus Button
-</button>
+```css
+.card-standard {
+  @apply bg-surface rounded-lg shadow-sm border border-border 
+         p-4 transition-all duration-200;
+}
 ```
 
----
+#### Elevated Card
 
-## 🃏 Cards
-
-### Card Variants
-
-```typescript
-// Game Card
-const gameCard =
-  "bg-white rounded-2xl shadow-soft hover:shadow-medium transition-all duration-200 hover:scale-[1.02] overflow-hidden border border-light-beige-200";
-
-// Profile Card
-const profileCard =
-  "bg-white rounded-2xl shadow-soft p-8 hover:shadow-medium transition-shadow duration-200";
-
-// Feature Card
-const featureCard =
-  "bg-white rounded-2xl shadow-soft p-6 hover:shadow-medium transition-shadow duration-200 text-center";
-
-// Info Card
-const infoCard =
-  "bg-light-beige-50 border border-light-beige-200 rounded-lg px-3 py-2";
+```css
+.card-elevated {
+  @apply bg-surface rounded-lg shadow-md border-0 
+         p-4 hover:shadow-lg transition-all duration-200;
+}
 ```
 
-### Card Usage
+#### Interactive Card
 
-```typescript
-// Game listing card
-<div className="bg-white rounded-2xl shadow-soft hover:shadow-medium transition-all duration-200 hover:scale-[1.02] overflow-hidden border border-light-beige-200">
-  <div className="p-4 space-y-3">
-    <h3 className="font-semibold text-dark-green-600 text-lg">Game Title</h3>
-    <p className="text-dark-green-500">Game description</p>
-  </div>
-</div>
-
-// Feature highlight card
-<div className="bg-white rounded-2xl shadow-soft p-6 hover:shadow-medium transition-shadow duration-200 text-center">
-  <div className="w-16 h-16 bg-vibrant-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-    {/* Icon */}
-  </div>
-  <h3 className="text-xl font-semibold text-dark-green-600 mb-2">Feature Title</h3>
-  <p className="text-dark-green-500">Feature description</p>
-</div>
+```css
+.card-interactive {
+  @apply bg-surface rounded-lg shadow-sm border-2 border-transparent 
+         p-4 hover:border-accent/20 hover:shadow-md 
+         transition-all duration-200 cursor-pointer;
+}
 ```
-
----
-
-## 📝 Forms
 
 ### Form Elements
 
-```typescript
-// Input Field
-const inputField =
-  "w-full px-3 py-2 rounded-lg border border-light-beige-200 bg-light-beige-50 text-dark-green-600 placeholder-dark-green-400 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200";
+#### Input
 
-// Label
-const label = "block text-sm font-medium text-dark-green-500 mb-2";
-
-// Form Group
-const formGroup = "space-y-4";
-
-// Error Message
-const errorMessage = "text-red-600 text-sm mt-1";
+```css
+.input-standard {
+  @apply px-3 py-2 rounded-md border-2 border-border 
+         focus:border-accent focus:ring-2 focus:ring-accent/20 
+         transition-all duration-200 bg-surface text-sm;
+}
 ```
 
-### Form Implementation
+#### Select
 
-```typescript
-// Complete form field
-<div className="space-y-4">
-  <label className="block text-sm font-medium text-dark-green-500 mb-2">
-    Game Title *
-  </label>
-  <input
-    type="text"
-    placeholder="e.g., Catan, Ticket to Ride"
-    className="w-full px-3 py-2 rounded-lg border border-light-beige-200 bg-light-beige-50 text-dark-green-600 placeholder-dark-green-400 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200"
-  />
-  {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
-</div>
+```css
+.select-standard {
+  @apply px-3 py-2 rounded-md border-2 border-border 
+         focus:border-accent focus:ring-2 focus:ring-accent/20 
+         transition-all duration-200 bg-surface text-sm;
+}
 ```
 
----
+#### Checkbox
 
-## 🎬 Animations & Transitions
-
-### Transition Classes
-
-```typescript
-// Hover effects
-const hoverEffects = "hover:scale-105 transition-transform duration-200";
-
-// Shadow transitions
-const shadowTransitions = "hover:shadow-medium transition-shadow duration-200";
-
-// Color transitions
-const colorTransitions = "transition-colors duration-200";
-
-// All transitions
-const allTransitions = "transition-all duration-200";
+```css
+.checkbox-standard {
+  @apply rounded-sm border-2 border-border text-accent 
+         focus:ring-2 focus:ring-accent/20 transition-all duration-200;
+}
 ```
 
-### Animation Usage
+### Badges
 
-```typescript
-// Button with multiple hover effects
-<button className="px-6 py-3 rounded-2xl bg-vibrant-orange-500 text-white hover:bg-vibrant-orange-600 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium">
-  Animated Button
-</button>
+#### Primary Badge
 
-// Card with hover animation
-<div className="bg-white rounded-2xl shadow-soft hover:shadow-medium transition-all duration-200 hover:scale-[1.02]">
-  {/* Card content */}
-</div>
-
-// Smooth color transition
-<div className="text-dark-green-600 hover:text-vibrant-orange-600 transition-colors duration-200">
-  Hover me
-</div>
+```css
+.badge-primary {
+  @apply px-2 py-1 rounded-sm bg-dark-green-100 
+         text-dark-green-700 text-xs font-medium;
+}
 ```
 
----
+#### Accent Badge
 
-## 📱 Responsive Design
+```css
+.badge-accent {
+  @apply px-2 py-1 rounded-sm bg-vibrant-orange-100 
+         text-vibrant-orange-700 text-xs font-medium;
+}
+```
+
+## Responsive Design
 
 ### Breakpoints
 
+- **Mobile**: 0-767px - Compact, single column
+- **Tablet**: 768-1023px - Two column layouts
+- **Desktop**: 1024px+ - Multi-column, expanded layouts
+
+### Mobile-First Approach
+
+- Start with compact mobile design
+- Expand spacing and layout for larger screens
+- Maintain consistent component sizing across breakpoints
+
+## Accessibility
+
+### Focus States
+
+- Clear focus rings with accent colors
+- High contrast focus indicators
+- Keyboard navigation support
+
+### Color Contrast
+
+- Minimum 4.5:1 ratio for normal text
+- Minimum 3:1 ratio for large text
+- Color is never the only indicator
+
+### Touch Targets
+
+- Minimum 44px × 44px for interactive elements
+- Adequate spacing between touch targets
+- Clear visual feedback for interactions
+
+## Empty States and Loading States
+
+### Empty State
+
 ```css
-/* Mobile First Approach */
---breakpoint-sm: 640px    /* Small devices */
---breakpoint-md: 768px    /* Medium devices */
---breakpoint-lg: 1024px   /* Large devices */
---breakpoint-xl: 1280px   /* Extra large devices */
---breakpoint-2xl: 1536px  /* 2X large devices */
-```
-
-### Responsive Utilities
-
-```typescript
-// Responsive text sizing
-const responsiveText = "text-base md:text-lg lg:text-xl";
-
-// Responsive spacing
-const responsiveSpacing = "py-8 md:py-12 lg:py-16";
-
-// Responsive grid
-const responsiveGrid = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-
-// Responsive container
-const responsiveContainer = "px-4 sm:px-6 lg:px-8";
-```
-
-### Mobile-First Implementation
-
-```typescript
-// Responsive button
-<button className="px-4 py-2 md:px-6 md:py-3 rounded-2xl bg-vibrant-orange-500 text-white text-base md:text-lg font-medium">
-  Responsive Button
-</button>
-
-// Responsive layout
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-  {/* Grid items */}
-</div>
-
-// Responsive spacing
-<div className="py-8 md:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
-  {/* Content */}
-</div>
-```
-
----
-
-## 🎯 Component Patterns
-
-### Hero Section
-
-```typescript
-const heroSection = "text-center space-y-6 mb-16";
-
-// Implementation
-<div className="text-center mb-16">
-  <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-dark-green-600 mb-6">
-    Hero Title
-  </h1>
-  <p className="text-xl md:text-2xl text-dark-green-500 mb-8 max-w-3xl mx-auto">
-    Hero description
-  </p>
-  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-    {/* CTA buttons */}
-  </div>
-</div>;
-```
-
-### Feature Grid
-
-```typescript
-const featureGrid = "grid md:grid-cols-3 gap-8 mb-16";
-
-// Implementation
-<div className="grid md:grid-cols-3 gap-8 mb-16">
-  <div className="bg-white rounded-2xl shadow-soft p-6 hover:shadow-medium transition-shadow duration-200 text-center">
-    {/* Feature content */}
-  </div>
-  {/* More features */}
-</div>;
-```
-
-### CTA Section
-
-```typescript
-const ctaSection =
-  "bg-gradient-to-r from-vibrant-orange-500 to-warm-yellow-400 rounded-2xl p-8 text-white text-center";
-
-// Implementation
-<div className="bg-gradient-to-r from-vibrant-orange-500 to-warm-yellow-400 rounded-2xl p-8 text-white">
-  <h2 className="text-3xl font-display font-bold mb-4">CTA Title</h2>
-  <p className="text-xl mb-6 opacity-90">CTA description</p>
-  <button className="inline-block px-8 py-4 bg-white text-vibrant-orange-600 rounded-2xl font-semibold hover:bg-gray-50 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium">
-    CTA Button
-  </button>
-</div>;
-```
-
----
-
-## 🔧 Design System Usage
-
-### Importing Utilities
-
-```typescript
-// Import design system
-import { colors, shadows, buttons, cards, forms, animations } from '@/lib/design-system';
-
-// Use in components
-<button className={buttons.primary}>
-  Primary Action
-</button>
-
-<div className={cards.feature}>
-  <h3>Feature Title</h3>
-  <p>Feature description</p>
-</div>
-```
-
-### Custom Components
-
-```typescript
-// Create consistent components
-function PrimaryButton({ children, ...props }) {
-  return (
-    <button
-      className="px-6 py-3 rounded-2xl bg-vibrant-orange-500 text-white hover:bg-vibrant-orange-600 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium font-medium"
-      {...props}
-    >
-      {children}
-    </button>
-  );
+.empty-state {
+  @apply text-center py-8 px-4;
 }
 
-// Usage
-<PrimaryButton onClick={handleClick}>Click Me</PrimaryButton>;
+.empty-state-icon {
+  @apply w-12 h-12 mx-auto mb-3 text-text-muted;
+}
+
+.empty-state-title {
+  @apply text-base font-semibold text-text mb-2;
+}
+
+.empty-state-description {
+  @apply text-sm text-text-secondary;
+}
 ```
 
----
+### Loading States
 
-## 📋 Design Checklist
+```css
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
 
-### Before Implementation
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+```
 
-- [ ] **Colors**: Using correct brand colors from palette
-- [ ] **Typography**: Appropriate font family and weight
-- [ ] **Spacing**: Consistent with design system scale
-- [ ] **Shadows**: Appropriate depth for component type
-- [ ] **Responsive**: Mobile-first approach implemented
+## Performance Guidelines
 
-### After Implementation
+### CSS Optimization
 
-- [ ] **Hover States**: Smooth transitions and effects
-- [ ] **Focus States**: Accessible keyboard navigation
-- [ ] **Animations**: Smooth, purposeful motion
-- [ ] **Consistency**: Matches existing components
-- [ ] **Accessibility**: Proper contrast and ARIA labels
+- Use CSS custom properties for consistent values
+- Minimize CSS bundle size
+- Leverage Tailwind's utility-first approach
 
----
+### Animation Performance
 
-## 🚀 Best Practices
+- Use `transform` and `opacity` for animations
+- Avoid animating layout properties
+- Keep animations under 300ms for responsiveness
 
-### Do's
+## Development Workflow
 
-- ✅ Use design system utilities consistently
-- ✅ Implement hover and focus states
-- ✅ Follow mobile-first responsive design
-- ✅ Maintain consistent spacing and sizing
-- ✅ Use semantic HTML with proper accessibility
+### Component Creation
 
-### Don'ts
+1. Start with mobile-first design
+2. Apply consistent spacing using 4px grid
+3. Use standard border radius values
+4. Test across all breakpoints
+5. Ensure accessibility compliance
 
-- ❌ Don't hardcode colors outside the system
-- ❌ Don't skip hover/focus states
-- ❌ Don't ignore mobile experience
-- ❌ Don't create inconsistent spacing
-- ❌ Don't forget accessibility considerations
+### Style Updates
 
----
+1. Update design system documentation first
+2. Apply changes to component library
+3. Update existing components systematically
+4. Test visual consistency across the app
 
-## 📚 Resources
+## Resources
 
 ### Design Tools
 
-- **Figma**: [Link to design files]
-- **Storybook**: [Link to component library]
-- **Brand Assets**: [Link to logo and images]
+- Figma for component design
+- Tailwind CSS for implementation
+- CSS custom properties for theming
 
 ### Documentation
 
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Next.js Styling Guide](https://nextjs.org/docs/basic-features/built-in-css-support)
-- [Accessibility Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- Component usage examples
+- Accessibility guidelines
+- Performance best practices
 
----
+## Changelog
 
-_This design system is maintained by the Second Turn Games design and development team._
-_For questions or updates, please contact the design team or create an issue._
+### v2.0.0 - Compact Design System
+
+- **Reduced spacing**: Changed from 8px to 4px grid system
+- **Smaller border radius**: Reduced from 16px+ to 6-8px max
+- **Tighter layouts**: Reduced padding and margins throughout
+- **Professional aesthetic**: Moved away from playful rounded design
+- **Efficient space usage**: Minimized whitespace for better content density
+
+### v1.0.0 - Initial Design System
+
+- Established brand colors and typography
+- Created component library foundation
+- Implemented responsive design patterns

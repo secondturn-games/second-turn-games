@@ -79,7 +79,7 @@ export default function GamesPage() {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-2xl shadow-soft p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-soft p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search Input */}
             <div className="flex-1">
@@ -90,13 +90,13 @@ export default function GamesPage() {
                 <input
                   type="text"
                   placeholder="Search games, sellers, or categories..."
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-light-beige-200 bg-light-beige-50 text-dark-green-600 placeholder-dark-green-400 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200"
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-light-beige-200 bg-light-beige-50 text-dark-green-600 placeholder-dark-green-400 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200"
                 />
               </div>
             </div>
 
             {/* Category Filter */}
-            <select className="px-4 py-3 rounded-xl border border-light-beige-200 bg-light-beige-50 text-dark-green-600 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200">
+            <select className="px-3 py-2 rounded-md border border-light-beige-200 bg-light-beige-50 text-dark-green-600 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200">
               <option value="">All Categories</option>
               <option value="board-game">Board Games</option>
               <option value="card-game">Card Games</option>
@@ -106,7 +106,7 @@ export default function GamesPage() {
             </select>
 
             {/* Condition Filter */}
-            <select className="px-4 py-3 rounded-xl border border-light-beige-200 bg-light-beige-50 text-dark-green-600 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200">
+            <select className="px-3 py-2 rounded-md border border-light-beige-200 bg-light-beige-50 text-dark-green-600 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200">
               <option value="">All Conditions</option>
               <option value="new">New</option>
               <option value="like-new">Like New</option>
@@ -115,7 +115,7 @@ export default function GamesPage() {
             </select>
 
             {/* Price Range */}
-            <select className="px-4 py-3 rounded-xl border border-light-beige-200 bg-light-beige-50 text-dark-green-600 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200">
+            <select className="px-3 py-2 rounded-md border border-light-beige-200 bg-light-beige-50 text-dark-green-600 focus:outline-none focus:ring-2 focus:ring-vibrant-orange-200 focus:border-vibrant-orange-300 transition-colors duration-200">
               <option value="">All Prices</option>
               <option value="0-20">Under €20</option>
               <option value="20-40">€20 - €40</option>
@@ -143,7 +143,7 @@ export default function GamesPage() {
         </div>
 
         {/* Games Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {sampleGames.map((game) => (
             <GameCard key={game.id} {...game} />
           ))}
@@ -151,7 +151,7 @@ export default function GamesPage() {
 
         {/* Load More */}
         <div className="text-center mt-12">
-          <button className="px-8 py-4 rounded-2xl border-2 border-dark-green-300 text-dark-green-600 hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-700 transition-all duration-200 hover:scale-105 font-semibold">
+          <button className="btn-secondary px-6 py-3 text-base font-semibold">
             Load More Games
           </button>
         </div>

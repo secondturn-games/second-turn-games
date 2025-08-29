@@ -6,6 +6,7 @@ import { GameSelectionStep } from './steps/game-selection-step'
 import { ConditionPhotosStep } from './steps/condition-photos-step'
 import { PriceDeliveryStep } from './steps/price-delivery-step'
 import { ListingPreview } from './listing-preview'
+import { StepIndicator } from './step-indicator'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react'
 
@@ -180,73 +181,23 @@ export function ListingWizard() {
   }
 
   return (
-         <div className="min-h-screen bg-light-beige">
-       <div className="container mx-auto px-4 py-6 max-w-7xl">
-         {/* Step Indicator */}
-         <div className="mb-6">
-          <div className="flex justify-center">
-            <div className="flex items-center">
-              {steps.map((step, index) => {
-                const isCurrent = currentStep === step.key
-                const isCompleted = steps.findIndex(s => s.key === currentStep) > index
-                const isAccessible = canProceedToStep(step.key) || canGoBackToStep(step.key)
-                
-                return (
-                  <div key={step.key} className="flex items-center">
-                                         {/* Step Circle */}
-                     <div 
-                       className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 font-bold text-sm cursor-pointer ${
-                         isCurrent 
-                           ? 'bg-vibrant-orange text-white shadow-medium scale-105' 
-                           : isCompleted
-                             ? 'bg-vibrant-orange text-white shadow-soft'
-                             : isAccessible
-                               ? 'bg-light-beige-200 hover:bg-light-beige-300 hover:scale-105 text-dark-green-600'
-                               : 'bg-light-beige-100 text-dark-green-400'
-                       }`}
-                       onClick={() => isAccessible && handleStepClick(step.key)}
-                     >
-                       {isCompleted ? '✓' : index + 1}
-                     </div>
-                     
-                     {/* Step Title */}
-                     <span className={`ml-1 lg:ml-2 text-xs font-medium hidden sm:inline transition-colors duration-200 ${
-                       isCurrent 
-                         ? 'text-vibrant-orange' 
-                         : isCompleted
-                           ? 'text-dark-green-600'
-                           : 'text-dark-green-400'
-                     }`}>
-                       {step.title}
-                     </span>
-                     
-                     {/* Progress Bar */}
-                     {index < steps.length - 1 && (
-                       <div className="w-8 sm:w-12 lg:w-16 h-1.5 mx-2 lg:mx-3 rounded-full bg-light-beige-200 overflow-hidden">
-                         <div 
-                           className={`h-full rounded-full transition-all duration-500 ease-out ${
-                             isCompleted 
-                               ? 'bg-vibrant-orange' 
-                               : 'bg-light-beige-300'
-                           }`}
-                           style={{ 
-                             width: isCompleted ? '100%' : '0%',
-                             transitionDelay: `${index * 100}ms`
-                           }}
-                         />
-                       </div>
-                     )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-
-                 {/* Main Content Layout */}
-         <div className="lg:flex lg:gap-6">
+    <div className="min-h-screen bg-light-beige">
+      <div className="container mx-auto px-2 sm:px-3 py-4 max-w-7xl">
+        {/* Main Content Layout */}
+        <div className="lg:flex lg:gap-4">
           {/* Left Column - Form Content */}
           <div className="lg:flex-1 lg:max-w-4xl">
+            {/* Step Indicator - Integrated into form */}
+            <div className="bg-white rounded-md shadow-sm border border-light-beige-200 mb-4">
+              <StepIndicator
+                steps={steps}
+                currentStep={currentStep}
+                onStepClick={handleStepClick}
+                canProceedToStep={canProceedToStep}
+                canGoBackToStep={canGoBackToStep}
+              />
+            </div>
+            
             {/* Step Content */}
             {currentStep === 'listing-type' && (
               <ListingTypeStep 
@@ -287,17 +238,17 @@ export function ListingWizard() {
 
           {/* Right Column - Listing Preview Sidebar */}
           {canShowPreview() && (
-            <div className="lg:w-96 lg:flex-shrink-0">
+            <div className="lg:w-80 lg:flex-shrink-0">
               {/* Mobile Preview Toggle */}
-              <div className="lg:hidden mb-4">
+              <div className="lg:hidden mb-3">
                 <Button
                   variant="outline"
                   onClick={() => setShowPreview(!showPreview)}
-                  className="w-full flex items-center justify-between border-vibrant-orange text-vibrant-orange hover:bg-vibrant-orange/10"
+                  className="w-full flex items-center justify-between border-vibrant-orange text-vibrant-orange hover:bg-vibrant-orange/10 px-3 py-1.5"
                 >
                   <div className="flex items-center space-x-2">
                     {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    <span>Preview Listing</span>
+                    <span className="text-sm">Preview Listing</span>
                   </div>
                   {showPreview ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                 </Button>
@@ -305,7 +256,7 @@ export function ListingWizard() {
 
               {/* Preview Content */}
               <div className={`${!showPreview ? 'hidden' : 'block'} lg:block`}>
-                <div className="lg:sticky lg:top-8">
+                <div className="lg:sticky lg:top-6">
                   <ListingPreview formData={formData} />
                 </div>
               </div>

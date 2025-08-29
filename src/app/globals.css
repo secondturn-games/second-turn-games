@@ -2,236 +2,242 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    /* Font Variables */
-    --font-manrope: 'Manrope', sans-serif;
-    --font-righteous: 'Righteous', sans-serif;
-    --font-bebas-neue: 'Bebas Neue', sans-serif;
-  }
-
-  body {
-    background-color: #E6EAD7;
-    color: #1B1B1B;
-    font-family: var(--font-manrope), sans-serif;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* Typography Scale */
-  h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    font-family: var(--font-righteous), sans-serif;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    font-family: var(--font-righteous), sans-serif;
-  }
-
-  h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
-
-  h4 {
-    font-size: 1.125rem;
-    font-weight: 600;
-  }
-
-  h5 {
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  h6 {
-    font-size: 0.875rem;
-    font-weight: 600;
-  }
-
-  .game-title {
-    font-family: var(--font-bebas-neue), sans-serif;
-    font-weight: 400;
-  }
-
-  .logo-text {
-    font-family: var(--font-righteous), sans-serif;
-    font-weight: 400;
-  }
+/* Custom scrollbar utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
 }
 
-@layer components {
-  /* Button Components */
-  .btn-primary {
-    @apply px-4 py-2 rounded-md bg-vibrant-orange text-white font-medium text-sm hover:bg-vibrant-orange-600 transition-all duration-200 shadow-soft hover:shadow-medium;
-  }
-
-  .btn-secondary {
-    @apply px-4 py-2 rounded-md border-2 border-dark-green-300 text-dark-green-600 font-medium text-sm hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-600 transition-all duration-200 shadow-soft hover:shadow-medium bg-white;
-  }
-
-  .btn-ghost {
-    @apply px-4 py-2 rounded-md text-dark-green-600 font-medium text-sm hover:bg-dark-green-50 transition-all duration-200;
-  }
-
-  /* Card Components */
-  .card-standard {
-    @apply bg-white rounded-lg shadow-soft border border-light-beige-200 p-4 transition-all duration-200;
-  }
-
-  .card-elevated {
-    @apply bg-white rounded-lg shadow-medium border-0 p-4 hover:shadow-lg transition-all duration-200;
-  }
-
-  .card-interactive {
-    @apply bg-white rounded-lg shadow-soft border-2 border-transparent p-4 hover:border-vibrant-orange-300/20 hover:shadow-medium transition-all duration-200 cursor-pointer;
-  }
-
-  /* Form Components */
-  .input-standard {
-    @apply px-3 py-2 rounded-md border-2 border-light-beige-200 focus:border-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 transition-all duration-200 bg-white text-sm;
-  }
-
-  .select-standard {
-    @apply px-3 py-2 rounded-md border-2 border-light-beige-200 focus:border-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 transition-all duration-200 bg-white text-sm;
-  }
-
-  .checkbox-standard {
-    @apply rounded-sm border-2 border-light-beige-200 text-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 transition-all duration-200;
-  }
-
-  /* Badge Components */
-  .badge-primary {
-    @apply px-2 py-1 rounded-sm bg-dark-green-100 text-dark-green-700 text-xs font-medium;
-  }
-
-  .badge-accent {
-    @apply px-2 py-1 rounded-sm bg-vibrant-orange-100 text-vibrant-orange-600 text-xs font-medium;
-  }
-
-  /* Empty State Components */
-  .empty-state {
-    @apply text-center py-8 px-4;
-  }
-
-  .empty-state-icon {
-    @apply w-12 h-12 mx-auto mb-3 text-text-muted;
-  }
-
-  .empty-state-title {
-    @apply text-base font-semibold text-text mb-2;
-  }
-
-  .empty-state-description {
-    @apply text-sm text-text-secondary;
-  }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
 }
 
-@layer utilities {
-  /* Loading States */
-  .loading-shimmer {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  /* Dice Roll Animation */
-  .dice-roll {
-    animation: diceRoll 0.6s ease-out;
-  }
-
-  @keyframes diceRoll {
-    0% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(90deg) scale(1.1); }
-    50% { transform: rotate(180deg) scale(0.9); }
-    75% { transform: rotate(270deg) scale(1.05); }
-    100% { transform: rotate(360deg) scale(1); }
-  }
-
-  /* Hover Effects */
-  .hover-lift {
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  }
-
-  /* Focus States */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-vibrant-orange/50 focus:ring-offset-2 focus:ring-offset-white;
-  }
-}
-
-/* Clerk Modal Styling */
+/* Custom CSS Variables for Ultra-Compact Design System */
 :root {
-  --clerk-primary: #D95323;
-  --clerk-primary-hover: #C44A1F;
-  --clerk-primary-text: white;
-  --clerk-border: #E6EAD7;
-  --clerk-background: #FFFFFF;
-  --clerk-text: #1B1B1B;
-  --clerk-text-secondary: #29432B;
-  --clerk-input-background: #FFFFFF;
-  --clerk-input-border: #E6EAD7;
-  --clerk-input-focus-border: #D95323;
-  --clerk-input-focus-ring: #FBC7BC;
+  /* Ultra-Compact Spacing (2px Grid) */
+  --spacing-xs: 0.125rem;    /* 2px */
+  --spacing-sm: 0.25rem;     /* 4px */
+  --spacing-md: 0.375rem;    /* 6px */
+  --spacing-lg: 0.5rem;      /* 8px */
+  --spacing-xl: 0.75rem;     /* 12px */
+  --spacing-2xl: 1rem;       /* 16px */
+  
+  /* Reduced Border Radius */
+  --radius-xs: 0.125rem;     /* 2px */
+  --radius-sm: 0.25rem;      /* 4px */
+  --radius-md: 0.375rem;     /* 6px */
+  --radius-lg: 0.5rem;       /* 8px */
+  --radius-xl: 0.75rem;      /* 12px */
+  
+  /* Compact Typography Scale */
+  --text-xs: 0.75rem;        /* 12px */
+  --text-sm: 0.875rem;       /* 14px */
+  --text-base: 0.875rem;     /* 14px */
+  --text-lg: 1rem;           /* 16px */
+  --text-xl: 1.125rem;       /* 18px */
+  --text-2xl: 1.375rem;      /* 22px */
+  --text-3xl: 1.75rem;       /* 28px */
+  
+  /* Shadows */
+  --shadow-soft: 0 2px 8px 0 rgb(0 0 0 / 0.08);
+  --shadow-medium: 0 4px 12px 0 rgb(0 0 0 / 0.12);
+  --shadow-strong: 0 8px 25px 0 rgb(0 0 0 / 0.15);
 }
 
-/* Enhanced Clerk Form Styling */
-.cl-formButtonPrimary {
-  @apply bg-vibrant-orange hover:bg-vibrant-orange-600 text-white font-medium rounded-md px-4 py-2.5 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium;
+/* Ultra-Compact Button Styles */
+.btn-primary {
+  @apply px-3 py-1.5 rounded-sm bg-vibrant-orange text-white font-medium text-sm
+         hover:bg-vibrant-orange-600 transition-all duration-200
+         shadow-soft hover:shadow-medium;
 }
 
-.cl-formButtonSecondary {
-  @apply border-2 border-dark-green-300 text-dark-green-600 hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-600 font-medium rounded-md px-4 py-2.5 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium bg-white;
+.btn-secondary {
+  @apply px-3 py-1.5 rounded-sm border-2 border-dark-green-300 
+         text-dark-green-600 font-medium text-sm
+         hover:bg-dark-green-50 hover:border-dark-green-400 
+         hover:text-dark-green-600 transition-all duration-200
+         shadow-soft hover:shadow-medium bg-white;
 }
 
-.cl-formInput {
-  @apply rounded-md border-2 border-dark-green-300 bg-white text-dark-green-600 placeholder-dark-green-400 focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange transition-all duration-200 px-3 py-2.5 text-sm shadow-medium;
+.btn-ghost {
+  @apply px-3 py-1.5 rounded-sm text-dark-green-600 
+         font-medium text-sm hover:bg-dark-green-50 
+         transition-all duration-200;
 }
 
-.cl-formLabel {
-  @apply text-sm font-semibold text-dark-green-600 mb-2 block;
+/* Ultra-Compact Card Styles */
+.card-standard {
+  @apply bg-white rounded-md shadow-sm border border-light-beige-200 
+         p-2 transition-all duration-200;
 }
 
-.cl-card {
-  @apply bg-white rounded-lg shadow-lg border-2 border-dark-green-200 p-6;
+.card-elevated {
+  @apply bg-white rounded-md shadow-medium border-0 
+         p-2 hover:shadow-strong transition-all duration-200;
 }
 
-.cl-headerTitle {
-  @apply text-2xl font-bold text-dark-green-600;
+.card-interactive {
+  @apply bg-white rounded-md shadow-sm border-2 border-transparent 
+         p-2 hover:border-vibrant-orange/20 hover:shadow-medium 
+         transition-all duration-200 cursor-pointer;
 }
 
-.cl-headerSubtitle {
-  @apply text-sm text-dark-green-600;
+/* Ultra-Compact Form Styles */
+.input-standard {
+  @apply px-2 py-1.5 rounded-sm border-2 border-light-beige-200 
+         focus:border-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 
+         transition-all duration-200 bg-white text-sm;
 }
 
-.cl-socialButtonsBlockButton {
-  @apply border-2 border-dark-green-300 bg-white text-dark-green-600 hover:bg-dark-green-50 hover:border-light-beige-300 font-medium rounded-md px-4 py-2.5 transition-all duration-200 hover:scale-105 shadow-medium hover:shadow-lg;
+.select-standard {
+  @apply px-2 py-1.5 rounded-sm border-2 border-light-beige-200 
+         focus:border-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 
+         transition-all duration-200 bg-white text-sm;
 }
 
-.cl-dividerLine {
-  @apply bg-light-beige-200;
+.checkbox-standard {
+  @apply rounded-xs border-2 border-light-beige-200 text-vibrant-orange 
+         focus:ring-2 focus:ring-vibrant-orange/20 transition-all duration-200;
 }
 
-.cl-dividerText {
-  @apply text-dark-green-500 font-medium text-sm;
+/* Ultra-Compact Badge Styles */
+.badge-primary {
+  @apply px-1.5 py-0.5 rounded-xs bg-dark-green-100 
+         text-dark-green-600 text-xs font-medium;
 }
 
-.cl-footerAction {
-  @apply text-sm text-dark-green-600;
+.badge-accent {
+  @apply px-1.5 py-0.5 rounded-xs bg-vibrant-orange-100 
+         text-vibrant-orange-600 text-xs font-medium;
 }
 
-.cl-footerActionLink {
-  @apply text-vibrant-orange hover:text-vibrant-orange-600 font-medium transition-colors duration-200;
+/* Clerk Modal Styling - Ultra-Compact */
+.clerk-modal {
+  @apply rounded-md border-2 border-light-beige-200 shadow-medium;
+}
+
+.clerk-modal-header {
+  @apply p-3 border-b border-light-beige-200;
+}
+
+.clerk-modal-content {
+  @apply p-3;
+}
+
+.clerk-modal-footer {
+  @apply p-3 border-t border-light-beige-200;
+}
+
+.clerk-input {
+  @apply px-2 py-1.5 rounded-sm border-2 border-light-beige-200 
+         focus:border-vibrant-orange focus:ring-2 focus:ring-vibrant-orange/20 
+         transition-all duration-200 bg-white text-sm;
+}
+
+.clerk-button {
+  @apply px-3 py-1.5 rounded-sm font-medium text-sm
+         transition-all duration-200 shadow-soft hover:shadow-medium;
+}
+
+.clerk-button-primary {
+  @apply bg-vibrant-orange text-white hover:bg-vibrant-orange-600;
+}
+
+.clerk-button-secondary {
+  @apply bg-white border-2 border-dark-green-300 text-dark-green-600
+         hover:bg-dark-green-50 hover:border-dark-green-400;
+}
+
+/* Custom Clerk Appearance Variables */
+.clerk-appearance {
+  --clerk-spacing-unit: 0.125rem;      /* 2px base unit */
+  --clerk-border-radius: 0.25rem;      /* 4px */
+  --clerk-font-size-small: 0.75rem;    /* 12px */
+  --clerk-font-size-base: 0.875rem;    /* 14px */
+  --clerk-font-size-large: 1rem;       /* 16px */
+  --clerk-spacing-small: 0.25rem;      /* 4px */
+  --clerk-spacing-medium: 0.5rem;      /* 8px */
+  --clerk-spacing-large: 0.75rem;      /* 12px */
+}
+
+/* Ultra-Compact Layout Utilities */
+.compact-section {
+  @apply my-4;
+}
+
+.compact-card {
+  @apply p-2;
+}
+
+.compact-button {
+  @apply px-3 py-1.5;
+}
+
+.compact-input {
+  @apply px-2 py-1.5;
+}
+
+.compact-gap {
+  @apply gap-2;
+}
+
+.compact-space-y {
+  @apply space-y-2;
+}
+
+.compact-space-x {
+  @apply space-x-2;
+}
+
+/* Responsive Ultra-Compact Adjustments */
+@media (min-width: 768px) {
+  .compact-card {
+    @apply p-3;
+  }
+  
+  .compact-button {
+    @apply px-4 py-2;
+  }
+  
+  .compact-input {
+    @apply px-3 py-2;
+  }
+  
+  .compact-gap {
+    @apply gap-3;
+  }
+  
+  .compact-space-y {
+    @apply space-y-3;
+  }
+  
+  .compact-space-x {
+    @apply space-x-3;
+  }
+}
+
+@media (min-width: 1024px) {
+  .compact-card {
+    @apply p-4;
+  }
+  
+  .compact-button {
+    @apply px-5 py-2.5;
+  }
+  
+  .compact-input {
+    @apply px-4 py-2.5;
+  }
+  
+  .compact-gap {
+    @apply gap-4;
+  }
+  
+  .compact-space-y {
+    @apply space-y-4;
+  }
+  
+  .compact-space-x {
+    @apply space-x-4;
+  }
 }

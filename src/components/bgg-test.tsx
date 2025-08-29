@@ -200,7 +200,7 @@ export function BGGTest() {
                   </h4>
                   <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${
                     game.type === 'boardgame' 
-                      ? 'bg-dark-green-100 text-dark-green-700' 
+                      ? 'bg-dark-green-100 text-dark-green-600' 
                       : 'bg-vibrant-orange-100 text-vibrant-orange-700'
                   }`}>
                     {game.type === 'boardgame' ? 'Base Game' : 'Expansion'}
@@ -232,7 +232,7 @@ export function BGGTest() {
                     </span>
                   )}
                   {game.average && (
-                    <span className="bg-dark-green-100 text-dark-green-700 px-2 py-1 rounded-full flex items-center gap-1">
+                    <span className="bg-dark-green-100 text-dark-green-600 px-2 py-1 rounded-full flex items-center gap-1">
                       <Star className="w-3 h-3" />
                       {parseFloat(game.average).toFixed(1)}
                     </span>
@@ -270,7 +270,7 @@ export function BGGTest() {
                </h4>
                <span className={`text-sm px-3 py-1 rounded-full ${
                  selectedGame.type === 'boardgame' 
-                   ? 'bg-dark-green-100 text-dark-green-700' 
+                   ? 'bg-dark-green-100 text-dark-green-600' 
                    : 'bg-vibrant-orange-100 text-vibrant-orange-700'
                }`}>
                  {selectedGame.type === 'boardgame' ? 'Base Game' : 'Expansion'}
@@ -359,7 +359,7 @@ export function BGGTest() {
                        {selectedGame.categories.slice(0, 5).map((category, index) => (
                          <span
                            key={index}
-                           className="text-xs bg-dark-green-100 text-dark-green-700 px-2 py-1 rounded-full"
+                           className="text-xs bg-dark-green-100 text-dark-green-600 px-2 py-1 rounded-full"
                          >
                            {category}
                          </span>
@@ -560,7 +560,7 @@ export function BGGTest() {
                 {/* Smart Name Suggestion */}
                 {versionMatch.suggestedAlternateName && (
                   <div className="mb-3 p-2 bg-dark-green-100 rounded-lg">
-                    <p className="text-xs text-dark-green-700 font-medium mb-1">
+                    <p className="text-xs text-dark-green-600 font-medium mb-1">
                       Suggested Name:
                     </p>
                     <p className="text-sm text-dark-green-800">

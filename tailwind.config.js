@@ -69,13 +69,13 @@ module.exports = {
         'game-titles': ['var(--font-bebas-neue)', 'sans-serif'],
       },
       spacing: {
-        // 4px grid system for compact design
-        'xs': '0.25rem',    // 4px
-        'sm': '0.5rem',     // 8px
-        'md': '0.75rem',    // 12px
-        'lg': '1rem',       // 16px
-        'xl': '1.5rem',     // 24px
-        '2xl': '2rem',      // 32px
+        // 2px grid system for ultra-compact design
+        'xs': '0.125rem',   // 2px
+        'sm': '0.25rem',    // 4px
+        'md': '0.375rem',   // 6px
+        'lg': '0.5rem',     // 8px
+        'xl': '0.75rem',    // 12px
+        '2xl': '1rem',      // 16px
       },
       borderRadius: {
         // Reduced border radius for professional look
@@ -97,8 +97,8 @@ module.exports = {
         'base': '0.875rem', // 14px
         'lg': '1rem',       // 16px
         'xl': '1.125rem',   // 18px
-        '2xl': '1.5rem',    // 24px
-        '3xl': '2rem',      // 32px
+        '2xl': '1.375rem',  // 22px
+        '3xl': '1.75rem',   // 28px
       },
     },
   },

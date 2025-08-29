@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Search, Calendar, Users, Clock, Cake, Package, Type, Languages, Building2, Ruler, Weight, CheckCircle, AlertCircle, Info } from 'lucide-react'
+import { Search, Calendar, Users, Clock, Cake, Package, Type, Languages, Building2, Ruler, Weight, CheckCircle, AlertCircle, Info, HelpCircle } from 'lucide-react'
 import { bggService } from '@/lib/bgg'
 import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion } from '@/lib/bgg'
 import type { ListingFormData } from '../listing-wizard'
+
 
 interface GameSelectionStepProps {
   formData: ListingFormData
@@ -38,11 +39,11 @@ export function GameSelectionStep({ updateFormData, onNext, onBack }: GameSelect
 
     setIsSearching(true)
     setSearchError('')
-    setHasSearched(true)
     setSearchResults([])
     setSelectedGame(null)
     setVersions([])
     setSelectedVersion(null)
+    setHasSearched(true)
 
     try {
       const searchResults = await bggService.searchGames(searchTerm, { gameType })
@@ -115,6 +116,29 @@ export function GameSelectionStep({ updateFormData, onNext, onBack }: GameSelect
 
   const canContinue = !!selectedGame && !!selectedVersion
 
+  const performSearchWithGameType = async (newGameType: 'base-game' | 'expansion') => {
+    if (!searchTerm.trim() || searchTerm.trim().length < 2) {
+      setSearchError('Please enter at least 2 characters to search')
+      return
+    }
+
+    setIsSearching(true)
+    setSearchError('')
+    setSearchResults([])
+    setSelectedGame(null)
+    setVersions([])
+    setSelectedVersion(null)
+
+    try {
+      const searchResults = await bggService.searchGames(searchTerm, { gameType: newGameType })
+      setSearchResults(searchResults)
+    } catch (err) {
+      setSearchError(err instanceof Error ? err.message : 'Search failed')
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -130,7 +154,10 @@ export function GameSelectionStep({ updateFormData, onNext, onBack }: GameSelect
                 setGameType('base-game')
                 setSearchResults([])
                 setSearchError('')
-                if (hasSearched) performSearch()
+                // Only search if we have a valid search term
+                if (searchTerm.trim() && searchTerm.trim().length >= 2) {
+                  performSearchWithGameType('base-game')
+                }
               }}
               className={`flex-1 py-2 px-3 rounded-md text-xs font-medium transition-colors ${
                 gameType === 'base-game'
@@ -145,7 +172,10 @@ export function GameSelectionStep({ updateFormData, onNext, onBack }: GameSelect
                 setGameType('expansion')
                 setSearchResults([])
                 setSearchError('')
-                if (hasSearched) performSearch()
+                // Only search if we have a valid search term
+                if (searchTerm.trim() && searchTerm.trim().length >= 2) {
+                  performSearchWithGameType('expansion')
+                }
               }}
               className={`flex-1 py-2 px-3 rounded-md text-xs font-medium transition-colors ${
                 gameType === 'expansion'
@@ -166,8 +196,28 @@ export function GameSelectionStep({ updateFormData, onNext, onBack }: GameSelect
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && performSearch()}
-                className="pl-10 border-gray-300 focus:border-vibrant-orange"
+                className="pl-10 pr-10 border-gray-300 focus:border-vibrant-orange"
               />
+              {searchTerm && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('')
+                    setSearchResults([])
+                    setSelectedGame(null)
+                    setVersions([])
+                    setSelectedVersion(null)
+                    setSearchError('')
+                    setHasSearched(false)
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  type="button"
+                  title="Clear search"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
             <Button
               onClick={performSearch}
@@ -233,6 +283,31 @@ export function GameSelectionStep({ updateFormData, onNext, onBack }: GameSelect
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* Empty State - No Search Results */}
+        {hasSearched && !isSearching && searchResults.length === 0 && !searchError && (
+          <div className="bg-teal/10 border border-teal/200 rounded-md p-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-teal/20 rounded-md flex items-center justify-center">
+                <HelpCircle className="w-5 h-5 text-teal-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-dark-green-600 mb-1">
+                  Hmm, we couldn&apos;t find that
+                </h3>
+                <p className="text-xs text-dark-green-500">
+                  Double-check the full name or spelling. If it&apos;s still missing, drop us a line: 
+                  <a 
+                    href="mailto:info@secondturn.games" 
+                    className="text-vibrant-orange hover:underline ml-1"
+                  >
+                    info@secondturn.games
+                  </a>
+                </p>
+              </div>
+            </div>
           </div>
         )}
 

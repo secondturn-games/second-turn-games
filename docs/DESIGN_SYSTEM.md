@@ -2,13 +2,13 @@
 
 ## Overview and Design Principles
 
-Our design system prioritizes **compact efficiency** and **clean precision** over excessive whitespace and rounded aesthetics. We focus on:
+Our design system prioritizes **ultra-compact efficiency** and **technical precision** over excessive whitespace and rounded aesthetics. We focus on:
 
-- **Compact Layouts**: Minimal padding and margins for efficient use of space
-- **Sharp Edges**: Reduced border radius for a more professional, less playful appearance
-- **Tight Spacing**: 4px grid system for consistent, space-efficient layouts
+- **Ultra-Compact Layouts**: Minimal padding and margins for maximum information density
+- **Sharp Edges**: Reduced border radius for a more professional, technical appearance
+- **Tight Spacing**: 2px grid system for consistent, space-efficient layouts
 - **Clear Hierarchy**: Strong visual separation without excessive breathing room
-- **Modern Minimalism**: Clean lines and precise spacing for a trustworthy marketplace feel
+- **Technical Aesthetic**: Clean lines and precise spacing for a professional marketplace feel
 
 ## Typography
 
@@ -18,14 +18,14 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 - **Display (Headings)**: Righteous - Distinctive brand identity
 - **Game Titles**: Bebas Neue - Strong, impactful for game names
 
-### Scale (Compact)
+### Scale (Ultra-Compact)
 
-- **h1**: 2rem (32px) - Page titles
-- **h2**: 1.5rem (24px) - Section headers
-- **h3**: 1.25rem (20px) - Subsection headers
-- **h4**: 1.125rem (18px) - Card titles
-- **h5**: 1rem (16px) - Small headers
-- **h6**: 0.875rem (14px) - Captions
+- **h1**: 1.75rem (28px) - Page titles
+- **h2**: 1.375rem (22px) - Section headers
+- **h3**: 1.125rem (18px) - Subsection headers
+- **h4**: 1rem (16px) - Card titles
+- **h5**: 0.875rem (14px) - Small headers
+- **h6**: 0.75rem (12px) - Captions
 - **Body**: 0.875rem (14px) - Default text size
 - **Small**: 0.75rem (12px) - Secondary text
 
@@ -62,24 +62,24 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 - **Light** `#F3F4F6` - Subtle borders
 - **Accent** `#D95323` - Focus states
 
-## Spacing System (4px Grid - Compact)
+## Spacing System (2px Grid - Ultra-Compact)
 
 ### Base Units
 
-- **xs**: 0.25rem (4px) - Minimal spacing
-- **sm**: 0.5rem (8px) - Tight spacing
-- **md**: 0.75rem (12px) - Standard spacing
-- **lg**: 1rem (16px) - Comfortable spacing
-- **xl**: 1.5rem (24px) - Section spacing
-- **2xl**: 2rem (32px) - Page spacing
+- **xs**: 0.125rem (2px) - Ultra-tight spacing
+- **sm**: 0.25rem (4px) - Minimal spacing
+- **md**: 0.375rem (6px) - Tight spacing
+- **lg**: 0.5rem (8px) - Standard spacing
+- **xl**: 0.75rem (12px) - Section spacing
+- **2xl**: 1rem (16px) - Page spacing
 
 ### Component Spacing
 
-- **Button Padding**: `px-4 py-2` (16px × 8px)
-- **Card Padding**: `p-4` (16px)
-- **Input Padding**: `px-3 py-2` (12px × 8px)
-- **Section Margins**: `my-6` (24px vertical)
-- **Element Gaps**: `gap-3` (12px)
+- **Button Padding**: `px-3 py-1.5` (12px × 6px)
+- **Card Padding**: `p-2` (8px)
+- **Input Padding**: `px-2 py-1.5` (8px × 6px)
+- **Section Margins**: `my-4` (16px vertical)
+- **Element Gaps**: `gap-2` (8px)
 
 ## Border Radius (Reduced)
 
@@ -93,10 +93,10 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ### Component Radius
 
-- **Buttons**: `rounded-md` (6px) - Clean, professional
-- **Cards**: `rounded-lg` (8px) - Subtle depth
-- **Inputs**: `rounded-md` (6px) - Consistent with buttons
-- **Badges**: `rounded-sm` (4px) - Sharp, compact
+- **Buttons**: `rounded-sm` (4px) - Clean, technical
+- **Cards**: `rounded-md` (6px) - Subtle depth
+- **Inputs**: `rounded-sm` (4px) - Consistent with buttons
+- **Badges**: `rounded-xs` (2px) - Sharp, ultra-compact
 
 ## Shadows (Subtle)
 
@@ -122,6 +122,12 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 - **Standard**: `ease-out` - Natural, responsive feel
 - **Hover**: `ease-out` - Quick, immediate feedback
 
+### Hover Effects
+
+- **Scale**: `hover:scale-[1.02]` - Subtle 2% scale increase (not 5%)
+- **Purpose**: Gentle feedback without disrupting layout
+- **Containment**: Effects stay within component boundaries
+
 ## Component Library
 
 ### Buttons
@@ -130,9 +136,9 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .btn-primary {
-  @apply px-4 py-2 rounded-md bg-vibrant-orange-500 
+  @apply px-3 py-1.5 rounded-sm bg-vibrant-orange-500 
          text-white font-medium text-sm
-         hover:bg-vibrant-orange-600 
+         hover:bg-vibrant-orange-600 hover:scale-[1.02]
          transition-all duration-200
          shadow-soft hover:shadow-medium;
 }
@@ -142,10 +148,10 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .btn-secondary {
-  @apply px-4 py-2 rounded-md border-2 border-dark-green-300 
+  @apply px-3 py-1.5 rounded-sm border-2 border-dark-green-300 
          text-dark-green-600 font-medium text-sm
          hover:bg-dark-green-50 hover:border-dark-green-400 
-         hover:text-dark-green-700 transition-all duration-200
+         hover:text-dark-green-700 hover:scale-[1.02] transition-all duration-200
          shadow-soft hover:shadow-medium bg-white;
 }
 ```
@@ -154,7 +160,7 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .btn-ghost {
-  @apply px-4 py-2 rounded-md text-dark-green-600 
+  @apply px-3 py-1.5 rounded-sm text-dark-green-600 
          font-medium text-sm hover:bg-dark-green-50 
          transition-all duration-200;
 }
@@ -166,8 +172,8 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .card-standard {
-  @apply bg-surface rounded-lg shadow-sm border border-border 
-         p-4 transition-all duration-200;
+  @apply bg-surface rounded-md shadow-sm border border-border 
+         p-2 transition-all duration-200;
 }
 ```
 
@@ -175,8 +181,8 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .card-elevated {
-  @apply bg-surface rounded-lg shadow-md border-0 
-         p-4 hover:shadow-lg transition-all duration-200;
+  @apply bg-surface rounded-md shadow-md border-0 
+         p-2 hover:shadow-lg transition-all duration-200;
 }
 ```
 
@@ -184,8 +190,8 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .card-interactive {
-  @apply bg-surface rounded-lg shadow-sm border-2 border-transparent 
-         p-4 hover:border-accent/20 hover:shadow-md 
+  @apply bg-surface rounded-md shadow-sm border-2 border-transparent 
+         p-2 hover:border-accent/20 hover:shadow-md 
          transition-all duration-200 cursor-pointer;
 }
 ```
@@ -196,7 +202,7 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .input-standard {
-  @apply px-3 py-2 rounded-md border-2 border-border 
+  @apply px-2 py-1.5 rounded-sm border-2 border-border 
          focus:border-accent focus:ring-2 focus:ring-accent/20 
          transition-all duration-200 bg-surface text-sm;
 }
@@ -206,7 +212,7 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .select-standard {
-  @apply px-3 py-2 rounded-md border-2 border-border 
+  @apply px-2 py-1.5 rounded-sm border-2 border-border 
          focus:border-accent focus:ring-2 focus:ring-accent/20 
          transition-all duration-200 bg-surface text-sm;
 }
@@ -216,7 +222,7 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .checkbox-standard {
-  @apply rounded-sm border-2 border-border text-accent 
+  @apply rounded-xs border-2 border-border text-accent 
          focus:ring-2 focus:ring-accent/20 transition-all duration-200;
 }
 ```
@@ -227,7 +233,7 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .badge-primary {
-  @apply px-2 py-1 rounded-sm bg-dark-green-100 
+  @apply px-1.5 py-0.5 rounded-xs bg-dark-green-100 
          text-dark-green-700 text-xs font-medium;
 }
 ```
@@ -236,7 +242,7 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .badge-accent {
-  @apply px-2 py-1 rounded-sm bg-vibrant-orange-100 
+  @apply px-1.5 py-0.5 rounded-xs bg-vibrant-orange-100 
          text-vibrant-orange-700 text-xs font-medium;
 }
 ```
@@ -245,13 +251,13 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ### Breakpoints
 
-- **Mobile**: 0-767px - Compact, single column
+- **Mobile**: 0-767px - Ultra-compact, single column
 - **Tablet**: 768-1023px - Two column layouts
 - **Desktop**: 1024px+ - Multi-column, expanded layouts
 
 ### Mobile-First Approach
 
-- Start with compact mobile design
+- Start with ultra-compact mobile design
 - Expand spacing and layout for larger screens
 - Maintain consistent component sizing across breakpoints
 
@@ -281,20 +287,78 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ```css
 .empty-state {
-  @apply text-center py-8 px-4;
+  @apply text-center py-6 px-3;
 }
 
 .empty-state-icon {
-  @apply w-12 h-12 mx-auto mb-3 text-text-muted;
+  @apply w-10 h-10 mx-auto mb-2 text-text-muted;
 }
 
 .empty-state-title {
-  @apply text-base font-semibold text-text mb-2;
+  @apply text-sm font-semibold text-text mb-1;
 }
 
 .empty-state-description {
-  @apply text-sm text-text-secondary;
+  @apply text-xs text-text-secondary;
 }
+```
+
+### Search Empty State
+
+```css
+.search-empty-state {
+  @apply bg-teal/10 border border-teal/200 rounded-md p-4;
+}
+
+.search-empty-state-icon {
+  @apply w-10 h-10 bg-teal/20 rounded-md flex items-center justify-center;
+}
+
+.search-empty-state-content {
+  @apply flex items-start space-x-3;
+}
+
+.search-empty-state-title {
+  @apply text-sm font-semibold text-dark-green-600 mb-1;
+}
+
+.search-empty-state-description {
+  @apply text-xs text-dark-green-500;
+}
+```
+
+### Usage Examples
+
+#### Basic Empty State
+
+```tsx
+<div className="empty-state">
+  <div className="empty-state-icon">
+    <Icon className="w-10 h-10" />
+  </div>
+  <h3 className="empty-state-title">No items found</h3>
+  <p className="empty-state-description">Try adjusting your search criteria</p>
+</div>
+```
+
+#### Search Empty State with Icon Layout
+
+```tsx
+<div className="search-empty-state">
+  <div className="search-empty-state-content">
+    <div className="search-empty-state-icon">
+      <HelpCircle className="w-5 h-5 text-teal-600" />
+    </div>
+    <div className="flex-1 min-w-0">
+      <h3 className="search-empty-state-title">
+        Hmm, we couldn&apos;t find that
+      </h3>
+      <p className="search-empty-state-description">
+        Double-check the full name or spelling
+      </p>
+    </div>
+  </div>
+</div>
 ```
 
 ### Loading States
@@ -334,8 +398,8 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 
 ### Component Creation
 
-1. Start with mobile-first design
-2. Apply consistent spacing using 4px grid
+1. Start with ultra-compact mobile design
+2. Apply consistent spacing using 2px grid
 3. Use standard border radius values
 4. Test across all breakpoints
 5. Ensure accessibility compliance
@@ -362,6 +426,15 @@ Our design system prioritizes **compact efficiency** and **clean precision** ove
 - Performance best practices
 
 ## Changelog
+
+### v3.0.0 - Ultra-Compact Design System
+
+- **Ultra-tight spacing**: Changed from 4px to 2px grid system
+- **Minimal padding**: Reduced card padding from 16px to 8px
+- **Tighter forms**: Reduced input padding from 12px×8px to 8px×6px
+- **Compact buttons**: Reduced button padding from 16px×8px to 12px×6px
+- **Technical aesthetic**: Moved to ultra-compact, professional tool feel
+- **Maximum density**: Minimized whitespace for optimal information display
 
 ### v2.0.0 - Compact Design System
 

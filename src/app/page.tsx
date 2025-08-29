@@ -21,7 +21,7 @@ export default function HomePage() {
             </Link>
             <Link 
               href="/sell" 
-              className="px-6 py-3 rounded-md border-2 border-dark-green-300 text-dark-green-600 text-base font-semibold hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-700 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium bg-white"
+              className="px-6 py-3 rounded-md border-2 border-dark-green-300 text-dark-green-600 text-base font-semibold hover:bg-dark-green-50 hover:border-dark-green-400 hover:text-dark-green-600 transition-all duration-200 hover:scale-105 shadow-soft hover:shadow-medium bg-white"
             >
               Sell a Game
             </Link>

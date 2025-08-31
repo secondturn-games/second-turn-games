@@ -33,7 +33,7 @@ Our design system prioritizes **ultra-compact efficiency** and **technical preci
 
 ### Core Brand Colors
 
-- **Dark Green** `#29432B` - Primary actions, navigation, text
+- **Dark Green** `#29432B` - Primary actions, navigation, textIsn't
 - **Vibrant Orange** `#D95323` - CTAs, highlights, accents
 - **Warm Yellow** `#F2C94C` - Warnings, trending indicators
 

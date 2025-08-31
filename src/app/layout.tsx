@@ -3,7 +3,8 @@ import { Righteous, Manrope, Bebas_Neue } from "next/font/google";
 import { ClerkProvider, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { MobileSearchBar } from "@/components/navigation/mobile-search-bar";
-// import { PWAInstaller } from "@/components/pwa/pwa-installer";
+import { PWAInstaller } from "@/components/pwa/pwa-installer";
+import { PWAStatus } from "@/components/pwa/pwa-status";
 import "./globals.css";
 
 const righteous = Righteous({
@@ -196,7 +197,7 @@ export default function RootLayout({
                 </SignedOut>
 
                 <SignedIn>
-                  <Link href="/list-game" className="btn-primary flex items-center gap-2">
+                  <Link href="/list-game-version" className="btn-primary flex items-center gap-2">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
@@ -213,8 +214,11 @@ export default function RootLayout({
 
           <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
           
-          {/* PWA Installer - Disabled in development */}
-          {/* <PWAInstaller /> */}
+          {/* PWA Installer - Conditionally enabled based on environment */}
+          <PWAInstaller />
+          
+          {/* PWA Status - Only visible in development */}
+          <PWAStatus />
         </body>
       </html>
     </ClerkProvider>

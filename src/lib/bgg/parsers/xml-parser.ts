@@ -338,6 +338,7 @@ function extractBasicMetadata(item: any): Partial<BGGAPIMetadata> {
     weight: extractWeight(item),
     mechanics: extractLinksFromItem(item, 'boardgamemechanic'),
     categories: extractLinksFromItem(item, 'boardgamecategory'),
+    designers: extractLinksFromItem(item, 'boardgamedesigner'),
     versions: extractVersionsFromItem(item),
     hasInboundExpansionLink: false,
     inboundExpansionLinks: []
@@ -642,9 +643,39 @@ function extractVersionData(item: any): BGGGameVersion | null {
   const depth = String(item.depth?.['@value'] || item.depth?.value || item.depth || '')
   const weight = String(item.weight?.['@value'] || item.weight?.value || item.weight || '')
 
+  // Improved name extraction to handle various XML structures
+  let versionName = 'Unknown'
+  if (item.name) {
+    if (typeof item.name === 'string') {
+      versionName = item.name
+    } else if (item.name['@value']) {
+      versionName = String(item.name['@value'])
+    } else if (item.name.value) {
+      versionName = String(item.name.value)
+    } else if (item.name['#text']) {
+      versionName = String(item.name['#text'])
+    } else if (Array.isArray(item.name)) {
+      // Handle case where name is an array
+      const firstValidName = item.name.find((n: any) => {
+        if (typeof n === 'string') return true
+        if (n && typeof n === 'object') {
+          return n['@value'] || n.value || n['#text']
+        }
+        return false
+      })
+      if (firstValidName) {
+        if (typeof firstValidName === 'string') {
+          versionName = firstValidName
+        } else {
+          versionName = String(firstValidName['@value'] || firstValidName.value || firstValidName['#text'] || 'Unknown')
+        }
+      }
+    }
+  }
+
   return {
     id: String(item.id || item['@id'] || ''),
-    name: String(item.name?.['@value'] || item.name?.value || item.name || 'Unknown'),
+    name: versionName,
     yearpublished: String(item.yearpublished?.['@value'] || item.yearpublished?.value || item.yearpublished || ''),
     publishers: extractPublishersFromItem(item),
     languages,

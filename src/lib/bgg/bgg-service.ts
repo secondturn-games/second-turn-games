@@ -384,6 +384,7 @@ export class BGGService {
       rank: metadata.rank || '',
       mechanics: metadata.mechanics || [],
       categories: metadata.categories || [],
+      designers: metadata.designers || [],
       alternateNames: metadata.alternateNames || [],
       versions: metadata.versions || [],
       type: metadata.type as 'boardgame' | 'boardgameexpansion',

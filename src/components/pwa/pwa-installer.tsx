@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Download, X, Smartphone } from 'lucide-react'
+import { shouldEnablePWA, shouldRegisterServiceWorker } from '@/lib/utils/pwa-utils'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -15,6 +16,11 @@ export function PWAInstaller() {
   const [isInstalled, setIsInstalled] = useState(false)
 
   useEffect(() => {
+    // Don't proceed if PWA is not enabled
+    if (!shouldEnablePWA()) {
+      return
+    }
+
     // Check if app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches || 
         (window.navigator as { standalone?: boolean }).standalone === true) {
@@ -39,8 +45,8 @@ export function PWAInstaller() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('appinstalled', handleAppInstalled)
 
-    // Register service worker
-    if ('serviceWorker' in navigator) {
+    // Register service worker only when PWA is enabled
+    if (shouldRegisterServiceWorker() && 'serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
           console.log('SW registered: ', registration)
@@ -55,6 +61,11 @@ export function PWAInstaller() {
       window.removeEventListener('appinstalled', handleAppInstalled)
     }
   }, [])
+
+  // Don't show PWA installer on localhost
+  if (!shouldEnablePWA()) {
+    return null
+  }
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return

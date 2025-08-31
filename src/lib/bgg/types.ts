@@ -35,6 +35,7 @@ export interface BGGGameDetails {
   rank: string
   mechanics: string[]
   categories: string[]
+  designers: string[]
   alternateNames: string[]
   versions: BGGGameVersion[]
   type: 'boardgame' | 'boardgameexpansion'
@@ -112,6 +113,7 @@ export interface BGGAPIMetadata {
   weight?: string
   mechanics?: string[]
   categories?: string[]
+  designers?: string[]
   versions?: BGGGameVersion[]
   // Critical fields for type classification
   hasInboundExpansionLink: boolean

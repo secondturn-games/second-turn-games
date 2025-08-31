@@ -10,35 +10,40 @@ import { formatDimensions, parseAndConvertWeight } from '../utils/dimensions'
  */
 export function parseXML(xmlText: string): any {
   if (!xmlText || typeof xmlText !== 'string') {
+    console.error('❌ XML parser: Invalid input:', typeof xmlText, xmlText?.length)
     return null
   }
 
   try {
     // Use DOMParser for browser environments
     if (typeof DOMParser !== 'undefined') {
+      console.log('🔍 Using DOMParser for XML parsing, input length:', xmlText.length)
       const parser = new DOMParser()
       const xmlDoc = parser.parseFromString(xmlText, 'text/xml')
       
       // Check for parsing errors
       const parseError = xmlDoc.getElementsByTagName('parsererror')
       if (parseError.length > 0) {
-        console.warn('XML parsing warning:', parseError[0].textContent)
+        console.error('❌ XML parsing error:', parseError[0].textContent)
+        console.error('❌ XML input preview:', xmlText.substring(0, 500))
+        return null
       }
       
       // Log the raw XML structure for debugging
       console.log('🔍 Raw XML document structure:')
-      console.log('📊 Root element:', xmlDoc.documentElement.tagName)
-      console.log('📊 Root attributes:', Array.from(xmlDoc.documentElement.attributes).map(attr => `${attr.name}="${attr.value}"`))
+      console.log('📊 Root element:', xmlDoc.documentElement?.tagName || 'No root element')
+      console.log('📊 Root attributes:', xmlDoc.documentElement ? Array.from(xmlDoc.documentElement.attributes).map(attr => `${attr.name}="${attr.value}"`) : 'No attributes')
       
       const result = xmlToObject(xmlDoc.documentElement)
-      console.log('📊 Parsed result structure:', result)
+      console.log('✅ XML parsing successful, result keys:', Object.keys(result || {}))
       return result
+    } else {
+      console.warn('⚠️ DOMParser not available, using fallback parser')
+      return fallbackXMLParser(xmlText)
     }
-    
-    // Fallback for Node.js environments
-    return fallbackXMLParser(xmlText)
   } catch (error) {
-    console.error('XML parsing failed:', error)
+    console.error('❌ XML parsing failed:', error)
+    console.error('❌ XML input preview:', xmlText.substring(0, 500))
     return null
   }
 }

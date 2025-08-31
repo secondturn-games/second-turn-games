@@ -24,6 +24,9 @@ export class BGGAPIClient {
     const url = this.buildUrl(endpoint, params)
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.config.searchTimeout)
+    
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    console.log('🌐 API Client: Making request to:', url, 'Mobile:', isMobile)
 
     try {
       const response = await fetch(url, {
@@ -36,8 +39,10 @@ export class BGGAPIClient {
       })
 
       clearTimeout(timeoutId)
+      console.log('📡 API Response status:', response.status, response.statusText, 'Mobile:', isMobile)
 
       if (!response.ok) {
+        console.error('❌ API Error:', response.status, response.statusText, 'Mobile:', isMobile)
         throw this.createAPIError(response.status, response.statusText, url)
       }
 
@@ -45,17 +50,22 @@ export class BGGAPIClient {
       const buffer = await response.arrayBuffer()
       const decoder = new TextDecoder('utf-8')
       const xmlText = decoder.decode(buffer)
+      
+      console.log('📄 Response decoded, length:', xmlText.length, 'Mobile:', isMobile)
 
       // Validate XML response
       if (!this.isValidXML(xmlText)) {
+        console.error('❌ Invalid XML response, Mobile:', isMobile)
         throw new Error(BGG_ERROR_MESSAGES.INVALID_RESPONSE)
       }
 
       this.incrementRequestCount()
+      console.log('✅ API request successful, Mobile:', isMobile)
       return xmlText
 
     } catch (error) {
       clearTimeout(timeoutId)
+      console.error('❌ API request failed:', error, 'Mobile:', isMobile)
       
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error(BGG_ERROR_MESSAGES.SEARCH_TIMEOUT)
@@ -78,7 +88,8 @@ export class BGGAPIClient {
     gameType?: 'boardgame' | 'boardgameexpansion', 
     exact?: boolean
   ): Promise<string> {
-    console.log('🔍 API Client: searchGames called with:', { query, gameType, exact })
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    console.log('🔍 API Client: searchGames called with:', { query, gameType, exact, isMobile })
     
     const params: Record<string, string> = {
       query: query.trim(),
@@ -91,7 +102,7 @@ export class BGGAPIClient {
 
     console.log('🔍 API Client: search params:', params)
     const result = await this.get(BGG_ENDPOINTS.SEARCH, params)
-    console.log('✅ API Client: search response length:', result.length)
+    console.log('✅ API Client: search response length:', result.length, 'Mobile:', isMobile)
     return result
   }
 

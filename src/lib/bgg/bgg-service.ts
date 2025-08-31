@@ -35,7 +35,8 @@ export class BGGService {
     }
 
     const cleanQuery = query.trim()
-    console.log(`🔍 BGG Search: Starting search for "${cleanQuery}" with filters:`, filters)
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    console.log(`🔍 BGG Search: Starting search for "${cleanQuery}" with filters:`, filters, 'Mobile:', isMobile)
 
     try {
       // Check cache first

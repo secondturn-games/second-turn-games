@@ -83,6 +83,16 @@ export default function ListGameVersionPage() {
       return
     }
 
+    // Add mobile detection and enhanced logging
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    console.log('🔍 Search initiated:', { 
+      searchTerm, 
+      gameType, 
+      isMobile, 
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString()
+    })
+
     // Reset Game Condition data when starting a new search
     if (formData.gameCondition) {
       resetGameCondition()
@@ -97,7 +107,13 @@ export default function ListGameVersionPage() {
     setHasSearched(true)
 
     try {
+      console.log('🔍 Calling BGG service...')
       const searchResults = await bggService.searchGames(searchTerm, { gameType })
+      console.log('✅ BGG service returned:', { 
+        resultsCount: searchResults.length, 
+        results: searchResults,
+        isMobile 
+      })
       setSearchResults(searchResults)
       
       // If only one result, auto-select it
@@ -105,6 +121,13 @@ export default function ListGameVersionPage() {
         await handleGameSelect(searchResults[0])
       }
     } catch (err) {
+      console.error('❌ Search error:', { 
+        error: err, 
+        message: err instanceof Error ? err.message : 'Unknown error',
+        isMobile,
+        searchTerm,
+        gameType
+      })
       setSearchError(err instanceof Error ? err.message : 'Search failed')
     } finally {
       setIsSearching(false)
@@ -492,8 +515,9 @@ export default function ListGameVersionPage() {
                   </div>
                   <Button
                     onClick={performSearch}
+                    onTouchEnd={performSearch}
                     disabled={!searchTerm.trim() || searchTerm.trim().length < 2 || isSearching}
-                    className="bg-vibrant-orange hover:bg-vibrant-orange/90 w-full sm:w-auto"
+                    className="bg-vibrant-orange hover:bg-vibrant-orange/90 w-full sm:w-auto touch-manipulation"
                   >
                     {isSearching ? 'Searching...' : 'Search'}
                   </Button>

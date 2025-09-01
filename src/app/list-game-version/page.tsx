@@ -161,6 +161,9 @@ export default function ListGameVersionPage() {
         
         // Update form data with auto-selected version and title
         updateFormData({
+          bggGameId: game.id,
+          gameName: game.name,
+          gameImage: gameDetails?.image || gameDetails?.thumbnail || null,
           bggVersionId: bestVersion.version.id,
           versionName: bestVersion.version.name,
           suggestedAlternateName: bestVersion.suggestedAlternateName,

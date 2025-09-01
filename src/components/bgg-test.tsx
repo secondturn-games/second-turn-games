@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { bggService } from '@/lib/bgg'
+import { bggServiceClient } from '@/lib/bgg/bgg-service-client'
 import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion } from '@/lib/bgg'
 import { 
   Search, 
@@ -53,14 +53,12 @@ export function BGGTest() {
     console.log('🔍 Starting search for:', query, 'with filters:', { gameType })
 
     try {
-      const searchResults = await bggService.searchGames(query, { gameType })
+      const searchResults = await bggServiceClient.searchGames(query, { gameType })
       console.log('✅ Search results received:', searchResults)
       setResults(searchResults)
       
-      // Update cache stats
-      const stats = bggService.getCacheStats()
-      console.log('📊 Cache stats:', stats)
-      setCacheStats(stats)
+      // Note: Cache stats not available in client service
+      setCacheStats({ size: 0, hitRate: 0, totalQueries: 0, cacheHits: 0 })
     } catch (err) {
       console.error('❌ Search error:', err)
       setError(err instanceof Error ? err.message : 'Search failed')
@@ -75,13 +73,13 @@ export function BGGTest() {
 
     try {
       console.log(`🔍 Getting game details for: ${gameId}`)
-      const gameDetails = await bggService.getGameDetails(gameId)
+      const gameDetails = await bggServiceClient.getGameDetails(gameId)
       console.log(`✅ Game details received:`, gameDetails)
       setSelectedGame(gameDetails)
       
       // Also fetch versions for this game
       console.log(`🔍 Fetching versions for game: ${gameId}`)
-      const gameVersions = await bggService.getLanguageMatchedVersions(gameId)
+      const gameVersions = await bggServiceClient.getLanguageMatchedVersions(gameId)
       console.log(`✅ Versions received:`, gameVersions)
       setVersions(gameVersions)
       setShowVersionSelection(true)
@@ -100,7 +98,7 @@ export function BGGTest() {
 
     try {
       console.log(`🔍 Manually fetching versions for game: ${gameId}`)
-      const gameVersions = await bggService.getLanguageMatchedVersions(gameId)
+      const gameVersions = await bggServiceClient.getLanguageMatchedVersions(gameId)
       console.log(`✅ Manual versions fetch result:`, gameVersions)
       setVersions(gameVersions)
       setShowVersionSelection(true)
@@ -113,8 +111,8 @@ export function BGGTest() {
   }
 
   const clearCache = () => {
-    bggService.clearCache()
-    setCacheStats(bggService.getCacheStats())
+    // Note: Cache operations not available in client service
+    setCacheStats({ size: 0, hitRate: 0, totalQueries: 0, cacheHits: 0 })
     setResults([])
     setSelectedGame(null)
     setSelectedVersion(null)

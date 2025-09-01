@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 
 
 import { Search, Calendar, Package, Type, Languages, Building2, HelpCircle, Users, Clock, Cake } from 'lucide-react'
-import { bggService } from '@/lib/bgg'
+import { bggServiceClient } from '@/lib/bgg/bgg-service-client'
 import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion } from '@/lib/bgg'
 import type { ListingFormData } from '../listing-wizard'
 
@@ -48,8 +48,8 @@ export function GameSelectionStep({ formData, updateFormData, onNext, onBack }: 
        // We need to fetch the actual game details to get alternate names
        const restoreGameData = async () => {
          try {
-           const gameDetails = await bggService.getGameDetails(formData.bggGameId!)
-           const gameVersions = await bggService.getLanguageMatchedVersions(formData.bggGameId!)
+           const gameDetails = await bggServiceClient.getGameDetails(formData.bggGameId!)
+           const gameVersions = await bggServiceClient.getLanguageMatchedVersions(formData.bggGameId!)
            
            setSelectedGame(gameDetails)
            setVersions(gameVersions)
@@ -160,7 +160,7 @@ export function GameSelectionStep({ formData, updateFormData, onNext, onBack }: 
     setHasSearched(true)
 
     try {
-      const searchResults = await bggService.searchGames(searchTerm, { gameType })
+      const searchResults = await bggServiceClient.searchGames(searchTerm, { gameType })
       setSearchResults(searchResults)
     } catch (err) {
       setSearchError(err instanceof Error ? err.message : 'Search failed')
@@ -172,8 +172,8 @@ export function GameSelectionStep({ formData, updateFormData, onNext, onBack }: 
     const handleGameSelect = async (game: BGGSearchResult) => {
     try {
       // Get full game details and versions
-      const gameDetails = await bggService.getGameDetails(game.id)
-      const gameVersions = await bggService.getLanguageMatchedVersions(game.id)
+              const gameDetails = await bggServiceClient.getGameDetails(game.id)
+        const gameVersions = await bggServiceClient.getLanguageMatchedVersions(game.id)
       
       setSelectedGame(gameDetails)
       setVersions(gameVersions)
@@ -372,7 +372,7 @@ export function GameSelectionStep({ formData, updateFormData, onNext, onBack }: 
      setShowTitleSelection(false)
 
     try {
-      const searchResults = await bggService.searchGames(searchTerm, { gameType: newGameType })
+      const searchResults = await bggServiceClient.searchGames(searchTerm, { gameType: newGameType })
       setSearchResults(searchResults)
     } catch (err) {
       setSearchError(err instanceof Error ? err.message : 'Search failed')

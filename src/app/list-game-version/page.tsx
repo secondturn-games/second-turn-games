@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Search, Calendar, Package, Type, Languages, Building2, HelpCircle, Users, Clock, Cake, ChevronDown, ChevronUp, Box, PackageOpen, Star, Repeat, XCircle, CheckCircle, AlertTriangle, ThumbsUp, ExternalLink, Cog } from 'lucide-react'
 import Image from 'next/image'
-import { bggService } from '@/lib/bgg'
+import { bggServiceClient } from '@/lib/bgg/bgg-service-client'
 import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion } from '@/lib/bgg'
 
 interface ListingFormData {
@@ -108,7 +108,7 @@ export default function ListGameVersionPage() {
 
     try {
       console.log('🔍 Calling BGG service...')
-      const searchResults = await bggService.searchGames(searchTerm, { gameType })
+      const searchResults = await bggServiceClient.searchGames(searchTerm, { gameType })
       console.log('✅ BGG service returned:', { 
         resultsCount: searchResults.length, 
         results: searchResults,
@@ -147,8 +147,8 @@ export default function ListGameVersionPage() {
       resetGameCondition()
       
       // Get full game details and versions
-      const gameDetails = await bggService.getGameDetails(game.id)
-      const gameVersions = await bggService.getLanguageMatchedVersions(game.id)
+          const gameDetails = await bggServiceClient.getGameDetails(game.id)
+    const gameVersions = await bggServiceClient.getLanguageMatchedVersions(game.id)
       
       setSelectedGame(gameDetails)
       setVersions(gameVersions)
@@ -373,7 +373,7 @@ export default function ListGameVersionPage() {
     setShowTitleSelection(false)
 
     try {
-      const searchResults = await bggService.searchGames(searchTerm, { gameType: newGameType })
+      const searchResults = await bggServiceClient.searchGames(searchTerm, { gameType: newGameType })
       setSearchResults(searchResults)
       
       // If only one result, auto-select it

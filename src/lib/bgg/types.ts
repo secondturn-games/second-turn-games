@@ -92,6 +92,8 @@ export interface BGGAPISearchItem {
   name: string
   type: string
   yearpublished?: string
+  thumbnail?: string
+  image?: string
 }
 
 export interface BGGAPIMetadata {

@@ -60,12 +60,12 @@ export function extractSearchItems(xmlText: string): BGGAPISearchItem[] {
   console.log('📊 Parsed XML structure:', JSON.stringify(parsed, null, 2))
   
   // Check for items at the root level (since BGG returns <items> as root)
-  let items = parsed?.item
+  let items = parsed?.items?.item
   
   if (!items) {
     console.log('❌ No items found in parsed XML')
     console.log('❌ parsed:', parsed)
-    console.log('❌ parsed.item:', parsed?.item)
+    console.log('❌ parsed.items?.item:', parsed?.items?.item)
     return []
   }
   
@@ -116,7 +116,9 @@ export function extractSearchItems(xmlText: string): BGGAPISearchItem[] {
         id: String(item.id || item['@id']),
         name,
         type: String(item.type || item['@type'] || 'boardgame'),
-        yearpublished: extractValue(item.yearpublished)
+        yearpublished: extractValue(item.yearpublished),
+        thumbnail: extractValue(item.thumbnail),
+        image: extractValue(item.image)
       }
     })
   
@@ -150,12 +152,12 @@ export function extractMetadata(xmlText: string): BGGAPIMetadata[] {
   }
   
   // Check for items at the root level (since BGG returns <items> as root)
-  let items = parsed?.item
+  let items = parsed?.items?.item
   
   if (!items) {
     console.log('❌ No items found in parsed XML')
     console.log('❌ parsed:', parsed)
-    console.log('❌ parsed.item:', parsed?.item)
+    console.log('❌ parsed.items?.item:', parsed?.items?.item)
     return []
   }
   

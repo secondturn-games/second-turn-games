@@ -4,6 +4,7 @@
 
 import type { BGGAPISearchItem, BGGAPIMetadata, BGGGameVersion, LanguageMatchedVersion } from '../types'
 import { formatDimensions, parseAndConvertWeight } from '../utils/dimensions'
+import { XMLParser } from 'fast-xml-parser'
 
 /**
  * Parse XML string to JavaScript object
@@ -15,32 +16,30 @@ export function parseXML(xmlText: string): any {
   }
 
   try {
-    // Use DOMParser for browser environments
-    if (typeof DOMParser !== 'undefined') {
-      console.log('🔍 Using DOMParser for XML parsing, input length:', xmlText.length)
-      const parser = new DOMParser()
-      const xmlDoc = parser.parseFromString(xmlText, 'text/xml')
-      
-      // Check for parsing errors
-      const parseError = xmlDoc.getElementsByTagName('parsererror')
-      if (parseError.length > 0) {
-        console.error('❌ XML parsing error:', parseError[0].textContent)
-        console.error('❌ XML input preview:', xmlText.substring(0, 500))
-        return null
+    // Use fast-xml-parser for both browser and Node.js environments
+    console.log('🔍 Using fast-xml-parser for XML parsing, input length:', xmlText.length)
+    
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      attributeNamePrefix: '@',
+      textNodeName: 'value',
+      parseAttributeValue: true,
+      parseTagValue: true,
+      trimValues: true,
+      removeNSPrefix: true,
+      alwaysCreateTextNode: false,
+      isArray: (name, _jpath, _isLeafNode, _isAttribute) => {
+        // Make sure 'item' elements are always arrays
+        if (name === 'item') return true
+        // Make sure 'link' elements are always arrays
+        if (name === 'link') return true
+        return false
       }
-      
-      // Log the raw XML structure for debugging
-      console.log('🔍 Raw XML document structure:')
-      console.log('📊 Root element:', xmlDoc.documentElement?.tagName || 'No root element')
-      console.log('📊 Root attributes:', xmlDoc.documentElement ? Array.from(xmlDoc.documentElement.attributes).map(attr => `${attr.name}="${attr.value}"`) : 'No attributes')
-      
-      const result = xmlToObject(xmlDoc.documentElement)
-      console.log('✅ XML parsing successful, result keys:', Object.keys(result || {}))
-      return result
-    } else {
-      console.warn('⚠️ DOMParser not available, using fallback parser')
-      return fallbackXMLParser(xmlText)
-    }
+    })
+    
+    const result = parser.parse(xmlText)
+    console.log('✅ XML parsing successful, result keys:', Object.keys(result || {}))
+    return result
   } catch (error) {
     console.error('❌ XML parsing failed:', error)
     console.error('❌ XML input preview:', xmlText.substring(0, 500))
@@ -48,111 +47,7 @@ export function parseXML(xmlText: string): any {
   }
 }
 
-/**
- * Convert XML DOM element to JavaScript object
- */
-function xmlToObject(element: Element): any {
-  const result: any = {}
-  
-  // Handle attributes
-  if (element.attributes.length > 0) {
-    for (let i = 0; i < element.attributes.length; i++) {
-      const attr = element.attributes[i]
-      result[`@${attr.name}`] = attr.value
-    }
-  }
-  
-  // Handle child nodes
-  for (let i = 0; i < element.childNodes.length; i++) {
-    const child = element.childNodes[i]
-    
-    if (child.nodeType === Node.TEXT_NODE) {
-      const text = child.textContent?.trim()
-      if (text) {
-        result.value = text
-      }
-    } else if (child.nodeType === Node.ELEMENT_NODE) {
-      const childElement = child as Element
-      const childName = childElement.tagName
-      const childData = xmlToObject(childElement)
-      
-      if (result[childName]) {
-        // Convert to array if multiple elements with same name
-        if (!Array.isArray(result[childName])) {
-          result[childName] = [result[childName]]
-        }
-        result[childName].push(childData)
-      } else {
-        result[childName] = childData
-      }
-    }
-  }
-  
-  return result
-}
 
-/**
- * Fallback XML parser for Node.js environments
- */
-function fallbackXMLParser(xmlText: string): any {
-  // Simple regex-based parser for basic XML structure
-  const result: any = {}
-  
-  // Extract root element
-  const rootMatch = xmlText.match(/<(\w+)[^>]*>([\s\S]*)<\/\1>/)
-  if (rootMatch) {
-    result[rootMatch[1]] = parseXMLContent(rootMatch[2])
-  }
-  
-  return result
-}
-
-/**
- * Parse XML content recursively
- */
-function parseXMLContent(content: string): any {
-  const result: any = {}
-  
-  // Extract all elements
-  const elementRegex = /<(\w+)([^>]*)>([^<]*(?:<[^>]*>[^<]*<\/[^>]*>[^<]*)*)<\/\1>/g
-  let match
-  
-  while ((match = elementRegex.exec(content)) !== null) {
-    const tagName = match[1]
-    const attributes = match[2]
-    const innerContent = match[3]
-    
-    let elementData: any = {}
-    
-    // Parse attributes
-    if (attributes) {
-      const attrRegex = /(\w+)="([^"]*)"/g
-      let attrMatch
-      while ((attrMatch = attrRegex.exec(attributes)) !== null) {
-        elementData[`@${attrMatch[1]}`] = attrMatch[2]
-      }
-    }
-    
-    // Parse inner content
-    if (innerContent && !innerContent.includes('<')) {
-      elementData.value = innerContent.trim()
-    } else if (innerContent) {
-      elementData = parseXMLContent(innerContent)
-    }
-    
-    // Handle multiple elements with same name
-    if (result[tagName]) {
-      if (!Array.isArray(result[tagName])) {
-        result[tagName] = [result[tagName]]
-      }
-      result[tagName].push(elementData)
-    } else {
-      result[tagName] = elementData
-    }
-  }
-  
-  return result
-}
 
 /**
  * Extract search items from XML

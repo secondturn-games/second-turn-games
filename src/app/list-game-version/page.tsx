@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Search, Calendar, Package, Type, Languages, Building2, HelpCircle, Users, Clock, Cake, ChevronDown, ChevronUp, Box, PackageOpen, Star, Repeat, XCircle, CheckCircle, AlertTriangle, ThumbsUp, ExternalLink, Cog } from 'lucide-react'
+import { Search, Calendar, Package, Type, Languages, Building2, HelpCircle, Users, Clock, Cake, ChevronDown, ChevronUp, Box, PackageOpen, Star, Repeat, XCircle, CheckCircle, AlertTriangle, ThumbsUp, ExternalLink, Cog, PackageCheck, Archive, PackageX, AlertCircle, Sparkles, Smile, BookOpenCheck, Book, BookX, Lock, Gift, Camera, Cuboid, Puzzle, NotebookText, BookMinus, Globe } from 'lucide-react'
 import Image from 'next/image'
 import { bggServiceClient } from '@/lib/bgg/bgg-service-client'
 import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion } from '@/lib/bgg'
@@ -30,12 +30,18 @@ interface ListingFormData {
     rating: string
   } | null
   gameCondition: {
-    overallCondition: string | null
+    activeFilter: string | null
+    boxCondition: string | null
+    boxDescription: string | null
     completeness: string | null
     missingDescription: string | null
+    componentCondition: string | null
+    rulebook: string | null
+    rulebookDescription: string | null
     extras: string[]
-    customExtras: string | null
+    extrasDescription: string | null
     photos: string[]
+    photoNotes: string | null
   } | null
 }
 
@@ -725,25 +731,24 @@ export default function ListGameVersionPage() {
                         </a>
                       </div>
                       
-                      {/* Version Info */}
-                      {selectedVersion && (
-                        <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
-                          <Package className="w-3 h-3 text-vibrant-orange" />
-                          <span>{selectedVersion.version.name}</span>
-                        </div>
-                      )}
-                      
-                      {/* Alternate Name */}
-                      {formData.customTitle && formData.customTitle !== selectedGame.name && (
-                        <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
-                          <Type className="w-3 h-3 text-vibrant-orange" />
-                          <span className="italic">{formData.customTitle}</span>
-                        </div>
-                      )}
-                      
                       {/* Version Details */}
                       {selectedVersion && formData.gameDetails && (
                         <div className="space-y-1 text-xs text-gray-600">
+                          {/* Version Info */}
+                          {selectedVersion && (
+                            <div className="flex items-center justify-center gap-1">
+                              <Globe className="w-3 h-3 text-vibrant-orange" />
+                              <span>{selectedVersion.version.name}</span>
+                            </div>
+                          )}
+                          
+                          {/* Alternate Name */}
+                          {formData.customTitle && formData.customTitle !== selectedGame.name && (
+                            <div className="flex items-center justify-center gap-1">
+                              <Type className="w-3 h-3 text-vibrant-orange" />
+                              <span className="italic">{formData.customTitle}</span>
+                            </div>
+                          )}
                           {/* Languages */}
                           {formData.gameDetails.languages && formData.gameDetails.languages.length > 0 && (
                             <div className="flex items-center justify-center gap-1">
@@ -781,46 +786,94 @@ export default function ListGameVersionPage() {
                     
                     {/* Section 3: User-Provided Game Condition */}
                     {formData.gameCondition && (
-                      <div className="border-t border-gray-100 pt-4 text-center space-y-1">
-                        {/* Overall Condition */}
-                        {formData.gameCondition.overallCondition && (
-                          <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
-                            {(() => {
-                              const conditionMap = {
-                                'in-shrink': { icon: Box, label: 'In Shrink' },
-                                'opened': { icon: PackageOpen, label: 'Opened' },
-                                'like-new': { icon: Star, label: 'Like New' },
-                                'well-played': { icon: ThumbsUp, label: 'Well Played' },
-                                'heavily-played': { icon: Repeat, label: 'Heavily Played' },
-                                'for-parts': { icon: XCircle, label: 'For Parts' }
+                      <div className="border-t border-gray-100 pt-4 text-center">
+                        <div className="text-xs text-gray-600 space-y-1">
+                          {(() => {
+                            const conditions = []
+                            
+                            // Box Condition - Only show if explicitly selected
+                            if (formData.gameCondition.boxCondition && formData.gameCondition.boxCondition !== null) {
+                              const boxMap = {
+                                'new': { icon: Lock, label: 'Sealed' },
+                                'like-new': { icon: PackageCheck, label: 'Like New' },
+                                'lightly-worn': { icon: Box, label: 'Lightly Worn' },
+                                'worn': { icon: Archive, label: 'Worn' },
+                                'damaged': { icon: PackageX, label: 'Damaged' }
                               }
-                              const condition = conditionMap[formData.gameCondition.overallCondition as keyof typeof conditionMap]
-                              if (!condition) return null
-                              const IconComponent = condition.icon
-                              return (
-                                <>
-                                  <IconComponent className="w-3 h-3 text-vibrant-orange" />
-                                  <span>{condition.label}</span>
-                                </>
+                              const box = boxMap[formData.gameCondition.boxCondition as keyof typeof boxMap]
+                              if (box) {
+                                const IconComponent = box.icon
+                                conditions.push(
+                                  <div key="box" className="flex items-center justify-center gap-1">
+                                    <IconComponent className="w-3 h-3 text-vibrant-orange" />
+                                    <span>{box.label}</span>
+                                  </div>
+                                )
+                              }
+                            }
+                            
+                            // Components - Only show if box is not "new" (sealed)
+                            if (formData.gameCondition.boxCondition !== 'new' && 
+                                formData.gameCondition.completeness && 
+                                formData.gameCondition.componentCondition) {
+                              const completenessMap = {
+                                'complete': 'Complete',
+                                'incomplete': 'Incomplete'
+                              }
+                              const componentMap = {
+                                'like-new': 'Like New',
+                                'lightly-used': 'Lightly Used',
+                                'well-played': 'Well Played',
+                                'damaged': 'Damaged'
+                              }
+                              const completeness = completenessMap[formData.gameCondition.completeness as keyof typeof completenessMap]
+                              const component = componentMap[formData.gameCondition.componentCondition as keyof typeof componentMap]
+                              if (completeness && component) {
+                                conditions.push(
+                                  <div key="components" className="flex items-center justify-center gap-1">
+                                    <Puzzle className="w-3 h-3 text-vibrant-orange" />
+                                    <span>{completeness} / {component}</span>
+                                  </div>
+                                )
+                              }
+                            }
+                            
+                            // Rulebook - Only show if box is not "new" (sealed)
+                            if (formData.gameCondition.boxCondition !== 'new' && 
+                                formData.gameCondition.rulebook) {
+                              const rulebookMap = {
+                                'included-good': 'Included',
+                                'included-worn': 'Included (worn)',
+                                'missing': 'Missing',
+                                'partially-included': 'Partially Included'
+                              }
+                              const rulebook = rulebookMap[formData.gameCondition.rulebook as keyof typeof rulebookMap]
+                              if (rulebook) {
+                                conditions.push(
+                                  <div key="rulebook" className="flex items-center justify-center gap-1">
+                                    <NotebookText className="w-3 h-3 text-vibrant-orange" />
+                                    <span>{rulebook}</span>
+                                  </div>
+                                )
+                              }
+                            }
+                            
+                            // Extras
+                            if (formData.gameCondition.extras && formData.gameCondition.extras.length > 0) {
+                              const firstExtra = formData.gameCondition.extras[0]
+                              const remainingCount = formData.gameCondition.extras.length - 1
+                              const moreText = remainingCount > 0 ? ` +${remainingCount} more` : ''
+                              conditions.push(
+                                <div key="extras" className="flex items-center justify-center gap-1">
+                                  <Gift className="w-3 h-3 text-vibrant-orange" />
+                                  <span>{firstExtra}{moreText}</span>
+                                </div>
                               )
-                            })()}
-                          </div>
-                        )}
-                        
-                        {/* Completeness - Only show if Missing */}
-                        {formData.gameCondition.completeness === 'missing' && (
-                          <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
-                            <AlertTriangle className="w-3 h-3 text-orange-600" />
-                            <span>Missing pieces</span>
-                          </div>
-                        )}
-                        
-                        {/* Extras */}
-                        {formData.gameCondition.extras && formData.gameCondition.extras.length > 0 && (
-                          <div className="text-xs text-gray-600">
-                            <span className="text-vibrant-orange">Extras:</span> {formData.gameCondition.extras.join(', ')}
-                          </div>
-                        )}
+                            }
+                            
+                            return conditions
+                          })()}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -897,25 +950,24 @@ export default function ListGameVersionPage() {
                         <div className="flex space-x-6">
                           {/* Column 2: Game Details (BGG Info) */}
                           <div className="flex-1 min-w-0">
-                            {/* Version Info */}
-                            {selectedVersion && (
-                              <div className="flex items-center gap-1 text-xs text-gray-600">
-                                <Package className="w-3 h-3 text-vibrant-orange" />
-                                <span>{selectedVersion.version.name}</span>
-                              </div>
-                            )}
-                            
-                            {/* Alternate Name */}
-                            {formData.customTitle && formData.customTitle !== selectedGame.name && (
-                              <div className="flex items-center gap-1 text-xs text-gray-600">
-                                <Type className="w-3 h-3 text-vibrant-orange" />
-                                <span className="italic">{formData.customTitle}</span>
-                              </div>
-                            )}
-                            
                             {/* Version Details */}
                             {selectedVersion && formData.gameDetails && (
                               <div className="space-y-1 text-xs text-gray-600">
+                                {/* Version Info */}
+                                {selectedVersion && (
+                                  <div className="flex items-center gap-1">
+                                    <Globe className="w-3 h-3 text-vibrant-orange" />
+                                    <span>{selectedVersion.version.name}</span>
+                                  </div>
+                                )}
+                                
+                                {/* Alternate Name */}
+                                {formData.customTitle && formData.customTitle !== selectedGame.name && (
+                                  <div className="flex items-center gap-1">
+                                    <Type className="w-3 h-3 text-vibrant-orange" />
+                                    <span className="italic">{formData.customTitle}</span>
+                                  </div>
+                                )}
                                 {/* Languages */}
                                 {formData.gameDetails.languages && formData.gameDetails.languages.length > 0 && (
                                   <div className="flex items-center gap-1">
@@ -953,46 +1005,94 @@ export default function ListGameVersionPage() {
                           
                           {/* Column 3: User-Provided Game Condition */}
                           {formData.gameCondition && (
-                            <div className="w-48 flex-shrink-0 space-y-1">
-                              {/* Overall Condition */}
-                              {formData.gameCondition.overallCondition && (
-                                <div className="flex items-center gap-1 text-xs text-gray-600">
-                                  {(() => {
-                                    const conditionMap = {
-                                      'in-shrink': { icon: Box, label: 'In Shrink' },
-                                      'opened': { icon: PackageOpen, label: 'Opened' },
-                                      'like-new': { icon: Star, label: 'Like New' },
-                                      'well-played': { icon: ThumbsUp, label: 'Well Played' },
-                                      'heavily-played': { icon: Repeat, label: 'Heavily Played' },
-                                      'for-parts': { icon: XCircle, label: 'For Parts' }
+                            <div className="w-56 flex-shrink-0">
+                              <div className="text-xs text-gray-600 space-y-1">
+                                {(() => {
+                                  const conditions = []
+                                  
+                                  // Box Condition - Only show if explicitly selected
+                                  if (formData.gameCondition.boxCondition && formData.gameCondition.boxCondition !== null) {
+                                    const boxMap = {
+                                      'new': { icon: Lock, label: 'Sealed' },
+                                      'like-new': { icon: PackageCheck, label: 'Like New' },
+                                      'lightly-worn': { icon: Box, label: 'Lightly Worn' },
+                                      'worn': { icon: Archive, label: 'Worn' },
+                                      'damaged': { icon: PackageX, label: 'Damaged' }
                                     }
-                                    const condition = conditionMap[formData.gameCondition.overallCondition as keyof typeof conditionMap]
-                                    if (!condition) return null
-                                    const IconComponent = condition.icon
-                                    return (
-                                      <>
-                                        <IconComponent className="w-3 h-3 text-vibrant-orange" />
-                                        <span>{condition.label}</span>
-                                      </>
+                                    const box = boxMap[formData.gameCondition.boxCondition as keyof typeof boxMap]
+                                    if (box) {
+                                      const IconComponent = box.icon
+                                      conditions.push(
+                                        <div key="box" className="flex items-center gap-1">
+                                          <IconComponent className="w-3 h-3 text-vibrant-orange" />
+                                          <span>{box.label}</span>
+                                        </div>
+                                      )
+                                    }
+                                  }
+                                  
+                                  // Components - Only show if box is not "new" (sealed)
+                                  if (formData.gameCondition.boxCondition !== 'new' && 
+                                      formData.gameCondition.completeness && 
+                                      formData.gameCondition.componentCondition) {
+                                    const completenessMap = {
+                                      'complete': 'Complete',
+                                      'incomplete': 'Incomplete'
+                                    }
+                                    const componentMap = {
+                                      'like-new': 'Like New',
+                                      'lightly-used': 'Lightly Used',
+                                      'well-played': 'Well Played',
+                                      'damaged': 'Damaged'
+                                    }
+                                    const completeness = completenessMap[formData.gameCondition.completeness as keyof typeof completenessMap]
+                                    const component = componentMap[formData.gameCondition.componentCondition as keyof typeof componentMap]
+                                    if (completeness && component) {
+                                      conditions.push(
+                                        <div key="components" className="flex items-center gap-1">
+                                          <Puzzle className="w-3 h-3 text-vibrant-orange" />
+                                          <span>{completeness} / {component}</span>
+                                        </div>
+                                      )
+                                    }
+                                  }
+                                  
+                                  // Rulebook - Only show if box is not "new" (sealed)
+                                  if (formData.gameCondition.boxCondition !== 'new' && 
+                                      formData.gameCondition.rulebook) {
+                                    const rulebookMap = {
+                                      'included-good': 'Included',
+                                      'included-worn': 'Included (worn)',
+                                      'missing': 'Missing',
+                                      'partially-included': 'Partially Included'
+                                    }
+                                    const rulebook = rulebookMap[formData.gameCondition.rulebook as keyof typeof rulebookMap]
+                                    if (rulebook) {
+                                      conditions.push(
+                                        <div key="rulebook" className="flex items-center gap-1">
+                                          <NotebookText className="w-3 h-3 text-vibrant-orange" />
+                                          <span>{rulebook}</span>
+                                        </div>
+                                      )
+                                    }
+                                  }
+                                  
+                                  // Extras
+                                  if (formData.gameCondition.extras && formData.gameCondition.extras.length > 0) {
+                                    const firstExtra = formData.gameCondition.extras[0]
+                                    const remainingCount = formData.gameCondition.extras.length - 1
+                                    const moreText = remainingCount > 0 ? ` +${remainingCount} more` : ''
+                                    conditions.push(
+                                      <div key="extras" className="flex items-center gap-1">
+                                        <Gift className="w-3 h-3 text-vibrant-orange" />
+                                        <span>{firstExtra}{moreText}</span>
+                                      </div>
                                     )
-                                  })()}
-                                </div>
-                              )}
-                              
-                              {/* Completeness - Only show if Missing */}
-                              {formData.gameCondition.completeness === 'missing' && (
-                                <div className="flex items-center gap-1 text-xs text-gray-600">
-                                  <AlertTriangle className="w-3 h-3 text-orange-600" />
-                                  <span>Missing pieces</span>
-                                </div>
-                              )}
-                              
-                              {/* Extras */}
-                              {formData.gameCondition.extras && formData.gameCondition.extras.length > 0 && (
-                                <div className="text-xs text-gray-600">
-                                  <span className="text-vibrant-orange">Extras:</span> {formData.gameCondition.extras.join(', ')}
-                                </div>
-                              )}
+                                  }
+                                  
+                                  return conditions
+                                })()}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -1013,7 +1113,7 @@ export default function ListGameVersionPage() {
                             onClick={() => setShowVersions(!showVersions)}
                             className="text-xs h-8 px-3 border-gray-300 text-gray-700 hover:bg-gray-50"
                           >
-                            Other Versions
+                            Other Versions ⌵
                           </Button>
                         )}
                         
@@ -1021,10 +1121,30 @@ export default function ListGameVersionPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setShowGameCondition(!showGameCondition)}
+                          onClick={() => {
+                            if (!formData.gameCondition) {
+                              updateFormData({
+                                gameCondition: {
+                                  activeFilter: null,
+                                  boxCondition: null,
+                                  boxDescription: null,
+                                  completeness: null,
+                                  missingDescription: null,
+                                  componentCondition: null,
+                                  rulebook: null,
+                                  rulebookDescription: null,
+                                  extras: [],
+                                  extrasDescription: null,
+                                  photos: [],
+                                  photoNotes: null
+                                }
+                              })
+                            }
+                            setShowGameCondition(!showGameCondition)
+                          }}
                           className="text-xs h-8 px-3 border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
-                          Game Condition
+                          Game Condition ⌵
                         </Button>
                       </div>
                     </div>
@@ -1042,6 +1162,10 @@ export default function ListGameVersionPage() {
                 {filteredAndSortedVersions.length} of {versions.length} versions
               </span>
             </div>
+            
+            <p className="text-xs text-gray-600 mb-4">
+              Board games travel the world — and so do their editions! Pick the exact version you own so buyers know what to expect. You can filter by language to make sure the right rulebook and components are included.
+            </p>
             
             {/* Language Filter Options */}
             <div className="mb-4">
@@ -1216,249 +1340,436 @@ export default function ListGameVersionPage() {
              <div className="mb-4">
                <h4 className="font-medium text-dark-green">Game Condition</h4>
                <p className="text-xs text-gray-600 mt-1">
-                 Choose the overall condition and list any missing or extra pieces — buyers will thank you!
+               Every game tells a story — some are fresh from the shelf, others have been on many adventures. Let buyers know what kind of journey your copy has had. The more detail you share, the easier it is for someone else to make their next move with confidence.
                </p>
              </div>
              
-             {/* Overall Condition */}
-             <div className="mb-6">
-               <h5 className="font-medium text-sm text-dark-green mb-3">Overall Condition</h5>
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+             {/* Condition Filter Buttons */}
+             <div className="mb-4">
+               <div className="flex flex-wrap gap-2">
                  {[
-                   {
-                     id: 'in-shrink',
-                     title: 'In Shrink',
-                     description: 'Sealed',
-                     icon: Box
-                   },
-                   {
-                     id: 'opened',
-                     title: 'Opened',
-                     description: 'But unplayed',
-                     icon: PackageOpen
-                   },
-                   {
-                     id: 'like-new',
-                     title: 'Like New',
-                     description: 'Played once or twice',
-                     icon: Star
-                   },
-                   {
-                     id: 'well-played',
-                     title: 'Well Played',
-                     description: 'Some wear, still playable',
-                     icon: ThumbsUp
-                   },
-                   {
-                     id: 'heavily-played',
-                     title: 'Heavily Played',
-                     description: 'Heavy wear or damage, still playable',
-                     icon: Repeat
-                   },
-                   {
-                     id: 'for-parts',
-                     title: 'For Parts',
-                     description: 'Missing key components',
-                     icon: XCircle
-                   }
-                 ].map((condition) => {
-                   const IconComponent = condition.icon
+                   { id: 'box', label: 'Box *', icon: Cuboid },
+                   { id: 'components', label: 'Components *', icon: Puzzle },
+                   { id: 'rulebook', label: 'Rulebook *', icon: NotebookText },
+                   { id: 'extras', label: 'Extras', icon: Gift },
+                   { id: 'photos', label: 'Photos', icon: Camera }
+                 ].map((filter) => {
+                   const IconComponent = filter.icon
+                   const isSelected = formData.gameCondition?.activeFilter === filter.id
+                   const isNewBox = formData.gameCondition?.boxCondition === 'new'
+                   const isDisabled = (filter.id === 'components' || filter.id === 'rulebook') && isNewBox
+                   
                    return (
-                     <Card
-                       key={condition.id}
-                       className={`cursor-pointer transition-all hover:shadow-md hover:border-vibrant-orange ${
-                         formData.gameCondition?.overallCondition === condition.id
-                           ? 'border-2 border-vibrant-orange bg-vibrant-orange/5 shadow-md'
-                           : 'border border-gray-200 hover:border-vibrant-orange'
-                       }`}
-                       onClick={() => updateFormData({
-                         gameCondition: {
-                           overallCondition: condition.id,
-                           completeness: formData.gameCondition?.completeness || null,
-                           missingDescription: formData.gameCondition?.missingDescription || null,
-                           extras: formData.gameCondition?.extras || [],
-                           customExtras: formData.gameCondition?.customExtras || null,
-                           photos: formData.gameCondition?.photos || []
+                     <button
+                       key={filter.id}
+                       onClick={() => {
+                         if (!isDisabled) {
+                           updateFormData({
+                             gameCondition: {
+                               ...formData.gameCondition,
+                               activeFilter: filter.id as any,
+                               extras: formData.gameCondition?.extras || []
+                             }
+                           })
                          }
-                       })}
+                       }}
+                       disabled={isDisabled}
+                       className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs border transition-all ${
+                         isDisabled
+                           ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                           : isSelected 
+                             ? 'border-vibrant-orange bg-orange-50 text-vibrant-orange' 
+                             : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                       }`}
                      >
-                       <CardContent className="p-3">
-                         <div className="flex items-center space-x-3">
-                           <div className="flex-shrink-0">
-                             <IconComponent className="w-5 h-5 text-vibrant-orange" />
-                           </div>
-                           <div className="flex-1 min-w-0">
-                             <h6 className="font-medium text-sm text-dark-green mb-1">{condition.title}</h6>
-                             <p className="text-xs text-gray-600 leading-tight">{condition.description}</p>
-                           </div>
-                         </div>
-                       </CardContent>
-                     </Card>
+                       <IconComponent className="w-4 h-4" />
+                       {isDisabled ? filter.label.replace(' *', '') : filter.label}
+                     </button>
                    )
                  })}
                </div>
              </div>
              
-             {/* Components Completeness */}
-             <div className="mb-6">
-               <h5 className="font-medium text-sm text-dark-green mb-3">Components (Completeness)</h5>
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                 {[
-                   {
-                     id: 'complete',
-                     title: 'Complete',
-                     description: 'Every piece accounted for.',
-                     icon: CheckCircle
-                   },
-                   {
-                     id: 'missing',
-                     title: 'Missing',
-                     description: 'Some pieces missing or slightly damaged.',
-                     icon: AlertTriangle
-                   }
-                 ].map((completeness) => {
-                   const IconComponent = completeness.icon
-                   return (
-                     <Card
-                       key={completeness.id}
-                       className={`cursor-pointer transition-all hover:shadow-md hover:border-vibrant-orange ${
-                         formData.gameCondition?.completeness === completeness.id
-                           ? 'border-2 border-vibrant-orange bg-vibrant-orange/5 shadow-md'
-                           : 'border border-gray-200 hover:border-vibrant-orange'
-                       }`}
-                       onClick={() => updateFormData({
-                         gameCondition: {
-                           overallCondition: formData.gameCondition?.overallCondition || null,
-                           completeness: completeness.id,
-                           missingDescription: formData.gameCondition?.missingDescription || null,
-                           extras: formData.gameCondition?.extras || [],
-                           customExtras: formData.gameCondition?.customExtras || null,
-                           photos: formData.gameCondition?.photos || []
-                         }
+             {/* Condition Options */}
+             {formData.gameCondition?.activeFilter && (
+               <div className="bg-white border border-gray-200 rounded-lg p-4">
+                 {formData.gameCondition.activeFilter === 'box' && (
+                   <div>
+                     <p className="text-xs text-gray-600 mb-4">
+                       Tell buyers about the game's outer box — is it fresh and sturdy, or has it seen a few gaming nights?
+                     </p>
+                     
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                       {[
+                         { id: 'new', icon: Lock, title: 'New', description: 'Still in shrink wrap' },
+                         { id: 'like-new', icon: PackageCheck, title: 'Like New', description: 'No visible wear' },
+                         { id: 'lightly-worn', icon: Box, title: 'Lightly Worn', description: 'Small scuffs or corner wear' },
+                         { id: 'worn', icon: Archive, title: 'Worn', description: 'Noticeable wear, but intact' },
+                         { id: 'damaged', icon: PackageX, title: 'Damaged', description: 'Tears, dents, or water damage' }
+                       ].map((condition) => {
+                         const IconComponent = condition.icon
+                         const isSelected = formData.gameCondition?.boxCondition === condition.id
+                         return (
+                           <button
+                             key={condition.id}
+                             onClick={() => updateFormData({
+                               gameCondition: {
+                                 ...formData.gameCondition,
+                                 boxCondition: condition.id as any
+                               }
+                             })}
+                             className={`p-3 rounded-lg border-2 text-left transition-all ${
+                               isSelected 
+                                 ? 'border-vibrant-orange bg-orange-50' 
+                                 : 'border-gray-200 bg-white hover:border-gray-300'
+                             }`}
+                           >
+                             <div className="flex items-start gap-3">
+                               <IconComponent className={`w-5 h-5 mt-0.5 ${isSelected ? 'text-vibrant-orange' : 'text-gray-400'}`} />
+                               <div>
+                                 <h6 className="font-medium text-sm text-gray-900">{condition.title}</h6>
+                                 <p className="text-xs text-gray-600 mt-1">{condition.description}</p>
+                               </div>
+                             </div>
+                           </button>
+                         )
                        })}
-                     >
-                       <CardContent className="p-3">
-                         <div className="flex items-center space-x-3">
-                           <div className="flex-shrink-0">
-                             <IconComponent className="w-5 h-5 text-vibrant-orange" />
+                     </div>
+                     
+                     {/* Optional text field */}
+                     <div>
+                       <textarea
+                         placeholder="Anything else about the box condition?"
+                         value={formData.gameCondition?.boxDescription || ''}
+                         onChange={(e) => updateFormData({
+                           gameCondition: {
+                             ...formData.gameCondition,
+                             boxDescription: e.target.value
+                           }
+                         })}
+                         className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                         rows={2}
+                       />
+                     </div>
+                   </div>
+                 )}
+                 
+                 {formData.gameCondition.activeFilter === 'components' && (
+                   <div>
+                     <p className="text-xs text-gray-600 mb-4">
+                       Are all the pieces present and in what shape are they? Buyers want to know they can play right out of the box.
+                     </p>
+                     
+                     {/* Completeness Options */}
+                     <div className="mb-4">
+                       <h6 className="font-medium text-sm text-gray-900 mb-3">Completeness</h6>
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                         {[
+                           { id: 'complete', icon: CheckCircle, title: 'Complete', description: 'All components included' },
+                           { id: 'incomplete', icon: AlertCircle, title: 'Incomplete', description: 'Something is missing (please list below)' }
+                         ].map((completeness) => {
+                           const IconComponent = completeness.icon
+                           const isSelected = formData.gameCondition?.completeness === completeness.id
+                           return (
+                             <button
+                               key={completeness.id}
+                               onClick={() => updateFormData({
+                                 gameCondition: {
+                                   ...formData.gameCondition,
+                                   completeness: completeness.id as any
+                                 }
+                               })}
+                               className={`p-3 rounded-lg border-2 text-left transition-all ${
+                                 isSelected 
+                                   ? 'border-vibrant-orange bg-orange-50' 
+                                   : 'border-gray-200 bg-white hover:border-gray-300'
+                               }`}
+                             >
+                               <div className="flex items-start gap-3">
+                                 <IconComponent className={`w-5 h-5 mt-0.5 ${isSelected ? 'text-vibrant-orange' : 'text-gray-400'}`} />
+                                 <div>
+                                   <h6 className="font-medium text-sm text-gray-900">{completeness.title}</h6>
+                                   <p className="text-xs text-gray-600 mt-1">{completeness.description}</p>
+                                 </div>
+                               </div>
+                             </button>
+                           )
+                         })}
+                       </div>
+                     </div>
+                     
+                     {/* Component Condition Options */}
+                     <div className="mb-4">
+                       <h6 className="font-medium text-sm text-gray-900 mb-3">Component Condition</h6>
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                         {[
+                           { id: 'like-new', icon: Sparkles, title: 'Like New', description: 'Unplayed or barely used' },
+                           { id: 'lightly-used', icon: Smile, title: 'Lightly Used', description: 'Minor wear' },
+                           { id: 'well-played', icon: ThumbsUp, title: 'Well Played', description: 'Visible wear, but fully usable' },
+                           { id: 'damaged', icon: AlertTriangle, title: 'Damaged', description: 'Some pieces / cards are marked, bent, or broken' }
+                         ].map((condition) => {
+                           const IconComponent = condition.icon
+                           const isSelected = formData.gameCondition?.componentCondition === condition.id
+                           return (
+                             <button
+                               key={condition.id}
+                               onClick={() => updateFormData({
+                                 gameCondition: {
+                                   ...formData.gameCondition,
+                                   componentCondition: condition.id as any
+                                 }
+                               })}
+                               className={`p-3 rounded-lg border-2 text-left transition-all ${
+                                 isSelected 
+                                   ? 'border-vibrant-orange bg-orange-50' 
+                                   : 'border-gray-200 bg-white hover:border-gray-300'
+                               }`}
+                             >
+                               <div className="flex items-start gap-3">
+                                 <IconComponent className={`w-5 h-5 mt-0.5 ${isSelected ? 'text-vibrant-orange' : 'text-gray-400'}`} />
+                                 <div>
+                                   <h6 className="font-medium text-sm text-gray-900">{condition.title}</h6>
+                                   <p className="text-xs text-gray-600 mt-1">{condition.description}</p>
+                                 </div>
+                               </div>
+                             </button>
+                           )
+                         })}
+                       </div>
+                     </div>
+                     
+                     {/* Optional text field */}
+                     <div>
+                       <textarea
+                         placeholder="List missing or damaged components, if any."
+                         value={formData.gameCondition?.missingDescription || ''}
+                         onChange={(e) => updateFormData({
+                           gameCondition: {
+                             ...formData.gameCondition,
+                             missingDescription: e.target.value
+                           }
+                         })}
+                         className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                         rows={2}
+                       />
+                     </div>
+                   </div>
+                 )}
+                 
+                 {formData.gameCondition.activeFilter === 'rulebook' && (
+                   <div>
+                     <p className="text-xs text-gray-600 mb-4">
+                       Games are easier to play with the rulebook — let buyers know what's included.
+                     </p>
+                     
+                     {/* Rulebook Options */}
+                     <div className="mb-4">
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                         {[
+                           { id: 'included-good', icon: BookOpenCheck, title: 'Included', description: 'Original in good condition' },
+                           { id: 'included-worn', icon: Book, title: 'Included', description: 'Worn (folds, marks, small tears)' },
+                           { id: 'missing', icon: BookX, title: 'Missing', description: 'Rulebook not included' },
+                           { id: 'partially-included', icon: BookMinus, title: 'Partially Included', description: 'Only some languages (please specify)' }
+                         ].map((rulebook) => {
+                           const IconComponent = rulebook.icon
+                           const isSelected = formData.gameCondition?.rulebook === rulebook.id
+                           return (
+                             <button
+                               key={rulebook.id}
+                               onClick={() => updateFormData({
+                                 gameCondition: {
+                                   ...formData.gameCondition,
+                                   rulebook: rulebook.id as any
+                                 }
+                               })}
+                               className={`p-3 rounded-lg border-2 text-left transition-all ${
+                                 isSelected 
+                                   ? 'border-vibrant-orange bg-orange-50' 
+                                   : 'border-gray-200 bg-white hover:border-gray-300'
+                               }`}
+                             >
+                               <div className="flex items-start gap-3">
+                                 <IconComponent className={`w-5 h-5 mt-0.5 ${isSelected ? 'text-vibrant-orange' : 'text-gray-400'}`} />
+                                 <div>
+                                   <h6 className="font-medium text-sm text-gray-900">{rulebook.title}</h6>
+                                   <p className="text-xs text-gray-600 mt-1">{rulebook.description}</p>
+                                 </div>
+                               </div>
+                             </button>
+                           )
+                         })}
+                       </div>
+                     </div>
+                     
+                     {/* Optional text field */}
+                     <div>
+                       <textarea
+                         placeholder="Which rulebooks are included or missing?"
+                         value={formData.gameCondition?.rulebookDescription || ''}
+                         onChange={(e) => updateFormData({
+                           gameCondition: {
+                             ...formData.gameCondition,
+                             rulebookDescription: e.target.value
+                           }
+                         })}
+                         className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                         rows={2}
+                       />
+                     </div>
+                   </div>
+                 )}
+                 
+                 {formData.gameCondition.activeFilter === 'extras' && (
+                   <div>
+                     <p className="text-xs text-gray-600 mb-4">
+                       Sometimes games come with a little extra magic. Mention anything special that makes your copy unique.
+                     </p>
+                     
+                     {/* Extras Options */}
+                     <div className="mb-4">
+                       <div className="flex flex-wrap gap-2">
+                         {[
+                           'Card sleeves',
+                           'Upgraded components',
+                           'Custom insert',
+                           'Playmat',
+                           'Painted miniatures',
+                           'Promos'
+                         ].map((extra) => {
+                           const isSelected = formData.gameCondition?.extras?.includes(extra) || false
+                           return (
+                             <button
+                               key={extra}
+                               onClick={() => {
+                                 const currentExtras = formData.gameCondition?.extras || []
+                                 const newExtras = isSelected 
+                                   ? currentExtras.filter(e => e !== extra)
+                                   : [...currentExtras, extra]
+                                 updateFormData({
+                                   gameCondition: {
+                                     ...formData.gameCondition,
+                                     extras: newExtras
+                                   }
+                                 })
+                               }}
+                               className={`px-3 py-2 rounded-md text-xs border transition-all ${
+                                 isSelected 
+                                   ? 'border-vibrant-orange bg-orange-50 text-vibrant-orange' 
+                                   : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                               }`}
+                             >
+                               {extra}
+                             </button>
+                           )
+                         })}
+                       </div>
+                     </div>
+                     
+                     {/* Optional text field */}
+                     <div>
+                       <textarea
+                         placeholder="Describe any extras or modifications."
+                         value={formData.gameCondition?.extrasDescription || ''}
+                         onChange={(e) => updateFormData({
+                           gameCondition: {
+                             ...formData.gameCondition,
+                             extrasDescription: e.target.value
+                           }
+                         })}
+                         className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                         rows={2}
+                       />
+                     </div>
+                   </div>
+                 )}
+                 
+                 {formData.gameCondition.activeFilter === 'photos' && (
+                   <div>
+                     <p className="text-xs text-gray-600 mb-4">
+                       A picture says more than a thousand dice rolls — add up to 3 photos so buyers see what they're getting.
+                     </p>
+                     
+                     {/* Upload Interface */}
+                     <div className="mb-4">
+                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-vibrant-orange transition-colors">
+                         <div className="space-y-2">
+                           <div className="w-12 h-12 mx-auto bg-gray-100 rounded-lg flex items-center justify-center">
+                             <Camera className="w-6 h-6 text-gray-400" />
                            </div>
-                           <div className="flex-1">
-                             <h6 className="font-medium text-sm text-dark-green">{completeness.title}</h6>
-                             <p className="text-xs text-gray-600">{completeness.description}</p>
+                           <div>
+                             <p className="text-sm font-medium text-gray-900">Upload photos</p>
+                             <p className="text-xs text-gray-600">Drag & drop or click to upload</p>
+                           </div>
+                           <div className="text-xs text-gray-500 space-y-1">
+                             <p>Up to 3 photos allowed</p>
+                             <p>Include box front + inside and any special extras</p>
+                             <p>Keep photos clear and well-lit</p>
                            </div>
                          </div>
-                       </CardContent>
-                     </Card>
-                   )
-                 })}
+                       </div>
+                       
+                       {/* Photo Thumbnails */}
+                       {formData.gameCondition?.photos && formData.gameCondition.photos.length > 0 && (
+                         <div className="mt-4">
+                           <div className="grid grid-cols-3 gap-3">
+                             {formData.gameCondition.photos.map((photo, index) => (
+                               <div key={index} className="relative group">
+                                 <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                                   <Image
+                                     src={photo}
+                                     alt={`Game photo ${index + 1}`}
+                                     width={150}
+                                     height={150}
+                                     className="w-full h-full object-cover"
+                                   />
+                                 </div>
+                                 <button
+                                   onClick={() => {
+                                     const newPhotos = formData.gameCondition?.photos?.filter((_, i) => i !== index) || []
+                                     updateFormData({
+                                       gameCondition: {
+                                         ...formData.gameCondition,
+                                         photos: newPhotos
+                                       }
+                                     })
+                                   }}
+                                   className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                                 >
+                                   ×
+                                 </button>
+                               </div>
+                             ))}
+                           </div>
+                           
+                           {/* Reorder hint */}
+                           {formData.gameCondition.photos.length > 1 && (
+                             <p className="text-xs text-gray-500 mt-2 text-center">
+                               Drag to reorder photos (coming soon)
+                             </p>
+                           )}
+                         </div>
+                       )}
+                     </div>
+                     
+                     {/* Optional text field */}
+                     <div>
+                       <textarea
+                         placeholder="Add notes about the photos (e.g., highlighting wear, scratches, or missing components)."
+                         value={formData.gameCondition?.photoNotes || ''}
+                         onChange={(e) => updateFormData({
+                           gameCondition: {
+                             ...formData.gameCondition,
+                             photoNotes: e.target.value
+                           }
+                         })}
+                         className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                         rows={2}
+                       />
+                     </div>
+                   </div>
+                 )}
                </div>
-               
-               {/* Missing Description Field */}
-               {formData.gameCondition?.completeness === 'missing' && (
-                 <div className="mt-3">
-                   <textarea
-                     placeholder="Describe missing pieces or damage..."
-                     value={formData.gameCondition?.missingDescription || ''}
-                     onChange={(e) => updateFormData({
-                       gameCondition: {
-                         overallCondition: formData.gameCondition?.overallCondition || null,
-                         completeness: formData.gameCondition?.completeness || null,
-                         missingDescription: e.target.value,
-                         extras: formData.gameCondition?.extras || [],
-                         customExtras: formData.gameCondition?.customExtras || null,
-                         photos: formData.gameCondition?.photos || []
-                       }
-                     })}
-                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
-                     rows={3}
-                   />
-                 </div>
-               )}
-             </div>
-             
-             {/* Extras & Add-Ons */}
-             <div className="mb-6">
-               <h5 className="font-medium text-sm text-dark-green mb-3">Extras & Add-Ons (Optional)</h5>
-               <div className="flex flex-wrap gap-2 mb-3">
-                 {[
-                   'Sleeved cards',
-                   'Custom insert',
-                   'Painted minis'
-                 ].map((extra) => (
-                   <button
-                     key={extra}
-                     type="button"
-                     onClick={() => {
-                       const currentExtras = formData.gameCondition?.extras || []
-                       const newExtras = currentExtras.includes(extra)
-                         ? currentExtras.filter(item => item !== extra)
-                         : [...currentExtras, extra]
-                       updateFormData({
-                         gameCondition: {
-                           overallCondition: formData.gameCondition?.overallCondition || null,
-                           completeness: formData.gameCondition?.completeness || null,
-                           missingDescription: formData.gameCondition?.missingDescription || null,
-                           extras: newExtras,
-                           customExtras: formData.gameCondition?.customExtras || null,
-                           photos: formData.gameCondition?.photos || []
-                         }
-                       })
-                     }}
-                     className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${
-                       formData.gameCondition?.extras?.includes(extra)
-                         ? 'bg-vibrant-orange text-white border-vibrant-orange'
-                         : 'bg-white text-gray-600 border-gray-300 hover:border-vibrant-orange hover:text-vibrant-orange'
-                     }`}
-                   >
-                     {extra}
-                   </button>
-                 ))}
-               </div>
-               
-               {/* Custom Extras Text Field */}
-               <div>
-                 <textarea
-                   placeholder="Describe any extras or upgrades your game includes..."
-                   value={formData.gameCondition?.customExtras || ''}
-                   onChange={(e) => updateFormData({
-                     gameCondition: {
-                       overallCondition: formData.gameCondition?.overallCondition || null,
-                       completeness: formData.gameCondition?.completeness || null,
-                       missingDescription: formData.gameCondition?.missingDescription || null,
-                       extras: formData.gameCondition?.extras || [],
-                       customExtras: e.target.value,
-                       photos: formData.gameCondition?.photos || []
-                     }
-                   })}
-                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
-                   rows={2}
-                 />
-               </div>
-             </div>
-             
-             {/* Photos Section */}
-             <div>
-               <h5 className="font-medium text-sm text-dark-green mb-3">Photos</h5>
-               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-vibrant-orange transition-colors">
-                 <div className="text-gray-400 mb-2">
-                   <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                   </svg>
-                 </div>
-                 <p className="text-sm text-gray-600 mb-2">
-                   <strong>Drag & Drop</strong> or <strong>Click to Upload</strong>
-                 </p>
-                 <p className="text-xs text-gray-500 mb-4">
-                   Recommended: 2 photos (max 3)<br />
-                   Include box front + inside and any special extras<br />
-                   Keep photos clear and well-lit
-                 </p>
-                 <div className="text-xs text-gray-500 space-y-1">
-                   <p>💡 <em>&ldquo;Don&apos;t hide the dents — honesty makes for a better second turn!&rdquo;</em></p>
-                   <p>💡 <em>&ldquo;Show any missing pieces or wear so buyers know what to expect.&rdquo;</em></p>
-                 </div>
-               </div>
-             </div>
+             )}
            </div>
          )}
          

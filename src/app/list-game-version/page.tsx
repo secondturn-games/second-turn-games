@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Search, Calendar, Package, Type, Languages, Building2, HelpCircle, Users, Clock, Cake, ChevronDown, ChevronUp, Box, PackageOpen, Star, Repeat, XCircle, CheckCircle, AlertTriangle, ThumbsUp, ExternalLink, Cog, PackageCheck, Archive, PackageX, AlertCircle, Sparkles, Smile, BookOpenCheck, Book, BookX, Lock, Gift, Camera, Cuboid, Puzzle, NotebookText, BookMinus, Globe } from 'lucide-react'
+import { Search, Calendar, Package, Type, Languages, Building2, HelpCircle, Users, Clock, Cake, ChevronDown, ChevronUp, Box, CheckCircle, AlertTriangle, ThumbsUp, ExternalLink, Cog, PackageCheck, Archive, PackageX, AlertCircle, Sparkles, Smile, BookOpenCheck, Book, BookX, Lock, Gift, Camera, Cuboid, Puzzle, NotebookText, BookMinus, Globe, Euro, MessageCircleQuestion, Handshake, Container, Truck } from 'lucide-react'
 import Image from 'next/image'
 import { bggServiceClient } from '@/lib/bgg/bgg-service-client'
 import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion } from '@/lib/bgg'
@@ -30,7 +30,7 @@ interface ListingFormData {
     rating: string
   } | null
   gameCondition: {
-    activeFilter: string | null
+    activeFilter: 'box' | 'components' | 'rulebook' | 'extras' | 'photos' | null
     boxCondition: string | null
     boxDescription: string | null
     completeness: string | null
@@ -42,6 +42,35 @@ interface ListingFormData {
     extrasDescription: string | null
     photos: string[]
     photoNotes: string | null
+  } | null
+  price: {
+    amount: string | null
+    negotiable: boolean
+    notes: string | null
+  } | null
+  shipping: {
+    activeFilter: 'pickup' | 'parcelLocker' | 'standardCourier' | null
+    pickup: {
+      enabled: boolean
+      location: string | null
+    }
+    parcelLocker: {
+      enabled: boolean
+      priceType: 'included' | 'separate' | null
+      price: string | null
+      location: string | null
+      countries: string[]
+      countryPrices: Record<string, string>
+    }
+    standardCourier: {
+      enabled: boolean
+      priceType: 'included' | 'separate' | null
+      price: string | null
+      location: string | null
+      countries: string[]
+      countryPrices: Record<string, string>
+    }
+    notes: string | null
   } | null
 }
 
@@ -65,6 +94,8 @@ export default function ListGameVersionPage() {
          const [showTitleSelection, setShowTitleSelection] = useState(false)
        const [selectedLanguage, setSelectedLanguage] = useState<string>('all')
   const [showGameCondition, setShowGameCondition] = useState(false)
+  const [showPrice, setShowPrice] = useState(false)
+  const [showShipping, setShowShipping] = useState(false)
 
   const [formData, setFormData] = useState<ListingFormData>({
     bggGameId: null,
@@ -76,11 +107,61 @@ export default function ListGameVersionPage() {
     versionImage: null,
     customTitle: null,
     gameDetails: null,
-    gameCondition: null
+    gameCondition: null,
+    price: null,
+    shipping: null
   })
 
   const updateFormData = (updates: Partial<ListingFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }))
+  }
+
+  const updateGameCondition = (updates: Partial<NonNullable<ListingFormData['gameCondition']>>) => {
+    updateFormData({
+      gameCondition: {
+        activeFilter: formData.gameCondition?.activeFilter || null,
+        boxCondition: formData.gameCondition?.boxCondition || null,
+        boxDescription: formData.gameCondition?.boxDescription || null,
+        completeness: formData.gameCondition?.completeness || null,
+        missingDescription: formData.gameCondition?.missingDescription || null,
+        componentCondition: formData.gameCondition?.componentCondition || null,
+        rulebook: formData.gameCondition?.rulebook || null,
+        rulebookDescription: formData.gameCondition?.rulebookDescription || null,
+        extras: formData.gameCondition?.extras || [],
+        extrasDescription: formData.gameCondition?.extrasDescription || null,
+        photos: formData.gameCondition?.photos || [],
+        photoNotes: formData.gameCondition?.photoNotes || null,
+        ...updates
+      }
+    })
+  }
+
+  const updatePrice = (updates: Partial<NonNullable<ListingFormData['price']>>) => {
+    updateFormData({
+      price: {
+        amount: formData.price?.amount || null,
+        negotiable: formData.price?.negotiable || false,
+        notes: formData.price?.notes || null,
+        ...updates
+      }
+    })
+  }
+
+  const updateShipping = (updates: Partial<NonNullable<ListingFormData['shipping']>>) => {
+    const currentShipping = formData.shipping || {
+      activeFilter: null,
+      pickup: { enabled: false, location: null },
+      parcelLocker: { enabled: false, priceType: null, price: null, location: null, countries: [], countryPrices: {} },
+      standardCourier: { enabled: false, priceType: null, price: null, location: null, countries: [], countryPrices: {} },
+      notes: null
+    }
+    
+    updateFormData({
+      shipping: {
+        ...currentShipping,
+        ...updates
+      }
+    })
   }
 
   const performSearch = async () => {
@@ -142,9 +223,13 @@ export default function ListGameVersionPage() {
 
   const resetGameCondition = () => {
     updateFormData({
-      gameCondition: null
+      gameCondition: null,
+      price: null,
+      shipping: null
     })
     setShowGameCondition(false)
+    setShowPrice(false)
+    setShowShipping(false)
   }
 
   const handleGameSelect = async (game: BGGSearchResult) => {
@@ -876,6 +961,20 @@ export default function ListGameVersionPage() {
                         </div>
                       </div>
                     )}
+                    
+                    {/* Section 4: Price Information */}
+                    {formData.price && formData.price.amount && (
+                      <div className="border-t border-gray-100 pt-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="font-display font-semibold text-dark-green-600 text-2xl leading-tight">
+                            €{parseFloat(formData.price.amount).toFixed(2)}
+                          </span>
+                          {formData.price.negotiable && (
+                            <MessageCircleQuestion className="w-4 h-4 text-vibrant-orange" />
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Desktop Layout: Image in first column, title spans columns 2+3, details below */}
@@ -1003,15 +1102,15 @@ export default function ListGameVersionPage() {
                             )}
                           </div>
                           
-                          {/* Column 3: User-Provided Game Condition */}
-                          {formData.gameCondition && (
+                          {/* Column 3: User-Provided Game Condition & Price */}
+                          {(formData.gameCondition || formData.price) && (
                             <div className="w-56 flex-shrink-0">
                               <div className="text-xs text-gray-600 space-y-1">
                                 {(() => {
                                   const conditions = []
                                   
                                   // Box Condition - Only show if explicitly selected
-                                  if (formData.gameCondition.boxCondition && formData.gameCondition.boxCondition !== null) {
+                                  if (formData.gameCondition?.boxCondition && formData.gameCondition.boxCondition !== null) {
                                     const boxMap = {
                                       'new': { icon: Lock, label: 'Sealed' },
                                       'like-new': { icon: PackageCheck, label: 'Like New' },
@@ -1032,9 +1131,9 @@ export default function ListGameVersionPage() {
                                   }
                                   
                                   // Components - Only show if box is not "new" (sealed)
-                                  if (formData.gameCondition.boxCondition !== 'new' && 
-                                      formData.gameCondition.completeness && 
-                                      formData.gameCondition.componentCondition) {
+                                  if (formData.gameCondition?.boxCondition !== 'new' && 
+                                      formData.gameCondition?.completeness && 
+                                      formData.gameCondition?.componentCondition) {
                                     const completenessMap = {
                                       'complete': 'Complete',
                                       'incomplete': 'Incomplete'
@@ -1058,8 +1157,8 @@ export default function ListGameVersionPage() {
                                   }
                                   
                                   // Rulebook - Only show if box is not "new" (sealed)
-                                  if (formData.gameCondition.boxCondition !== 'new' && 
-                                      formData.gameCondition.rulebook) {
+                                  if (formData.gameCondition?.boxCondition !== 'new' && 
+                                      formData.gameCondition?.rulebook) {
                                     const rulebookMap = {
                                       'included-good': 'Included',
                                       'included-worn': 'Included (worn)',
@@ -1078,7 +1177,7 @@ export default function ListGameVersionPage() {
                                   }
                                   
                                   // Extras
-                                  if (formData.gameCondition.extras && formData.gameCondition.extras.length > 0) {
+                                  if (formData.gameCondition?.extras && formData.gameCondition.extras.length > 0) {
                                     const firstExtra = formData.gameCondition.extras[0]
                                     const remainingCount = formData.gameCondition.extras.length - 1
                                     const moreText = remainingCount > 0 ? ` +${remainingCount} more` : ''
@@ -1086,6 +1185,20 @@ export default function ListGameVersionPage() {
                                       <div key="extras" className="flex items-center gap-1">
                                         <Gift className="w-3 h-3 text-vibrant-orange" />
                                         <span>{firstExtra}{moreText}</span>
+                                      </div>
+                                    )
+                                  }
+                                  
+                                  // Price
+                                  if (formData.price?.amount) {
+                                    conditions.push(
+                                      <div key="price" className="flex items-center gap-2">
+                                        <span className="font-display font-semibold text-dark-green-600 text-2xl leading-tight">
+                                          €{parseFloat(formData.price.amount).toFixed(2)}
+                                        </span>
+                                        {formData.price.negotiable && (
+                                          <MessageCircleQuestion className="w-4 h-4 text-vibrant-orange" />
+                                        )}
                                       </div>
                                     )
                                   }
@@ -1145,6 +1258,67 @@ export default function ListGameVersionPage() {
                           className="text-xs h-8 px-3 border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                           Game Condition ⌵
+                        </Button>
+                        
+                        {/* Price Button - Always visible */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (!formData.price) {
+                              updateFormData({
+                                price: {
+                                  amount: null,
+                                  negotiable: false,
+                                  notes: null
+                                }
+                              })
+                            }
+                            setShowPrice(!showPrice)
+                          }}
+                          className="text-xs h-8 px-3 border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                          Price ⌵
+                        </Button>
+                        
+                        {/* Shipping Button - Always visible */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (!formData.shipping) {
+                              updateFormData({
+                                shipping: {
+                                  activeFilter: null,
+                                  pickup: {
+                                    enabled: false,
+                                    location: null
+                                  },
+                                  parcelLocker: {
+                                    enabled: false,
+                                    priceType: null,
+                                    price: null,
+                                    location: null,
+                                    countries: [],
+                                    countryPrices: {}
+                                  },
+                                  standardCourier: {
+                                    enabled: false,
+                                    priceType: null,
+                                    price: null,
+                                    location: null,
+                                    countries: [],
+                                    countryPrices: {}
+                                  },
+                                  notes: null
+                                }
+                              })
+                            }
+                            setShowShipping(!showShipping)
+                          }}
+                          className="text-xs h-8 px-3 border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                          Shipping ⌵
                         </Button>
                       </div>
                     </div>
@@ -1364,13 +1538,7 @@ export default function ListGameVersionPage() {
                        key={filter.id}
                        onClick={() => {
                          if (!isDisabled) {
-                           updateFormData({
-                             gameCondition: {
-                               ...formData.gameCondition,
-                               activeFilter: filter.id as any,
-                               extras: formData.gameCondition?.extras || []
-                             }
-                           })
+                           updateGameCondition({ activeFilter: filter.id as 'box' | 'components' | 'rulebook' | 'extras' | 'photos' })
                          }
                        }}
                        disabled={isDisabled}
@@ -1396,7 +1564,7 @@ export default function ListGameVersionPage() {
                  {formData.gameCondition.activeFilter === 'box' && (
                    <div>
                      <p className="text-xs text-gray-600 mb-4">
-                       Tell buyers about the game's outer box — is it fresh and sturdy, or has it seen a few gaming nights?
+                       Tell buyers about the game&apos;s outer box — is it fresh and sturdy, or has it seen a few gaming nights?
                      </p>
                      
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -1412,12 +1580,7 @@ export default function ListGameVersionPage() {
                          return (
                            <button
                              key={condition.id}
-                             onClick={() => updateFormData({
-                               gameCondition: {
-                                 ...formData.gameCondition,
-                                 boxCondition: condition.id as any
-                               }
-                             })}
+                             onClick={() => updateGameCondition({ boxCondition: condition.id as string })}
                              className={`p-3 rounded-lg border-2 text-left transition-all ${
                                isSelected 
                                  ? 'border-vibrant-orange bg-orange-50' 
@@ -1441,12 +1604,7 @@ export default function ListGameVersionPage() {
                        <textarea
                          placeholder="Anything else about the box condition?"
                          value={formData.gameCondition?.boxDescription || ''}
-                         onChange={(e) => updateFormData({
-                           gameCondition: {
-                             ...formData.gameCondition,
-                             boxDescription: e.target.value
-                           }
-                         })}
+                         onChange={(e) => updateGameCondition({ boxDescription: e.target.value })}
                          className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
                          rows={2}
                        />
@@ -1473,12 +1631,7 @@ export default function ListGameVersionPage() {
                            return (
                              <button
                                key={completeness.id}
-                               onClick={() => updateFormData({
-                                 gameCondition: {
-                                   ...formData.gameCondition,
-                                   completeness: completeness.id as any
-                                 }
-                               })}
+                               onClick={() => updateGameCondition({ completeness: completeness.id as string })}
                                className={`p-3 rounded-lg border-2 text-left transition-all ${
                                  isSelected 
                                    ? 'border-vibrant-orange bg-orange-50' 
@@ -1513,12 +1666,7 @@ export default function ListGameVersionPage() {
                            return (
                              <button
                                key={condition.id}
-                               onClick={() => updateFormData({
-                                 gameCondition: {
-                                   ...formData.gameCondition,
-                                   componentCondition: condition.id as any
-                                 }
-                               })}
+                               onClick={() => updateGameCondition({ componentCondition: condition.id as string })}
                                className={`p-3 rounded-lg border-2 text-left transition-all ${
                                  isSelected 
                                    ? 'border-vibrant-orange bg-orange-50' 
@@ -1543,12 +1691,7 @@ export default function ListGameVersionPage() {
                        <textarea
                          placeholder="List missing or damaged components, if any."
                          value={formData.gameCondition?.missingDescription || ''}
-                         onChange={(e) => updateFormData({
-                           gameCondition: {
-                             ...formData.gameCondition,
-                             missingDescription: e.target.value
-                           }
-                         })}
+                         onChange={(e) => updateGameCondition({ missingDescription: e.target.value })}
                          className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
                          rows={2}
                        />
@@ -1559,7 +1702,7 @@ export default function ListGameVersionPage() {
                  {formData.gameCondition.activeFilter === 'rulebook' && (
                    <div>
                      <p className="text-xs text-gray-600 mb-4">
-                       Games are easier to play with the rulebook — let buyers know what's included.
+                       Games are easier to play with the rulebook — let buyers know what&apos;s included.
                      </p>
                      
                      {/* Rulebook Options */}
@@ -1576,12 +1719,7 @@ export default function ListGameVersionPage() {
                            return (
                              <button
                                key={rulebook.id}
-                               onClick={() => updateFormData({
-                                 gameCondition: {
-                                   ...formData.gameCondition,
-                                   rulebook: rulebook.id as any
-                                 }
-                               })}
+                               onClick={() => updateGameCondition({ rulebook: rulebook.id as string })}
                                className={`p-3 rounded-lg border-2 text-left transition-all ${
                                  isSelected 
                                    ? 'border-vibrant-orange bg-orange-50' 
@@ -1606,12 +1744,7 @@ export default function ListGameVersionPage() {
                        <textarea
                          placeholder="Which rulebooks are included or missing?"
                          value={formData.gameCondition?.rulebookDescription || ''}
-                         onChange={(e) => updateFormData({
-                           gameCondition: {
-                             ...formData.gameCondition,
-                             rulebookDescription: e.target.value
-                           }
-                         })}
+                         onChange={(e) => updateGameCondition({ rulebookDescription: e.target.value })}
                          className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
                          rows={2}
                        />
@@ -1645,12 +1778,7 @@ export default function ListGameVersionPage() {
                                  const newExtras = isSelected 
                                    ? currentExtras.filter(e => e !== extra)
                                    : [...currentExtras, extra]
-                                 updateFormData({
-                                   gameCondition: {
-                                     ...formData.gameCondition,
-                                     extras: newExtras
-                                   }
-                                 })
+                                 updateGameCondition({ extras: newExtras })
                                }}
                                className={`px-3 py-2 rounded-md text-xs border transition-all ${
                                  isSelected 
@@ -1670,12 +1798,7 @@ export default function ListGameVersionPage() {
                        <textarea
                          placeholder="Describe any extras or modifications."
                          value={formData.gameCondition?.extrasDescription || ''}
-                         onChange={(e) => updateFormData({
-                           gameCondition: {
-                             ...formData.gameCondition,
-                             extrasDescription: e.target.value
-                           }
-                         })}
+                         onChange={(e) => updateGameCondition({ extrasDescription: e.target.value })}
                          className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
                          rows={2}
                        />
@@ -1686,7 +1809,7 @@ export default function ListGameVersionPage() {
                  {formData.gameCondition.activeFilter === 'photos' && (
                    <div>
                      <p className="text-xs text-gray-600 mb-4">
-                       A picture says more than a thousand dice rolls — add up to 3 photos so buyers see what they're getting.
+                       A picture says more than a thousand dice rolls — add up to 3 photos so buyers see what they&apos;re getting.
                      </p>
                      
                      {/* Upload Interface */}
@@ -1726,12 +1849,7 @@ export default function ListGameVersionPage() {
                                  <button
                                    onClick={() => {
                                      const newPhotos = formData.gameCondition?.photos?.filter((_, i) => i !== index) || []
-                                     updateFormData({
-                                       gameCondition: {
-                                         ...formData.gameCondition,
-                                         photos: newPhotos
-                                       }
-                                     })
+                                     updateGameCondition({ photos: newPhotos })
                                    }}
                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
                                  >
@@ -1756,12 +1874,7 @@ export default function ListGameVersionPage() {
                        <textarea
                          placeholder="Add notes about the photos (e.g., highlighting wear, scratches, or missing components)."
                          value={formData.gameCondition?.photoNotes || ''}
-                         onChange={(e) => updateFormData({
-                           gameCondition: {
-                             ...formData.gameCondition,
-                             photoNotes: e.target.value
-                           }
-                         })}
+                         onChange={(e) => updateGameCondition({ photoNotes: e.target.value })}
                          className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
                          rows={2}
                        />
@@ -1770,6 +1883,709 @@ export default function ListGameVersionPage() {
                  )}
                </div>
              )}
+           </div>
+         )}
+         
+         {/* Price Section */}
+         {selectedGame && showPrice && (
+           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+             <div className="mb-4">
+               <h4 className="font-medium text-dark-green">Price</h4>
+               <p className="text-xs text-gray-600 mt-1">
+                 Set the value of your game so buyers know what to expect. Fair pricing helps trades happen faster!
+               </p>
+             </div>
+             
+             <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+               {/* Price Amount and Negotiable Card - Two Columns */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 {/* Price Amount */}
+                 <div>
+                   <div className="relative">
+                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                       <Euro className="h-4 w-4 text-gray-400" />
+                     </div>
+                     <input
+                       type="number"
+                       step="0.01"
+                       min="0.01"
+                       placeholder="0.00"
+                       value={formData.price?.amount || ''}
+                       onChange={(e) => {
+                         const value = e.target.value
+                         // Validate: must be > 0 and allow up to 2 decimal places
+                         if (value === '' || (parseFloat(value) > 0 && /^\d+(\.\d{1,2})?$/.test(value))) {
+                           updatePrice({ amount: value })
+                         }
+                       }}
+                       onBlur={(e) => {
+                         // Format to 2 decimals when user leaves the field
+                         if (e.target.value && !isNaN(parseFloat(e.target.value))) {
+                           updatePrice({ amount: parseFloat(e.target.value).toFixed(2) })
+                         }
+                       }}
+                       className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                     />
+                   </div>
+                 </div>
+                 
+                 {/* Negotiable Checkbox */}
+                 <div>
+                   <label className="flex items-center space-x-3">
+                     <input
+                       type="checkbox"
+                       checked={formData.price?.negotiable || false}
+                       onChange={(e) => updatePrice({ negotiable: e.target.checked })}
+                       className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300 rounded hover:border-vibrant-orange"
+                     />
+                     <div>
+                       <span className="text-sm font-medium text-gray-700">Negotiable?</span>
+                       <p className="text-xs text-gray-500">Allow buyers to make offers if selected.</p>
+                     </div>
+                   </label>
+                 </div>
+               </div>
+               
+               {/* Optional Notes */}
+               <div>
+                 <textarea
+                   placeholder="Want to add context to the price?"
+                   value={formData.price?.notes || ''}
+                   onChange={(e) => updatePrice({ notes: e.target.value })}
+                   className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                   rows={2}
+                 />
+               </div>
+             </div>
+           </div>
+         )}
+         
+         {/* Shipping Section */}
+         {selectedGame && showShipping && (
+           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+             <div className="mb-4">
+               <h4 className="font-medium text-dark-green">Shipping</h4>
+               <p className="text-xs text-gray-600 mt-1">
+                 Tell buyers how their game will get to them and where it can travel. Clear shipping info avoids surprises and keeps everyone happy.
+               </p>
+             </div>
+             
+             <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+               {/* Shipping Filter Buttons */}
+               <div className="flex flex-wrap gap-2">
+                 {[
+                   { id: 'pickup', label: 'Pickup / Local delivery', icon: Handshake },
+                   { id: 'parcelLocker', label: 'Parcel locker', icon: Container },
+                   { id: 'standardCourier', label: 'Standard courier', icon: Truck }
+                 ].map((filter) => {
+                   const IconComponent = filter.icon
+                   const isSelected = formData.shipping?.activeFilter === filter.id
+                   return (
+                     <button
+                       key={filter.id}
+                       onClick={() => updateShipping({ activeFilter: filter.id as 'pickup' | 'parcelLocker' | 'standardCourier' })}
+                       className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs border transition-all ${
+                         isSelected 
+                           ? 'border-vibrant-orange bg-orange-50 text-vibrant-orange' 
+                           : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                       }`}
+                     >
+                       <IconComponent className="h-4 w-4" />
+                       <span>{filter.label}</span>
+                     </button>
+                   )
+                 })}
+               </div>
+               
+               {/* Shipping Options Content */}
+               {formData.shipping?.activeFilter && (
+                 <div className="border-t border-gray-100 pt-4">
+                   {formData.shipping?.activeFilter === 'pickup' && (
+                     <div className="space-y-4">
+                       <div>
+                         <p className="text-xs text-gray-600 mb-3">Perfect for local buyers who can meet you in person.</p>
+                         
+                         {/* Enable/Disable Toggle */}
+                         <div className="mb-4">
+                           <label className="flex items-center space-x-3">
+                             <input
+                               type="checkbox"
+                               checked={formData.shipping?.pickup?.enabled || false}
+                                                                                              onChange={(e) => updateShipping({
+                                 pickup: {
+                                   enabled: e.target.checked,
+                                   location: formData.shipping?.pickup?.location || null
+                                 }
+                               })}
+                               className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300 rounded hover:border-vibrant-orange"
+                             />
+                             <span className="text-sm font-medium text-gray-700">Enable pickup / local delivery</span>
+                           </label>
+                         </div>
+                         
+                         {/* Location Field */}
+                         {formData.shipping?.pickup?.enabled && (
+                           <div>
+                             <label className="block text-sm font-medium text-gray-700 mb-2">
+                               Location *
+                             </label>
+                             <input
+                               type="text"
+                               placeholder="City, area, or meeting point"
+                               value={formData.shipping?.pickup?.location || ''}
+                               onChange={(e) => updateShipping({
+                                 pickup: {
+                                   enabled: formData.shipping?.pickup?.enabled || false,
+                                   location: e.target.value
+                                 }
+                               })}
+                               className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                             />
+                           </div>
+                         )}
+                       </div>
+                     </div>
+                   )}
+                   
+                   {formData.shipping.activeFilter === 'parcelLocker' && (
+                     <div className="space-y-4">
+                       <div>
+                         <p className="text-xs text-gray-600 mb-3">Convenient automated pickup points for buyers.</p>
+                         
+                         {/* Enable/Disable Toggle */}
+                         <div className="mb-4">
+                           <label className="flex items-center space-x-3">
+                             <input
+                               type="checkbox"
+                               checked={formData.shipping?.parcelLocker.enabled || false}
+                                                                onChange={(e) => updateShipping({
+                                   parcelLocker: {
+                                     enabled: e.target.checked,
+                                     priceType: formData.shipping?.parcelLocker?.priceType || null,
+                                     price: formData.shipping?.parcelLocker?.price || null,
+                                     location: formData.shipping?.parcelLocker?.location || null,
+                                     countries: formData.shipping?.parcelLocker?.countries || [],
+                                     countryPrices: formData.shipping?.parcelLocker?.countryPrices || {}
+                                   }
+                                 })}
+                               className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300 rounded hover:border-vibrant-orange"
+                             />
+                             <span className="text-sm font-medium text-gray-700">Enable parcel locker shipping</span>
+                           </label>
+                         </div>
+                         
+                         {/* Parcel Locker Options */}
+                         {formData.shipping?.parcelLocker.enabled && (
+                           <div className="space-y-4">
+                             {/* Price Type */}
+                             <div>
+                               <label className="block text-sm font-medium text-gray-700 mb-2">
+                                 Shipping Price *
+                               </label>
+                               <div className="space-y-2">
+                                 <label className="flex items-center space-x-3">
+                                   <input
+                                     type="radio"
+                                     name="parcelLocker-priceType"
+                                     value="included"
+                                     checked={formData.shipping?.parcelLocker.priceType === 'included'}
+                                                                          onChange={(e) => updateShipping({
+                                       parcelLocker: {
+                                         enabled: formData.shipping?.parcelLocker?.enabled || false,
+                                         priceType: e.target.value as 'included',
+                                         price: formData.shipping?.parcelLocker?.price || null,
+                                         location: formData.shipping?.parcelLocker?.location || null,
+                                         countries: formData.shipping?.parcelLocker?.countries || [],
+                                         countryPrices: formData.shipping?.parcelLocker?.countryPrices || {}
+                                       }
+                                     })}
+                                     className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300"
+                                   />
+                                   <span className="text-sm text-gray-700">Included in game price</span>
+                                 </label>
+                                 <label className="flex items-center space-x-3">
+                                   <input
+                                     type="radio"
+                                     name="parcelLocker-priceType"
+                                     value="separate"
+                                     checked={formData.shipping?.parcelLocker.priceType === 'separate'}
+                                                                          onChange={(e) => updateShipping({
+                                       parcelLocker: {
+                                         enabled: formData.shipping?.parcelLocker?.enabled || false,
+                                         priceType: e.target.value as 'separate',
+                                         price: formData.shipping?.parcelLocker?.price || null,
+                                         location: formData.shipping?.parcelLocker?.location || null,
+                                         countries: formData.shipping?.parcelLocker?.countries || [],
+                                         countryPrices: formData.shipping?.parcelLocker?.countryPrices || {}
+                                       }
+                                     })}
+                                     className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300"
+                                   />
+                                   <span className="text-sm text-gray-700">Separate shipping price</span>
+                                 </label>
+                               </div>
+                             </div>
+                             
+                             {/* Separate Price Input */}
+                             {formData.shipping?.parcelLocker.priceType === 'separate' && (
+                               <div>
+                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                                   Base Shipping Price *
+                                 </label>
+                                 <div className="relative">
+                                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                     <Euro className="h-4 w-4 text-gray-400" />
+                                   </div>
+                                   <input
+                                     type="number"
+                                     step="0.01"
+                                     min="0.01"
+                                     placeholder="0.00"
+                                     value={formData.shipping?.parcelLocker.price || ''}
+                                     onChange={(e) => {
+                                       const value = e.target.value
+                                       if (value === '' || (parseFloat(value) > 0 && /^\d+(\.\d{1,2})?$/.test(value))) {
+                                         updateShipping({
+                                           parcelLocker: {
+                                             enabled: formData.shipping?.parcelLocker?.enabled || false,
+                                             priceType: formData.shipping?.parcelLocker?.priceType || null,
+                                             price: value,
+                                             location: formData.shipping?.parcelLocker?.location || null,
+                                             countries: formData.shipping?.parcelLocker?.countries || [],
+                                             countryPrices: formData.shipping?.parcelLocker?.countryPrices || {}
+                                           }
+                                         })
+                                       }
+                                     }}
+                                     onBlur={(e) => {
+                                       if (e.target.value && !isNaN(parseFloat(e.target.value))) {
+                                         updateShipping({
+                                           parcelLocker: {
+                                             enabled: formData.shipping?.parcelLocker?.enabled || false,
+                                             priceType: formData.shipping?.parcelLocker?.priceType || null,
+                                             price: parseFloat(e.target.value).toFixed(2),
+                                             location: formData.shipping?.parcelLocker?.location || null,
+                                             countries: formData.shipping?.parcelLocker?.countries || [],
+                                             countryPrices: formData.shipping?.parcelLocker?.countryPrices || {}
+                                           }
+                                         })
+                                       }
+                                     }}
+                                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                                   />
+                                 </div>
+                               </div>
+                             )}
+                             
+                             {/* Game Location */}
+                             <div>
+                               <label className="block text-sm font-medium text-gray-700 mb-2">
+                                 Game Location *
+                               </label>
+                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                 <div>
+                                   <select
+                                     value="Estonia"
+                                     onChange={(e) => {
+                                       // TODO: Update with user's country from profile
+                                       console.log('Parcel Locker Country selected:', e.target.value)
+                                     }}
+                                     className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                                   >
+                                     <option value="Estonia">Estonia</option>
+                                     <option value="Latvia">Latvia</option>
+                                     <option value="Lithuania">Lithuania</option>
+                                   </select>
+                                 </div>
+                                 <div>
+                                   <input
+                                     type="text"
+                                     placeholder="City, area"
+                                     value={formData.shipping?.parcelLocker.location || ''}
+                                     onChange={(e) => updateShipping({
+                                       parcelLocker: {
+                                         enabled: formData.shipping?.parcelLocker?.enabled || false,
+                                         priceType: formData.shipping?.parcelLocker?.priceType || null,
+                                         price: formData.shipping?.parcelLocker?.price || null,
+                                         location: e.target.value,
+                                         countries: formData.shipping?.parcelLocker?.countries || [],
+                                         countryPrices: formData.shipping?.parcelLocker?.countryPrices || {}
+                                       }
+                                     })}
+                                     className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                                   />
+                                 </div>
+                               </div>
+                             </div>
+                             
+                             {/* Shipping To Countries */}
+                             <div>
+                               <label className="block text-sm font-medium text-gray-700 mb-2">
+                                 Shipping To
+                               </label>
+                               <div className="space-y-2">
+                                 {['Estonia', 'Latvia', 'Lithuania', 'Finland', 'Sweden', 'Denmark'].map((country) => {
+                                   const isSelected = formData.shipping?.parcelLocker?.countries?.includes(country) || false
+                                   return (
+                                     <div key={country} className="flex items-center justify-between">
+                                       <label className="flex items-center space-x-3">
+                                         <input
+                                           type="checkbox"
+                                           checked={isSelected}
+                                           onChange={(e) => {
+                                             const newCountries = e.target.checked
+                                               ? [...(formData.shipping?.parcelLocker?.countries || []), country]
+                                               : (formData.shipping?.parcelLocker?.countries || []).filter(c => c !== country)
+                                                                                            updateShipping({
+                                                 parcelLocker: {
+                                                   enabled: formData.shipping?.parcelLocker?.enabled || false,
+                                                   priceType: formData.shipping?.parcelLocker?.priceType || null,
+                                                   price: formData.shipping?.parcelLocker?.price || null,
+                                                   location: formData.shipping?.parcelLocker?.location || null,
+                                                   countries: newCountries,
+                                                   countryPrices: formData.shipping?.parcelLocker?.countryPrices || {}
+                                                 }
+                                               })
+                                           }}
+                                           className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300 rounded hover:border-vibrant-orange"
+                                         />
+                                         <span className="text-sm text-gray-700">{country}</span>
+                                       </label>
+                                       {isSelected && formData.shipping?.parcelLocker.priceType === 'separate' && (
+                                         <div className="flex items-center gap-1">
+                                           <Euro className="h-3 w-3 text-gray-400" />
+                                           <input
+                                             type="number"
+                                             step="0.01"
+                                             min="0.01"
+                                             placeholder="0.00"
+                                             value={formData.shipping?.parcelLocker.countryPrices[country] || ''}
+                                             onChange={(e) => {
+                                               const value = e.target.value
+                                               if (value === '' || (parseFloat(value) > 0 && /^\d+(\.\d{1,2})?$/.test(value))) {
+                                                 updateShipping({
+                                                   parcelLocker: {
+                                                     enabled: formData.shipping?.parcelLocker?.enabled || false,
+                                                     priceType: formData.shipping?.parcelLocker?.priceType || null,
+                                                     price: formData.shipping?.parcelLocker?.price || null,
+                                                     location: formData.shipping?.parcelLocker?.location || null,
+                                                     countries: formData.shipping?.parcelLocker?.countries || [],
+                                                     countryPrices: {
+                                                       ...formData.shipping?.parcelLocker?.countryPrices,
+                                                       [country]: value
+                                                     }
+                                                   }
+                                                 })
+                                               }
+                                             }}
+                                             onBlur={(e) => {
+                                               if (e.target.value && !isNaN(parseFloat(e.target.value))) {
+                                                 updateShipping({
+                                                   parcelLocker: {
+                                                     enabled: formData.shipping?.parcelLocker?.enabled || false,
+                                                     priceType: formData.shipping?.parcelLocker?.priceType || null,
+                                                     price: formData.shipping?.parcelLocker?.price || null,
+                                                     location: formData.shipping?.parcelLocker?.location || null,
+                                                     countries: formData.shipping?.parcelLocker?.countries || [],
+                                                     countryPrices: {
+                                                       ...formData.shipping?.parcelLocker?.countryPrices,
+                                                       [country]: parseFloat(e.target.value).toFixed(2)
+                                                     }
+                                                   }
+                                                 })
+                                               }
+                                             }}
+                                             className="w-20 pl-6 pr-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                                           />
+                                         </div>
+                                       )}
+                                     </div>
+                                   )
+                                 })}
+                               </div>
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                     </div>
+                   )}
+                   
+                   {formData.shipping.activeFilter === 'standardCourier' && (
+                     <div className="space-y-4">
+                       <div>
+                         <p className="text-xs text-gray-600 mb-3">Traditional shipping via postal services or courier companies.</p>
+                         
+                         {/* Enable/Disable Toggle */}
+                         <div className="mb-4">
+                           <label className="flex items-center space-x-3">
+                             <input
+                               type="checkbox"
+                               checked={formData.shipping?.standardCourier.enabled || false}
+                                                                onChange={(e) => updateShipping({
+                                   standardCourier: {
+                                     enabled: e.target.checked,
+                                     priceType: formData.shipping?.standardCourier?.priceType || null,
+                                     price: formData.shipping?.standardCourier?.price || null,
+                                     location: formData.shipping?.standardCourier?.location || null,
+                                     countries: formData.shipping?.standardCourier?.countries || [],
+                                     countryPrices: formData.shipping?.standardCourier?.countryPrices || {}
+                                   }
+                                 })}
+                               className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300 rounded hover:border-vibrant-orange"
+                             />
+                             <span className="text-sm font-medium text-gray-700">Enable standard courier shipping</span>
+                           </label>
+                         </div>
+                         
+                         {/* Standard Courier Options */}
+                         {formData.shipping?.standardCourier.enabled && (
+                           <div className="space-y-4">
+                             {/* Price Type */}
+                             <div>
+                               <label className="block text-sm font-medium text-gray-700 mb-2">
+                                 Shipping Price *
+                               </label>
+                               <div className="space-y-2">
+                                 <label className="flex items-center space-x-3">
+                                   <input
+                                     type="radio"
+                                     name="standardCourier-priceType"
+                                     value="included"
+                                     checked={formData.shipping?.standardCourier.priceType === 'included'}
+                                                                          onChange={(e) => updateShipping({
+                                       standardCourier: {
+                                         enabled: formData.shipping?.standardCourier?.enabled || false,
+                                         priceType: e.target.value as 'included',
+                                         price: formData.shipping?.standardCourier?.price || null,
+                                         location: formData.shipping?.standardCourier?.location || null,
+                                         countries: formData.shipping?.standardCourier?.countries || [],
+                                         countryPrices: formData.shipping?.standardCourier?.countryPrices || {}
+                                       }
+                                     })}
+                                     className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300"
+                                   />
+                                   <span className="text-sm text-gray-700">Included in game price</span>
+                                 </label>
+                                 <label className="flex items-center space-x-3">
+                                   <input
+                                     type="radio"
+                                     name="standardCourier-priceType"
+                                     value="separate"
+                                     checked={formData.shipping?.standardCourier.priceType === 'separate'}
+                                                                          onChange={(e) => updateShipping({
+                                       standardCourier: {
+                                         enabled: formData.shipping?.standardCourier?.enabled || false,
+                                         priceType: e.target.value as 'separate',
+                                         price: formData.shipping?.standardCourier?.price || null,
+                                         location: formData.shipping?.standardCourier?.location || null,
+                                         countries: formData.shipping?.standardCourier?.countries || [],
+                                         countryPrices: formData.shipping?.standardCourier?.countryPrices || {}
+                                       }
+                                     })}
+                                     className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300"
+                                   />
+                                   <span className="text-sm text-gray-700">Separate shipping price</span>
+                                 </label>
+                               </div>
+                             </div>
+                             
+                             {/* Separate Price Input */}
+                             {formData.shipping?.standardCourier.priceType === 'separate' && (
+                               <div>
+                                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                                   Base Shipping Price *
+                                 </label>
+                                 <div className="relative">
+                                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                     <Euro className="h-4 w-4 text-gray-400" />
+                                   </div>
+                                   <input
+                                     type="number"
+                                     step="0.01"
+                                     min="0.01"
+                                     placeholder="0.00"
+                                     value={formData.shipping?.standardCourier.price || ''}
+                                     onChange={(e) => {
+                                       const value = e.target.value
+                                       if (value === '' || (parseFloat(value) > 0 && /^\d+(\.\d{1,2})?$/.test(value))) {
+                                         updateShipping({
+                                           standardCourier: {
+                                             enabled: formData.shipping?.standardCourier?.enabled || false,
+                                             priceType: formData.shipping?.standardCourier?.priceType || null,
+                                             price: value,
+                                             location: formData.shipping?.standardCourier?.location || null,
+                                             countries: formData.shipping?.standardCourier?.countries || [],
+                                             countryPrices: formData.shipping?.standardCourier?.countryPrices || {}
+                                           }
+                                         })
+                                       }
+                                     }}
+                                     onBlur={(e) => {
+                                       if (e.target.value && !isNaN(parseFloat(e.target.value))) {
+                                         updateShipping({
+                                           standardCourier: {
+                                             enabled: formData.shipping?.standardCourier?.enabled || false,
+                                             priceType: formData.shipping?.standardCourier?.priceType || null,
+                                             price: parseFloat(e.target.value).toFixed(2),
+                                             location: formData.shipping?.standardCourier?.location || null,
+                                             countries: formData.shipping?.standardCourier?.countries || [],
+                                             countryPrices: formData.shipping?.standardCourier?.countryPrices || {}
+                                           }
+                                         })
+                                       }
+                                     }}
+                                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                                   />
+                                 </div>
+                               </div>
+                             )}
+                             
+                             {/* Game Location */}
+                             <div>
+                               <label className="block text-sm font-medium text-gray-700 mb-2">
+                                 Game Location *
+                               </label>
+                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                 <div>
+                                   <select
+                                     value="Estonia"
+                                     onChange={(e) => {
+                                       // TODO: Update with user's country from profile
+                                       console.log('Standard Courier Country selected:', e.target.value)
+                                     }}
+                                     className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                                   >
+                                     <option value="Estonia">Estonia</option>
+                                     <option value="Latvia">Latvia</option>
+                                     <option value="Lithuania">Lithuania</option>
+                                   </select>
+                                 </div>
+                                 <div>
+                                   <input
+                                     type="text"
+                                     placeholder="City, area"
+                                     value={formData.shipping?.standardCourier.location || ''}
+                                     onChange={(e) => updateShipping({
+                                       standardCourier: {
+                                         enabled: formData.shipping?.standardCourier?.enabled || false,
+                                         priceType: formData.shipping?.standardCourier?.priceType || null,
+                                         price: formData.shipping?.standardCourier?.price || null,
+                                         location: e.target.value,
+                                         countries: formData.shipping?.standardCourier?.countries || [],
+                                         countryPrices: formData.shipping?.standardCourier?.countryPrices || {}
+                                       }
+                                     })}
+                                     className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                                   />
+                                 </div>
+                               </div>
+                             </div>
+                             
+                             {/* Shipping To Countries */}
+                             <div>
+                               <label className="block text-sm font-medium text-gray-700 mb-2">
+                                 Shipping To
+                               </label>
+                               <div className="space-y-2">
+                                 {['Estonia', 'Latvia', 'Lithuania', 'Finland', 'Sweden', 'Denmark'].map((country) => {
+                                   const isSelected = formData.shipping?.standardCourier?.countries?.includes(country) || false
+                                   return (
+                                     <div key={country} className="flex items-center justify-between">
+                                       <label className="flex items-center space-x-3">
+                                         <input
+                                           type="checkbox"
+                                           checked={isSelected}
+                                           onChange={(e) => {
+                                             const newCountries = e.target.checked
+                                               ? [...(formData.shipping?.standardCourier?.countries || []), country]
+                                               : (formData.shipping?.standardCourier?.countries || []).filter(c => c !== country)
+                                                                                            updateShipping({
+                                                 standardCourier: {
+                                                   enabled: formData.shipping?.standardCourier?.enabled || false,
+                                                   priceType: formData.shipping?.standardCourier?.priceType || null,
+                                                   price: formData.shipping?.standardCourier?.price || null,
+                                                   location: formData.shipping?.standardCourier?.location || null,
+                                                   countries: newCountries,
+                                                   countryPrices: formData.shipping?.standardCourier?.countryPrices || {}
+                                                 }
+                                               })
+                                           }}
+                                           className="h-4 w-4 text-vibrant-orange focus:ring-vibrant-orange border-gray-300 rounded hover:border-vibrant-orange"
+                                         />
+                                         <span className="text-sm text-gray-700">{country}</span>
+                                       </label>
+                                       {isSelected && formData.shipping?.standardCourier.priceType === 'separate' && (
+                                         <div className="flex items-center gap-1">
+                                           <Euro className="h-3 w-3 text-gray-400" />
+                                           <input
+                                             type="number"
+                                             step="0.01"
+                                             min="0.01"
+                                             placeholder="0.00"
+                                             value={formData.shipping?.standardCourier.countryPrices[country] || ''}
+                                             onChange={(e) => {
+                                               const value = e.target.value
+                                               if (value === '' || (parseFloat(value) > 0 && /^\d+(\.\d{1,2})?$/.test(value))) {
+                                                 updateShipping({
+                                                   standardCourier: {
+                                                     enabled: formData.shipping?.standardCourier?.enabled || false,
+                                                     priceType: formData.shipping?.standardCourier?.priceType || null,
+                                                     price: formData.shipping?.standardCourier?.price || null,
+                                                     location: formData.shipping?.standardCourier?.location || null,
+                                                     countries: formData.shipping?.standardCourier?.countries || [],
+                                                     countryPrices: {
+                                                       ...formData.shipping?.standardCourier?.countryPrices,
+                                                       [country]: value
+                                                     }
+                                                   }
+                                                 })
+                                               }
+                                             }}
+                                             onBlur={(e) => {
+                                               if (e.target.value && !isNaN(parseFloat(e.target.value))) {
+                                                 updateShipping({
+                                                   standardCourier: {
+                                                     enabled: formData.shipping?.standardCourier?.enabled || false,
+                                                     priceType: formData.shipping?.standardCourier?.priceType || null,
+                                                     price: formData.shipping?.standardCourier?.price || null,
+                                                     location: formData.shipping?.standardCourier?.location || null,
+                                                     countries: formData.shipping?.standardCourier?.countries || [],
+                                                     countryPrices: {
+                                                       ...formData.shipping?.standardCourier?.countryPrices,
+                                                       [country]: parseFloat(e.target.value).toFixed(2)
+                                                     }
+                                                   }
+                                                 })
+                                               }
+                                             }}
+                                             className="w-20 pl-6 pr-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                                           />
+                                         </div>
+                                       )}
+                                     </div>
+                                   )
+                                 })}
+                               </div>
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                     </div>
+                   )}
+                 </div>
+               )}
+               
+               {/* Optional Notes */}
+               <div>
+                 <textarea
+                   placeholder="Want to add shipping details or restrictions?"
+                   value={formData.shipping?.notes || ''}
+                   onChange={(e) => updateShipping({ notes: e.target.value })}
+                   className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange"
+                   rows={2}
+                 />
+               </div>
+             </div>
            </div>
          )}
          

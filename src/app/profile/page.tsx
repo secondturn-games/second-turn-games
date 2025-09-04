@@ -10,14 +10,20 @@ export default async function ProfilePage() {
   try {
     const { userId } = await auth();
     
+    console.log('Profile page - userId:', userId);
+    
     if (!userId) {
+      console.log('No userId found, redirecting to home');
       redirect('/');
     }
 
     // Get user data from Clerk
     const user = await currentUser();
     
+    console.log('Profile page - user:', user ? 'found' : 'not found');
+    
     if (!user) {
+      console.log('No user found, redirecting to home');
       redirect('/');
     }
 

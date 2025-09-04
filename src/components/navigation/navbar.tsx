@@ -1,12 +1,14 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export function Navbar() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   // Prevent hydration mismatch by only rendering after mount
@@ -134,11 +136,25 @@ export function Navbar() {
                 </svg>
                 List a Game
               </Link>
-              <UserButton 
-                afterSignOutUrl="/"
-                userProfileUrl="/profile"
-                userProfileMode="navigation"
-              />
+              <button
+                onClick={() => router.push('/profile')}
+                className="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden hover:ring-2 hover:ring-vibrant-orange-500 hover:ring-offset-2 transition-all duration-200"
+                title="Go to Profile"
+              >
+                {user?.imageUrl ? (
+                  <img 
+                    src={user.imageUrl} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-vibrant-orange-500 flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                )}
+              </button>
             </>
           )}
         </div>

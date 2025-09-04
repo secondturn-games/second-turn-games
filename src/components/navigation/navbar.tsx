@@ -106,11 +106,7 @@ export function Navbar() {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-6" role="navigation" aria-label="Main navigation">
-          {isLoaded && isSignedIn && (
-            <Link href="/profile" className="text-dark-green-600 hover:text-vibrant-orange-600 font-medium transition-colors duration-200 relative group">
-              Profile
-            </Link>
-          )}
+          {/* Profile link removed - now accessible via avatar click */}
         </nav>
 
         {/* Auth controls */}
@@ -138,7 +134,11 @@ export function Navbar() {
                 </svg>
                 List a Game
               </Link>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton 
+                afterSignOutUrl="/"
+                userProfileUrl="/profile"
+                userProfileMode="navigation"
+              />
             </>
           )}
         </div>

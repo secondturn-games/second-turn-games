@@ -5,6 +5,7 @@ import { User, Settings, BarChart3, Package, Heart, MessageCircle } from 'lucide
 import { ProfileForm } from './profile-form';
 import { UserStats } from './user-stats';
 import { UserListings } from './user-listings';
+import { SettingsSection } from './settings-section';
 
 interface Profile {
   id: string;
@@ -76,7 +77,7 @@ export function UserDashboard({ profile, userListings }: UserDashboardProps) {
       case 'listings':
         return <UserListings listings={userListings} />;
       case 'settings':
-        return <div className="p-8 text-center text-dark-green-500">Settings coming soon!</div>;
+        return <SettingsSection profile={profile} />;
       default:
         return <UserOverview profile={profile} listings={userListings} />;
     }

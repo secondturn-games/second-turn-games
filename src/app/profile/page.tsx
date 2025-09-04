@@ -21,6 +21,11 @@ export default async function ProfilePage() {
       redirect('/');
     }
 
+    // Check environment variables first
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      throw new Error('Missing Supabase environment variables');
+    }
+
     const supabase = await createClient();
     
     // Debug: Check if environment variables are available
@@ -39,6 +44,12 @@ export default async function ProfilePage() {
 
   let profile = profileResult.data;
   const profileError = profileResult.error;
+
+  // Log database connection status
+  if (profileError && profileError.code !== 'PGRST116') {
+    console.error('Database error:', profileError);
+    throw new Error(`Database error: ${profileError.message}`);
+  }
 
   // If no profile exists, create one automatically
   if (!profile && profileError?.code === 'PGRST116') {
@@ -123,6 +134,20 @@ export default async function ProfilePage() {
   );
   } catch (error) {
     console.error('Profile page error:', error);
+    
+    // More detailed error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace';
+    
+    console.error('Error details:', {
+      message: errorMessage,
+      stack: errorStack,
+      name: error instanceof Error ? error.name : 'Unknown',
+      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasSupabaseKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      hasClerkKey: !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+    });
+    
     return (
       <div className="min-h-screen bg-light-beige py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
@@ -135,9 +160,23 @@ export default async function ProfilePage() {
             <p className="text-red-600 mb-4 text-lg">
               An error occurred while loading your profile.
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mb-4">
               Please try refreshing the page or contact support if the issue persists.
             </p>
+            {/* Debug information - remove in production */}
+            <details className="text-left bg-gray-100 p-4 rounded-lg max-w-2xl mx-auto">
+              <summary className="cursor-pointer text-sm font-medium text-gray-700 mb-2">
+                Debug Information (for development)
+              </summary>
+              <pre className="text-xs text-gray-600 whitespace-pre-wrap">
+                Error: {errorMessage}
+                {'\n\n'}
+                Environment Variables:
+                - Supabase URL: {process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing'}
+                - Supabase Key: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Missing'}
+                - Clerk Key: {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? 'Set' : 'Missing'}
+              </pre>
+            </details>
           </div>
         </div>
       </div>

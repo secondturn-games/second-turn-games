@@ -138,13 +138,6 @@ export function Navbar() {
                 afterSignOutUrl="/"
                 userProfileUrl="/profile"
                 userProfileMode="navigation"
-                appearance={{
-                  elements: {
-                    userButtonPopoverCard: "hidden",
-                    userButtonPopoverActions: "hidden",
-                    userButtonPopoverActionButton: "hidden"
-                  }
-                }}
               />
             </>
           )}

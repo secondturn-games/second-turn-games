@@ -1,17 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useUser, useClerk } from '@clerk/nextjs';
-import { 
-  Settings, 
-  User, 
-  Bell, 
-  Shield, 
-  LogOut, 
-  Mail, 
-  Globe,
-  Eye
-} from 'lucide-react';
+import { useClerk } from '@clerk/nextjs';
+import { User, LogOut } from 'lucide-react';
 
 interface Profile {
   id: string;
@@ -57,143 +48,57 @@ export function SettingsSection({ profile }: SettingsSectionProps) {
     }
   };
 
-  const settingsCategories = [
-    {
-      id: 'account',
-      title: 'Account Management',
-      description: 'Manage your account settings, security, and personal information',
-      icon: User,
-      items: [
-        {
-          id: 'profile',
-          title: 'Profile & Avatar',
-          description: 'Update your display name, bio, and profile picture',
-          icon: User,
-          action: () => {
-            // This would open Clerk's profile management
-            window.open('/user-profile', '_blank');
-          }
-        },
-        {
-          id: 'security',
-          title: 'Security & Password',
-          description: 'Change password, enable 2FA, and manage security settings',
-          icon: Shield,
-          action: () => {
-            // This would open Clerk's security settings
-            window.open('/user-profile/security', '_blank');
-          }
-        },
-        {
-          id: 'email',
-          title: 'Email & Phone',
-          description: 'Manage your email addresses and phone numbers',
-          icon: Mail,
-          action: () => {
-            // This would open Clerk's contact settings
-            window.open('/user-profile/contact', '_blank');
-          }
-        }
-      ]
-    },
-    {
-      id: 'preferences',
-      title: 'Preferences',
-      description: 'Customize your marketplace experience',
-      icon: Settings,
-      items: [
-        {
-          id: 'notifications',
-          title: 'Notifications',
-          description: 'Manage email and SMS notifications',
-          icon: Bell,
-          action: () => {
-            // This would open notification settings
-            console.log('Open notification settings');
-          }
-        },
-        {
-          id: 'language',
-          title: 'Language & Region',
-          description: 'Set your preferred language and region',
-          icon: Globe,
-          action: () => {
-            // This would open language settings
-            console.log('Open language settings');
-          }
-        },
-        {
-          id: 'privacy',
-          title: 'Privacy & Visibility',
-          description: 'Control what information is visible to other users',
-          icon: Eye,
-          action: () => {
-            // This would open privacy settings
-            console.log('Open privacy settings');
-          }
-        }
-      ]
-    }
-  ];
+  const handleManageInClerk = () => {
+    // Open Clerk Dashboard in a new tab
+    window.open('/user-profile', '_blank');
+  };
 
   return (
     <div className="p-4">
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-dark-green-600 mb-2">Settings</h2>
         <p className="text-sm text-dark-green-500">
-          Manage your account, preferences, and marketplace settings
+          Manage your account and session
         </p>
       </div>
 
-      <div className="space-y-6">
-        {settingsCategories.map((category) => {
-          const CategoryIcon = category.icon;
-          
-          return (
-            <div key={category.id} className="bg-white rounded-xl shadow-soft overflow-hidden">
-              <div className="p-4 border-b border-light-beige-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-vibrant-orange-100 rounded-lg flex items-center justify-center">
-                    <CategoryIcon className="w-4 h-4 text-vibrant-orange-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-dark-green-600">{category.title}</h3>
-                    <p className="text-xs text-dark-green-500">{category.description}</p>
-                  </div>
-                </div>
+      <div className="space-y-4">
+        {/* Account Management */}
+        <div className="bg-white rounded-xl shadow-soft overflow-hidden">
+          <div className="p-4 border-b border-light-beige-200">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-vibrant-orange-100 rounded-lg flex items-center justify-center">
+                <User className="w-4 h-4 text-vibrant-orange-600" />
               </div>
-              
-              <div className="p-4 space-y-3">
-                {category.items.map((item) => {
-                  const ItemIcon = item.icon;
-                  
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={item.action}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-light-beige-50 transition-colors duration-200 text-left group"
-                    >
-                      <div className="w-8 h-8 bg-light-beige-100 rounded-lg flex items-center justify-center group-hover:bg-vibrant-orange-100 transition-colors duration-200">
-                        <ItemIcon className="w-4 h-4 text-dark-green-500 group-hover:text-vibrant-orange-600 transition-colors duration-200" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-dark-green-600 text-sm">{item.title}</h4>
-                        <p className="text-xs text-dark-green-500">{item.description}</p>
-                      </div>
-                      <div className="text-dark-green-400 group-hover:text-vibrant-orange-600 transition-colors duration-200">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </button>
-                  );
-                })}
+              <div>
+                <h3 className="font-semibold text-dark-green-600">Account Management</h3>
+                <p className="text-xs text-dark-green-500">Manage your account settings, security, and personal information</p>
               </div>
             </div>
-          );
-        })}
+          </div>
+          
+          <div className="p-4">
+            <button
+              onClick={handleManageInClerk}
+              className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-light-beige-50 transition-colors duration-200 text-left group"
+            >
+              <div className="w-8 h-8 bg-light-beige-100 rounded-lg flex items-center justify-center group-hover:bg-vibrant-orange-100 transition-colors duration-200">
+                <User className="w-4 h-4 text-dark-green-500 group-hover:text-vibrant-orange-600 transition-colors duration-200" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium text-dark-green-600 text-sm">Manage in Clerk</h4>
+                <p className="text-xs text-dark-green-500">Update profile, security, and account settings</p>
+              </div>
+              <div className="text-dark-green-400 group-hover:text-vibrant-orange-600 transition-colors duration-200">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
 
-        {/* Sign Out Section */}
+        {/* Sign Out */}
         <div className="bg-white rounded-xl shadow-soft overflow-hidden">
           <div className="p-4 border-b border-light-beige-200">
             <div className="flex items-center gap-3">

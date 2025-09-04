@@ -116,33 +116,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         )}
       </div>
 
-      {/* Account Management Section */}
-      <div className="mb-4 bg-light-beige-50 rounded-lg p-4">
-        <h3 className="text-base font-semibold text-dark-green-600 mb-2">Account Management</h3>
-        <p className="text-xs text-dark-green-500 mb-3">
-          Manage your account settings, profile picture, email, and security through your Clerk dashboard.
-        </p>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-soft">
-            {profile.avatar_url ? (
-              <img 
-                src={profile.avatar_url} 
-                alt="Profile" 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <User className="w-5 h-5 text-dark-green-400" />
-            )}
-          </div>
-          <div className="flex-1">
-            <h4 className="text-sm font-medium text-dark-green-600">{profile.first_name} {profile.last_name}</h4>
-            <p className="text-xs text-dark-green-500">{profile.email}</p>
-            <button className="mt-1 text-xs text-vibrant-orange-600 hover:text-vibrant-orange-700 font-medium">
-              Manage Account Settings →
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -241,11 +214,6 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 {new Date(profile.created_at).toLocaleDateString()}
               </p>
             </div>
-          </div>
-          <div className="mt-3 p-3 bg-vibrant-orange-50 rounded-lg border border-vibrant-orange-200">
-            <p className="text-xs text-vibrant-orange-700">
-              <strong>Need to change your email, password, or profile picture?</strong> Use the &quot;Manage Account Settings&quot; button above to access your Clerk dashboard.
-            </p>
           </div>
         </div>
 

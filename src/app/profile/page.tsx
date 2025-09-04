@@ -129,15 +129,15 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-light-beige py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-light-beige py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-xl lg:text-2xl font-display text-dark-green-600 mb-2">
             Your Dashboard
           </h1>
           <p className="text-sm text-gray-600">
-            Manage your profile, listings, and account settings
+            Your side of the table - manage your profile, track your games, and tweak your settings
           </p>
         </div>
 

@@ -62,10 +62,10 @@ export function UserDashboard({ profile, userListings }: UserDashboardProps) {
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   const sections = [
-    { id: 'profile', label: 'Profile', icon: User, description: 'Manage your personal information' },
-    { id: 'stats', label: 'Statistics', icon: BarChart3, description: 'View your activity and performance' },
-    { id: 'listings', label: 'My Listings', icon: Package, description: 'Manage your game listings' },
-    { id: 'settings', label: 'Settings', icon: Settings, description: 'Account preferences and notifications' }
+    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'stats', label: 'Statistics', icon: BarChart3 },
+    { id: 'listings', label: 'My Listings', icon: Package },
+    { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
   const renderSection = () => {
@@ -109,15 +109,6 @@ export function UserDashboard({ profile, userListings }: UserDashboardProps) {
             );
           })}
         </div>
-        
-        {/* Section Description */}
-        {activeSection && (
-          <div className="mt-3 p-3 bg-light-beige-50 rounded-lg">
-            <p className="text-xs text-dark-green-600">
-              {sections.find(s => s.id === activeSection)?.description}
-            </p>
-          </div>
-        )}
       </div>
 
       {/* Active Section Content */}

@@ -146,35 +146,35 @@ export function UserStats({ profile, listings }: UserStatsProps) {
   ];
 
   return (
-    <div className="p-8">
+    <div className="p-4">
       {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-display font-bold text-dark-green-600 mb-2">Your Statistics</h2>
-        <p className="text-dark-green-500">Track your performance and activity on the platform</p>
+      <div className="mb-4">
+        <h2 className="text-lg font-display font-bold text-dark-green-600 mb-1">Your Statistics</h2>
+        <p className="text-sm text-dark-green-500">Track your performance and activity on the platform</p>
       </div>
 
       {/* Main Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           const isPositive = stat.change > 0;
           const isNegative = stat.change < 0;
           
           return (
-            <div key={index} className="bg-white rounded-xl p-6 shadow-soft border border-light-beige-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 bg-${stat.color}-100 rounded-full flex items-center justify-center`}>
-                  <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+            <div key={index} className="bg-white rounded-lg p-4 shadow-soft border border-light-beige-200">
+              <div className="flex items-center justify-between mb-3">
+                <div className={`w-8 h-8 bg-${stat.color}-100 rounded-full flex items-center justify-center`}>
+                  <Icon className={`w-4 h-4 text-${stat.color}-600`} />
                 </div>
                 {stat.change !== 0 && (
-                  <div className={`text-sm font-medium ${
+                  <div className={`text-xs font-medium ${
                     isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-dark-green-500'
                   }`}>
                     {isPositive ? '+' : ''}{stat.change} this month
                   </div>
                 )}
               </div>
-              <div className="text-2xl font-bold text-dark-green-600 mb-1">{stat.value}</div>
+              <div className="text-lg font-bold text-dark-green-600 mb-1">{stat.value}</div>
               <div className="text-sm font-medium text-dark-green-600 mb-1">{stat.title}</div>
               <div className="text-xs text-dark-green-400">{stat.description}</div>
             </div>
@@ -183,19 +183,19 @@ export function UserStats({ profile, listings }: UserStatsProps) {
       </div>
 
       {/* Account Information */}
-      <div className="bg-light-beige-50 rounded-xl p-6 mb-8">
-        <h3 className="text-lg font-semibold text-dark-green-600 mb-4">Account Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="bg-light-beige-50 rounded-lg p-4 mb-4">
+        <h3 className="text-base font-semibold text-dark-green-600 mb-3">Account Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recentActivity.map((activity, index) => {
             const Icon = activity.icon;
             return (
-              <div key={index} className="flex items-center gap-4">
-                <div className={`w-10 h-10 bg-${activity.color}-100 rounded-full flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 text-${activity.color}-600`} />
+              <div key={index} className="flex items-center gap-3">
+                <div className={`w-8 h-8 bg-${activity.color}-100 rounded-full flex items-center justify-center`}>
+                  <Icon className={`w-4 h-4 text-${activity.color}-600`} />
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-dark-green-500">{activity.title}</div>
-                  <div className="text-lg font-semibold text-dark-green-600">{activity.value}</div>
+                  <div className="text-xs font-medium text-dark-green-500">{activity.title}</div>
+                  <div className="text-sm font-semibold text-dark-green-600">{activity.value}</div>
                 </div>
               </div>
             );
@@ -205,34 +205,34 @@ export function UserStats({ profile, listings }: UserStatsProps) {
 
       {/* Top Performing Listings */}
       {listings.length > 0 && (
-        <div className="bg-white rounded-xl shadow-soft border border-light-beige-200">
-          <div className="p-6 border-b border-light-beige-200">
-            <h3 className="text-lg font-semibold text-dark-green-600">Top Performing Listings</h3>
-            <p className="text-sm text-dark-green-500">Your most viewed and favorited games</p>
+        <div className="bg-white rounded-lg shadow-soft border border-light-beige-200">
+          <div className="p-4 border-b border-light-beige-200">
+            <h3 className="text-base font-semibold text-dark-green-600">Top Performing Listings</h3>
+            <p className="text-xs text-dark-green-500">Your most viewed and favorited games</p>
           </div>
-          <div className="p-6">
-            <div className="space-y-4">
+          <div className="p-4">
+            <div className="space-y-2">
               {listings
                 .sort((a, b) => (b.views + b.favorites) - (a.views + a.favorites))
                 .slice(0, 5)
                 .map((listing, index) => (
-                  <div key={listing.id} className="flex items-center gap-4 p-3 bg-light-beige-50 rounded-lg">
-                    <div className="w-8 h-8 bg-vibrant-orange-100 rounded-full flex items-center justify-center text-sm font-bold text-vibrant-orange-600">
+                  <div key={listing.id} className="flex items-center gap-3 p-2 bg-light-beige-50 rounded-lg">
+                    <div className="w-6 h-6 bg-vibrant-orange-100 rounded-full flex items-center justify-center text-xs font-bold text-vibrant-orange-600">
                       {index + 1}
                     </div>
-                    <div className="w-12 h-12 bg-light-beige-200 rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-light-beige-200 rounded flex items-center justify-center">
                       {listing.image_url ? (
-                        <img src={listing.image_url} alt={listing.title} className="w-10 h-10 rounded object-cover" />
+                        <img src={listing.image_url} alt={listing.title} className="w-6 h-6 rounded object-cover" />
                       ) : (
-                        <Package className="w-6 h-6 text-dark-green-400" />
+                        <Package className="w-4 h-4 text-dark-green-400" />
                       )}
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-dark-green-600">{listing.title}</h4>
-                      <p className="text-sm text-dark-green-500">€{listing.price} • {listing.condition}</p>
+                      <h4 className="text-sm font-medium text-dark-green-600">{listing.title}</h4>
+                      <p className="text-xs text-dark-green-500">€{listing.price} • {listing.condition}</p>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium text-dark-green-600">{listing.views} views</div>
+                      <div className="text-xs font-medium text-dark-green-600">{listing.views} views</div>
                       <div className="text-xs text-dark-green-500">{listing.favorites} favorites</div>
                     </div>
                   </div>
@@ -244,11 +244,11 @@ export function UserStats({ profile, listings }: UserStatsProps) {
 
       {/* Empty State */}
       {listings.length === 0 && (
-        <div className="text-center py-12">
-          <BarChart3 className="w-16 h-16 text-dark-green-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-dark-green-600 mb-2">No Data Yet</h3>
-          <p className="text-dark-green-500 mb-6">Start by creating your first game listing to see statistics here.</p>
-          <button className="px-6 py-3 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200">
+        <div className="text-center py-6">
+          <BarChart3 className="w-12 h-12 text-dark-green-300 mx-auto mb-3" />
+          <h3 className="text-base font-semibold text-dark-green-600 mb-2">No Data Yet</h3>
+          <p className="text-sm text-dark-green-500 mb-4">Start by creating your first game listing to see statistics here.</p>
+          <button className="px-4 py-2 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200 text-sm">
             Create Your First Listing
           </button>
         </div>

@@ -98,17 +98,17 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-2xl font-display font-bold text-dark-green-600 mb-2">Profile Information</h2>
-          <p className="text-dark-green-500">Manage your personal details and preferences</p>
+          <h2 className="text-lg font-display font-bold text-dark-green-600 mb-1">Profile Information</h2>
+          <p className="text-sm text-dark-green-500">Manage your personal details and preferences</p>
         </div>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200"
+            className="flex items-center gap-2 px-3 py-2 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200 text-sm"
           >
             <User className="w-4 h-4" />
             Edit Profile
@@ -117,13 +117,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </div>
 
       {/* Account Management Section */}
-      <div className="mb-8 bg-light-beige-50 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-dark-green-600 mb-4">Account Management</h3>
-        <p className="text-sm text-dark-green-500 mb-4">
+      <div className="mb-4 bg-light-beige-50 rounded-lg p-4">
+        <h3 className="text-base font-semibold text-dark-green-600 mb-2">Account Management</h3>
+        <p className="text-xs text-dark-green-500 mb-3">
           Manage your account settings, profile picture, email, and security through your Clerk dashboard.
         </p>
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-soft">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-soft">
             {profile.avatar_url ? (
               <img 
                 src={profile.avatar_url} 
@@ -131,13 +131,13 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <User className="w-8 h-8 text-dark-green-400" />
+              <User className="w-5 h-5 text-dark-green-400" />
             )}
           </div>
           <div className="flex-1">
-            <h4 className="font-medium text-dark-green-600">{profile.first_name} {profile.last_name}</h4>
-            <p className="text-sm text-dark-green-500">{profile.email}</p>
-            <button className="mt-2 text-sm text-vibrant-orange-600 hover:text-vibrant-orange-700 font-medium">
+            <h4 className="text-sm font-medium text-dark-green-600">{profile.first_name} {profile.last_name}</h4>
+            <p className="text-xs text-dark-green-500">{profile.email}</p>
+            <button className="mt-1 text-xs text-vibrant-orange-600 hover:text-vibrant-orange-700 font-medium">
               Manage Account Settings →
             </button>
           </div>
@@ -145,11 +145,11 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Marketplace-Specific Information */}
 
         <div>
-          <label htmlFor="display_name" className="block text-sm font-medium text-dark-green-600 mb-2">
+          <label htmlFor="display_name" className="block text-sm font-medium text-dark-green-600 mb-1">
             Display Name
           </label>
           <input
@@ -159,14 +159,14 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             value={formData.display_name}
             onChange={handleInputChange}
             disabled={!isEditing}
-            className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 disabled:bg-light-beige-50 disabled:text-dark-green-400"
+            className="w-full px-3 py-2 border border-dark-green-200 rounded-lg focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 disabled:bg-light-beige-50 disabled:text-dark-green-400 text-sm"
             placeholder="How you'd like to be known on the platform"
           />
           <p className="text-xs text-dark-green-400 mt-1">This will be shown to other users instead of your real name</p>
         </div>
 
         <div>
-          <label htmlFor="bio" className="block text-sm font-medium text-dark-green-600 mb-2">
+          <label htmlFor="bio" className="block text-sm font-medium text-dark-green-600 mb-1">
             Bio
           </label>
           <textarea
@@ -175,15 +175,15 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             value={formData.bio}
             onChange={handleInputChange}
             disabled={!isEditing}
-            rows={4}
-            className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 disabled:bg-light-beige-50 disabled:text-dark-green-400"
+            rows={3}
+            className="w-full px-3 py-2 border border-dark-green-200 rounded-lg focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 disabled:bg-light-beige-50 disabled:text-dark-green-400 text-sm"
             placeholder="Tell us about yourself, your gaming interests, or anything else you'd like to share..."
           />
         </div>
 
         {/* Location */}
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-dark-green-600 mb-2">
+          <label htmlFor="location" className="block text-sm font-medium text-dark-green-600 mb-1">
             <MapPin className="w-4 h-4 inline mr-1" />
             Location
           </label>
@@ -194,7 +194,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             value={formData.location}
             onChange={handleInputChange}
             disabled={!isEditing}
-            className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 disabled:bg-light-beige-50 disabled:text-dark-green-400"
+            className="w-full px-3 py-2 border border-dark-green-200 rounded-lg focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 disabled:bg-light-beige-50 disabled:text-dark-green-400 text-sm"
             placeholder="City, Country (for shipping and local pickup)"
           />
           <p className="text-xs text-dark-green-400 mt-1">This helps buyers understand shipping options and local pickup availability</p>
@@ -202,7 +202,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
         {/* Language Preference */}
         <div>
-          <label htmlFor="language" className="block text-sm font-medium text-dark-green-600 mb-2">
+          <label htmlFor="language" className="block text-sm font-medium text-dark-green-600 mb-1">
             <Globe className="w-4 h-4 inline mr-1" />
             Language Preference
           </label>
@@ -212,7 +212,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             value={formData.language}
             onChange={handleInputChange}
             disabled={!isEditing}
-            className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 disabled:bg-light-beige-50 disabled:text-dark-green-400"
+            className="w-full px-3 py-2 border border-dark-green-200 rounded-lg focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 disabled:bg-light-beige-50 disabled:text-dark-green-400 text-sm"
           >
             <option value="en">English</option>
             <option value="et">Eesti</option>
@@ -225,25 +225,25 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         </div>
 
         {/* Account Information (Read-only) */}
-        <div className="border-t border-light-beige-200 pt-6">
-          <h3 className="text-lg font-semibold text-dark-green-600 mb-4">Account Information</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="border-t border-light-beige-200 pt-4">
+          <h3 className="text-base font-semibold text-dark-green-600 mb-3">Account Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-dark-green-500 mb-1">Email</label>
-              <p className="text-dark-green-600 bg-light-beige-50 px-3 py-2 rounded-lg border border-light-beige-200">
+              <label className="block text-xs font-medium text-dark-green-500 mb-1">Email</label>
+              <p className="text-sm text-dark-green-600 bg-light-beige-50 px-3 py-2 rounded-lg border border-light-beige-200">
                 {profile.email}
               </p>
               <p className="text-xs text-dark-green-400 mt-1">Email is managed by your authentication provider</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-dark-green-500 mb-1">Member Since</label>
-              <p className="text-dark-green-600 bg-light-beige-50 px-3 py-2 rounded-lg border border-light-beige-200">
+              <label className="block text-xs font-medium text-dark-green-500 mb-1">Member Since</label>
+              <p className="text-sm text-dark-green-600 bg-light-beige-50 px-3 py-2 rounded-lg border border-light-beige-200">
                 {new Date(profile.created_at).toLocaleDateString()}
               </p>
             </div>
           </div>
-          <div className="mt-4 p-4 bg-vibrant-orange-50 rounded-lg border border-vibrant-orange-200">
-            <p className="text-sm text-vibrant-orange-700">
+          <div className="mt-3 p-3 bg-vibrant-orange-50 rounded-lg border border-vibrant-orange-200">
+            <p className="text-xs text-vibrant-orange-700">
               <strong>Need to change your email, password, or profile picture?</strong> Use the &quot;Manage Account Settings&quot; button above to access your Clerk dashboard.
             </p>
           </div>
@@ -262,11 +262,11 @@ export function ProfileForm({ profile }: ProfileFormProps) {
 
         {/* Form Actions */}
         {isEditing && (
-          <div className="flex items-center gap-4 pt-6 border-t border-light-beige-200">
+          <div className="flex items-center gap-3 pt-4 border-t border-light-beige-200">
             <button
               type="submit"
               disabled={isLoading}
-              className="flex items-center gap-2 px-6 py-3 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               <Save className="w-4 h-4" />
               {isLoading ? 'Saving...' : 'Save Changes'}
@@ -274,7 +274,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             <button
               type="button"
               onClick={handleCancel}
-              className="flex items-center gap-2 px-6 py-3 border border-dark-green-300 text-dark-green-600 rounded-lg hover:bg-light-beige-50 transition-colors duration-200"
+              className="flex items-center gap-2 px-4 py-2 border border-dark-green-300 text-dark-green-600 rounded-lg hover:bg-light-beige-50 transition-colors duration-200 text-sm"
             >
               <X className="w-4 h-4" />
               Cancel

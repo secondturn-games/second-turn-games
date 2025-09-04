@@ -73,16 +73,16 @@ export function UserListings({ listings }: UserListingsProps) {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4">
       {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-display font-bold text-dark-green-600 mb-2">My Listings</h2>
-        <p className="text-dark-green-500">Manage your game listings and track their performance</p>
+      <div className="mb-4">
+        <h2 className="text-lg font-display font-bold text-dark-green-600 mb-1">My Listings</h2>
+        <p className="text-sm text-dark-green-500">Manage your game listings and track their performance</p>
       </div>
 
       {/* Filters and Controls */}
-      <div className="bg-white rounded-xl shadow-soft p-6 mb-6">
-        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+      <div className="bg-white rounded-lg shadow-soft p-4 mb-4">
+        <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
           {/* Filter Buttons */}
           <div className="flex gap-2">
             {[
@@ -93,7 +93,7 @@ export function UserListings({ listings }: UserListingsProps) {
               <button
                 key={filterOption.id}
                 onClick={() => setFilter(filterOption.id as 'all' | 'active' | 'inactive')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors duration-200 text-sm ${
                   filter === filterOption.id
                     ? 'bg-vibrant-orange text-white'
                     : 'bg-light-beige-50 text-dark-green-600 hover:bg-light-beige-100'
@@ -106,11 +106,11 @@ export function UserListings({ listings }: UserListingsProps) {
 
           {/* Sort Dropdown */}
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-dark-green-600">Sort by:</label>
+            <label className="text-xs font-medium text-dark-green-600">Sort by:</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'price-high' | 'price-low' | 'views')}
-              className="px-3 py-2 border border-dark-green-200 rounded-lg focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200"
+              className="px-2 py-1.5 border border-dark-green-200 rounded-lg focus:ring-2 focus:ring-vibrant-orange focus:border-transparent transition-all duration-200 text-sm"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -124,11 +124,11 @@ export function UserListings({ listings }: UserListingsProps) {
 
       {/* Listings Grid */}
       {sortedListings.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {sortedListings.map((listing) => (
-            <div key={listing.id} className="bg-white rounded-xl shadow-soft overflow-hidden border border-light-beige-200 hover:shadow-medium transition-shadow duration-200">
+            <div key={listing.id} className="bg-white rounded-lg shadow-soft overflow-hidden border border-light-beige-200 hover:shadow-medium transition-shadow duration-200">
               {/* Image */}
-              <div className="relative h-48 bg-light-beige-100">
+              <div className="relative h-32 bg-light-beige-100">
                 {listing.image_url ? (
                   <img 
                     src={listing.image_url} 
@@ -167,49 +167,49 @@ export function UserListings({ listings }: UserListingsProps) {
               </div>
 
               {/* Content */}
-              <div className="p-4">
-                <h3 className="font-semibold text-dark-green-600 mb-2 line-clamp-2">{listing.title}</h3>
+              <div className="p-3">
+                <h3 className="text-sm font-semibold text-dark-green-600 mb-2 line-clamp-2">{listing.title}</h3>
                 
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-2xl font-bold text-vibrant-orange-600">€{listing.price}</div>
-                  <div className="text-sm text-dark-green-500">{listing.condition}</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-lg font-bold text-vibrant-orange-600">€{listing.price}</div>
+                  <div className="text-xs text-dark-green-500">{listing.condition}</div>
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center gap-4 text-sm text-dark-green-500 mb-4">
+                <div className="flex items-center gap-3 text-xs text-dark-green-500 mb-3">
                   <div className="flex items-center gap-1">
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-3 h-3" />
                     {listing.views}
                   </div>
                   <div className="flex items-center gap-1">
-                    <Heart className="w-4 h-4" />
+                    <Heart className="w-3 h-3" />
                     {listing.favorites}
                   </div>
                   <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
+                    <Calendar className="w-3 h-3" />
                     {new Date(listing.created_at).toLocaleDateString()}
                   </div>
                 </div>
 
                 {/* Description */}
                 {listing.description && (
-                  <p className="text-sm text-dark-green-500 mb-4 line-clamp-2">{listing.description}</p>
+                  <p className="text-xs text-dark-green-500 mb-3 line-clamp-2">{listing.description}</p>
                 )}
 
                 {/* Actions */}
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(listing.id)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-light-beige-50 text-dark-green-600 rounded-lg hover:bg-light-beige-100 transition-colors duration-200"
+                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-light-beige-50 text-dark-green-600 rounded-lg hover:bg-light-beige-100 transition-colors duration-200 text-xs"
                   >
-                    <Edit3 className="w-4 h-4" />
+                    <Edit3 className="w-3 h-3" />
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(listing.id)}
-                    className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                    className="px-2 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               </div>
@@ -217,19 +217,19 @@ export function UserListings({ listings }: UserListingsProps) {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <Package className="w-16 h-16 text-dark-green-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-dark-green-600 mb-2">
+        <div className="text-center py-6">
+          <Package className="w-12 h-12 text-dark-green-300 mx-auto mb-3" />
+          <h3 className="text-base font-semibold text-dark-green-600 mb-2">
             {filter === 'all' ? 'No Listings Yet' : `No ${filter} Listings`}
           </h3>
-          <p className="text-dark-green-500 mb-6">
+          <p className="text-sm text-dark-green-500 mb-4">
             {filter === 'all' 
               ? 'Start by creating your first game listing to sell your board games.'
               : `You don't have any ${filter} listings at the moment.`
             }
           </p>
           {filter === 'all' && (
-            <button className="px-6 py-3 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200">
+            <button className="px-4 py-2 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200 text-sm">
               Create Your First Listing
             </button>
           )}
@@ -238,30 +238,30 @@ export function UserListings({ listings }: UserListingsProps) {
 
       {/* Summary Stats */}
       {listings.length > 0 && (
-        <div className="mt-8 bg-light-beige-50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-dark-green-600 mb-4">Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="mt-4 bg-light-beige-50 rounded-lg p-4">
+          <h3 className="text-base font-semibold text-dark-green-600 mb-3">Summary</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="text-center">
-              <div className="text-2xl font-bold text-dark-green-600">{listings.length}</div>
-              <div className="text-sm text-dark-green-500">Total Listings</div>
+              <div className="text-lg font-bold text-dark-green-600">{listings.length}</div>
+              <div className="text-xs text-dark-green-500">Total Listings</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-dark-green-600">
+              <div className="text-lg font-bold text-dark-green-600">
                 {listings.filter(l => l.is_active).length}
               </div>
-              <div className="text-sm text-dark-green-500">Active</div>
+              <div className="text-xs text-dark-green-500">Active</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-dark-green-600">
+              <div className="text-lg font-bold text-dark-green-600">
                 {listings.reduce((sum, l) => sum + l.views, 0)}
               </div>
-              <div className="text-sm text-dark-green-500">Total Views</div>
+              <div className="text-xs text-dark-green-500">Total Views</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-dark-green-600">
+              <div className="text-lg font-bold text-dark-green-600">
                 €{listings.reduce((sum, l) => sum + l.price, 0).toFixed(2)}
               </div>
-              <div className="text-sm text-dark-green-500">Total Value</div>
+              <div className="text-xs text-dark-green-500">Total Value</div>
             </div>
           </div>
         </div>

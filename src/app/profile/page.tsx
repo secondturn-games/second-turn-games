@@ -1,6 +1,7 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { updateLastActive } from '@/lib/supabase/update-last-active';
 import { UserDashboard } from '@/components/user-dashboard/user-dashboard';
 
 // Force dynamic rendering since we use cookies() in Supabase client
@@ -73,6 +74,11 @@ export default async function ProfilePage() {
 
   let profile = profileResult.data;
   const profileError = profileResult.error;
+  
+  // Debug: Log the raw profile data
+  console.log('Raw profile data from database:', profile);
+  console.log('Profile country field:', profile?.country);
+  console.log('Profile local_area field:', profile?.local_area);
 
   // Log database connection status
   if (profileError && profileError.code !== 'PGRST116') {
@@ -114,6 +120,11 @@ export default async function ProfilePage() {
   // Log any errors that aren't "not found"
   if (profileError && profileError.code !== 'PGRST116') {
     console.error('Error fetching profile:', profileError);
+  }
+
+  // Update last_active timestamp for the user
+  if (profile) {
+    await updateLastActive(userId);
   }
 
   // Fetch user's listings for dashboard

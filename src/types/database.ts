@@ -8,7 +8,8 @@ export interface Database {
           description: string | null
           price: number
           condition: string
-          location: string | null
+          country: string | null
+          localArea: string | null
           imageUrl: string | null
           genre: string | null
           playerCount: string | null
@@ -72,7 +73,8 @@ export interface Database {
           lastName: string | null
           displayName: string | null
           bio: string | null
-          location: string | null
+          country: string | null
+          localArea: string | null
           phone: string | null
           avatarUrl: string | null
           emailNotifications: boolean

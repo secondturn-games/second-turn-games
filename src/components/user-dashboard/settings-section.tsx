@@ -62,6 +62,33 @@ export function SettingsSection({ profile }: SettingsSectionProps) {
           This is where you adjust your account rules. We use Clerk to keep everything secure.
         </p>
 
+        {/* User Profile Section */}
+        <div className="bg-light-beige-50 rounded-lg p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-soft">
+              {profile.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-6 h-6 text-dark-green-400" />
+              )}
+            </div>
+            <div className="flex-1">
+              <h4 className="text-sm font-medium text-dark-green-600">{profile.first_name} {profile.last_name}</h4>
+              <p className="text-xs text-dark-green-500">{profile.email}</p>
+              <button 
+                onClick={handleManageInClerk}
+                className="mt-1 text-xs text-vibrant-orange-600 hover:text-vibrant-orange-700 font-medium"
+              >
+                Manage Account →
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Expandable Clerk Info Box */}
         <div className="bg-light-beige-50 rounded-lg overflow-hidden">
           <button
@@ -73,8 +100,8 @@ export function SettingsSection({ profile }: SettingsSectionProps) {
                 <Shield className="w-4 h-4 text-vibrant-orange-600" />
               </div>
               <div className="text-left">
-                <h3 className="text-sm font-medium text-dark-green-600">Clerk – The Rulebook for Logging In</h3>
-                <p className="text-xs text-dark-green-500">Learn more about how we keep your account secure</p>
+                <h3 className="text-sm font-medium text-dark-green-600">Learn more about Clerk</h3>
+                <p className="text-xs text-dark-green-500">How we keep your account secure</p>
               </div>
             </div>
             {isClerkInfoExpanded ? (
@@ -108,7 +135,7 @@ export function SettingsSection({ profile }: SettingsSectionProps) {
                     </div>
                     <div>
                       <h4 className="text-xs font-medium text-dark-green-600 mb-1">Security checks</h4>
-                      <p className="text-xs text-dark-green-500">making sure no one else sneaks into your game</p>
+                      <p className="text-xs text-dark-green-500">making sure no one else sneaks into your account</p>
                     </div>
                   </div>
                   
@@ -139,34 +166,7 @@ export function SettingsSection({ profile }: SettingsSectionProps) {
           )}
         </div>
 
-        {/* User Profile Section */}
-        <div className="bg-light-beige-50 rounded-lg p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-soft">
-              {profile.avatar_url ? (
-                <img 
-                  src={profile.avatar_url} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <User className="w-6 h-6 text-dark-green-400" />
-              )}
-            </div>
-            <div className="flex-1">
-              <h4 className="text-sm font-medium text-dark-green-600">{profile.first_name} {profile.last_name}</h4>
-              <p className="text-xs text-dark-green-500">{profile.email}</p>
-              <button 
-                onClick={handleManageInClerk}
-                className="mt-1 text-xs text-vibrant-orange-600 hover:text-vibrant-orange-700 font-medium"
-              >
-                Manage Account →
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Simple Sign Out Button */}
+        {/* Sign Out Button */}
         <div className="flex justify-end">
           <button
             onClick={handleSignOut}

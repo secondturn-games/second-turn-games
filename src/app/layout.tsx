@@ -5,6 +5,7 @@ import { Navbar } from "@/components/navigation/navbar";
 import { MobileSearchBar } from "@/components/navigation/mobile-search-bar";
 import { PWAInstaller } from "@/components/pwa/pwa-installer";
 import { PWAStatus } from "@/components/pwa/pwa-status";
+import { ActivityTracker } from "@/components/activity-tracker";
 import "./globals.css";
 
 const righteous = Righteous({
@@ -142,6 +143,9 @@ export default function RootLayout({
           
           {/* PWA Status - Only visible in development */}
           <PWAStatus />
+          
+          {/* Activity Tracker - Tracks user activity across the site */}
+          <ActivityTracker />
         </body>
       </html>
     </ClerkProvider>

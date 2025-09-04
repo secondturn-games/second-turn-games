@@ -109,6 +109,11 @@ export function Navbar() {
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-6" role="navigation" aria-label="Main navigation">
           {/* Profile link removed - now accessible via avatar click */}
+          {process.env.NODE_ENV === 'development' && (
+            <Link href="/shipping-test" className="text-dark-green-600 hover:text-vibrant-orange transition-colors">
+              Shipping Test
+            </Link>
+          )}
         </nav>
 
         {/* Auth controls */}

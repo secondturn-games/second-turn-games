@@ -48,6 +48,12 @@ export class LockerService {
       return data || [];
     } catch (error) {
       console.error('Failed to search lockers:', error);
+      console.error('Error details:', {
+        message: (error as Error).message,
+        code: (error as { code?: string })?.code,
+        details: (error as { details?: string })?.details,
+        hint: (error as { hint?: string })?.hint
+      });
       throw error;
     }
   }

@@ -26,7 +26,30 @@ export default async function ProfilePage() {
       throw new Error('Missing Supabase environment variables');
     }
 
-    const supabase = await createClient();
+    // Debug: Log the actual URL being used
+    console.log('Supabase URL being used:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('Supabase URL type:', typeof process.env.NEXT_PUBLIC_SUPABASE_URL);
+    console.log('Supabase URL length:', process.env.NEXT_PUBLIC_SUPABASE_URL?.length);
+
+    // Validate URL format
+    try {
+      new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!);
+      console.log('URL validation: PASSED');
+    } catch (urlError) {
+      console.error('URL validation failed:', urlError);
+      throw new Error(`Invalid Supabase URL format: ${process.env.NEXT_PUBLIC_SUPABASE_URL}`);
+    }
+
+    // Create Supabase client with error handling
+    let supabase;
+    try {
+      console.log('Creating Supabase client...');
+      supabase = await createClient();
+      console.log('Supabase client created successfully');
+    } catch (clientError) {
+      console.error('Error creating Supabase client:', clientError);
+      throw new Error(`Failed to create Supabase client: ${clientError instanceof Error ? clientError.message : 'Unknown error'}`);
+    }
     
     // Debug: Check if environment variables are available
     console.log('Environment check:', {
@@ -175,6 +198,10 @@ export default async function ProfilePage() {
                 - Supabase URL: {process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing'}
                 - Supabase Key: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Missing'}
                 - Clerk Key: {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? 'Set' : 'Missing'}
+                {'\n\n'}
+                Supabase URL Value: {process.env.NEXT_PUBLIC_SUPABASE_URL || 'Not set'}
+                {'\n'}
+                URL Length: {process.env.NEXT_PUBLIC_SUPABASE_URL?.length || 0}
               </pre>
             </details>
           </div>

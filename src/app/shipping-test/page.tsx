@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { MapPin, Search, Package, Truck } from 'lucide-react';
 import { LockerService } from '@/lib/shipping/locker-service';
 import { ShipmentService } from '@/lib/shipping/shipment-service';
@@ -16,8 +16,8 @@ export default function ShippingTestPage() {
   const [error, setError] = useState<string | null>(null);
   const [shipments, setShipments] = useState<Shipment[]>([]);
 
-  const lockerService = new LockerService();
-  const shipmentService = new ShipmentService();
+  const lockerService = useMemo(() => new LockerService(), []);
+  const shipmentService = useMemo(() => new ShipmentService(), []);
 
   const loadAllLockers = useCallback(async () => {
     try {

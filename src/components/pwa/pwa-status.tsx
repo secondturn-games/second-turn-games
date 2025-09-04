@@ -13,8 +13,8 @@ export function PWAStatus() {
     setIsPWAEnabled(shouldEnablePWA())
   }, [])
 
-  // Only show in development for debugging
-  if (process.env.NODE_ENV !== 'development') {
+  // Only show in development for debugging, but not on localhost
+  if (process.env.NODE_ENV !== 'development' || typeof window !== 'undefined' && window.location.hostname === 'localhost') {
     return null
   }
 

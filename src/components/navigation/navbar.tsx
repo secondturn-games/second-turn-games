@@ -16,8 +16,8 @@ export function Navbar() {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    // Show loading state during hydration
+  if (!mounted || !isLoaded) {
+    // Show loading state during hydration and while Clerk is loading
     return (
       <header className="border-b border-dark-green/10 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="mx-auto max-w-6xl px-3 md:px-4 py-2.5 md:py-3 flex items-center justify-between">

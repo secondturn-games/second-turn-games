@@ -182,7 +182,7 @@ export class ShipmentService {
   }
 
   /**
-   * Call carrier API to create shipment
+   * Call LP Express API to create a shipment (locker → locker)
    */
   private async callCarrierAPI(data: CreateShipmentRequest): Promise<CreateShipmentResponse> {
     const apiBase = process.env.NEXT_PUBLIC_LP_EXPRESS_API_URL || 'https://api-manosiuntostst.post.lt/api/v2';
@@ -195,29 +195,25 @@ export class ShipmentService {
     }
 
     try {
-      // Get authentication token
-      const authResponse = await fetch(`${apiBase}/auth/login`, {
+      // Authenticate
+      const authResponse = await fetch(`${apiBase}/users/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username,
-          password
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
       });
 
       if (!authResponse.ok) {
-        throw new Error(`Authentication failed: ${authResponse.statusText}`);
+        throw new Error(`Authentication failed: ${authResponse.status} ${authResponse.statusText}`);
       }
 
-      const authData = await authResponse.json();
-      const token = authData.token || authData.access_token;
+      const { token } = await authResponse.json();
+      if (!token) throw new Error('No token returned from LP Express API');
 
-      // Create shipment
+      // Build shipment payload according to Swagger schema
       const shipmentPayload = this.buildShipmentPayload(data);
-      
-      const shipmentResponse = await fetch(`${apiBase}/parcels`, {
+
+      // Create parcel
+      const shipmentResponse = await fetch(`${apiBase}/parcel`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -228,62 +224,36 @@ export class ShipmentService {
 
       if (!shipmentResponse.ok) {
         const errorText = await shipmentResponse.text();
-        throw new Error(`Shipment creation failed: ${shipmentResponse.statusText} - ${errorText}`);
+        throw new Error(`Shipment creation failed: ${shipmentResponse.status} - ${errorText}`);
       }
 
       const shipmentData = await shipmentResponse.json();
       return this.parseShipmentResponse(shipmentData);
+
     } catch (error) {
       console.error('LP Express API call failed:', error);
-      // Fallback to mock response for testing
+      // fallback to mock for dev/testing
       return this.getMockResponse(data);
     }
   }
 
   /**
-   * Build shipment payload for LP Express API
+   * Build payload for LP Express /parcel endpoint
    */
   private buildShipmentPayload(data: CreateShipmentRequest) {
     return {
-      // Basic shipment info
-      service: data.service_code,
-      size: data.size_code,
-      
-      // Sender information
-      sender: {
-        name: data.sender.name,
-        phone: data.sender.phone,
-        email: data.sender.email
-      },
-      
-      // Recipient information  
-      recipient: {
-        name: data.recipient.name,
-        phone: data.recipient.phone,
-        email: data.recipient.email
-      },
-      
-      // Locker information
-      from_locker: data.from_locker_id,
-      to_locker: data.to_locker_id,
-      
-      // Parcel dimensions
-      parcel: data.parcel ? {
-        weight: data.parcel.weight_grams,
-        length: data.parcel.length_cm,
-        width: data.parcel.width_cm,
-        height: data.parcel.height_cm
-      } : undefined,
-      
-      // Order reference
-      order_reference: data.order_id,
-      
-      // Additional options
-      options: {
-        insurance: false,
-        cod: false,
-        notification: true
-      }
+      parcelSize: data.size_code,                 // "XS" | "S" | "M" | "L"
+      senderTerminalId: data.from_locker_id,      // optional, seller's drop-off locker
+      receiverTerminalId: data.to_locker_id,      // required
+      senderName: data.sender.name,
+      senderPhone: data.sender.phone,
+      senderEmail: data.sender.email,
+      receiverName: data.recipient.name,
+      receiverPhone: data.recipient.phone,
+      receiverEmail: data.recipient.email,
+      reference: data.order_id,                   // your marketplace order id
+      codAmount: 0,
+      insurance: false
     };
   }
 
@@ -293,12 +263,12 @@ export class ShipmentService {
   private parseShipmentResponse(apiResponse: unknown): CreateShipmentResponse {
     const response = apiResponse as Record<string, unknown>;
     return {
-      shipment_id: String(response.id || response.shipment_id || ''),
-      tracking_number: String(response.tracking_number || response.tracking_code || ''),
-      label_url: String(response.label_url || response.label || ''),
-      label_format: (response.label_format as 'PDF' | 'ZPL') || 'PDF',
-      drop_off_code: String(response.drop_off_code || response.pickup_code || ''),
-      estimated_delivery: String(response.estimated_delivery || response.delivery_date || new Date().toISOString())
+      shipment_id: String(response.parcelId || response.id || ''),
+      tracking_number: String(response.barcode || response.tracking_number || ''),
+      label_url: String(response.labelPdfUrl || response.label_url || ''),
+      label_format: 'PDF',
+      drop_off_code: String(response.dropOffCode || response.drop_off_code || ''),
+      estimated_delivery: String(response.estimatedDelivery || response.estimated_delivery || new Date().toISOString())
     };
   }
 

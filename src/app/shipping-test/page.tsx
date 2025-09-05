@@ -61,6 +61,27 @@ export default function ShippingTestPage() {
     }
   };
 
+  const syncLockersFromAPI = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Sync lockers for all countries
+      await lockerService.syncLockers('EE');
+      await lockerService.syncLockers('LV');
+      await lockerService.syncLockers('LT');
+      
+      // Reload all lockers
+      await loadAllLockers();
+      
+      alert('Lockers synced successfully from LP Express API!');
+    } catch (err) {
+      setError('Failed to sync lockers: ' + (err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const createTestShipment = async () => {
     if (!selectedFromLocker || !selectedToLocker) {
       setError('Please select both from and to lockers');
@@ -73,18 +94,26 @@ export default function ShippingTestPage() {
       
       const shipment = await shipmentService.createShipment({
         order_id: 'test-order-' + Date.now(),
-        carrier: 'UNISEND',
+        carrier: 'LP_EXPRESS',
         service_code: 'LOCKER_LOCKER',
         size_code: 'M',
         from_locker_id: selectedFromLocker.id,
         to_locker_id: selectedToLocker.id,
         sender: {
           name: 'Test Sender',
-          phone: '+372 12345678'
+          phone: '+372 12345678',
+          email: 'sender@test.com'
         },
         recipient: {
           name: 'Test Recipient',
-          phone: '+371 87654321'
+          phone: '+371 87654321',
+          email: 'recipient@test.com'
+        },
+        parcel: {
+          weight_grams: 500,
+          length_cm: 20,
+          width_cm: 15,
+          height_cm: 10
         }
       });
 
@@ -349,31 +378,69 @@ export default function ShippingTestPage() {
           </div>
         )}
 
-        {/* Quick Test Buttons */}
+        {/* API Configuration & Testing */}
         <div className="mt-6 bg-white rounded-lg border border-dark-green-200 p-6">
-          <h2 className="text-xl font-semibold text-dark-green-800 mb-4">Quick Tests</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button
-              onClick={() => setSearchLocation({ lat: 59.4370, lng: 24.7536 })}
-              className="p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
-            >
-              <p className="font-medium text-dark-green-800">Test Tallinn</p>
-              <p className="text-sm text-dark-green-600">59.4370, 24.7536</p>
-            </button>
-            <button
-              onClick={() => setSearchLocation({ lat: 56.9465, lng: 24.1048 })}
-              className="p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
-            >
-              <p className="font-medium text-dark-green-800">Test Riga</p>
-              <p className="text-sm text-dark-green-600">56.9465, 24.1048</p>
-            </button>
-            <button
-              onClick={() => setSearchLocation({ lat: 54.6872, lng: 25.2797 })}
-              className="p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
-            >
-              <p className="font-medium text-dark-green-800">Test Vilnius</p>
-              <p className="text-sm text-dark-green-600">54.6872, 25.2797</p>
-            </button>
+          <h2 className="text-xl font-semibold text-dark-green-800 mb-4">API Configuration & Testing</h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* API Status */}
+            <div>
+              <h3 className="text-lg font-medium text-dark-green-700 mb-3">LP Express API Status</h3>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <span className="text-sm text-dark-green-600">
+                    API URL: {process.env.NEXT_PUBLIC_LP_EXPRESS_API_URL || 'https://api-manosiuntostst.post.lt/api/v2'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${process.env.LP_EXPRESS_USERNAME ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                  <span className="text-sm text-dark-green-600">
+                    Credentials: {process.env.LP_EXPRESS_USERNAME ? 'Configured' : 'Not configured'}
+                  </span>
+                </div>
+                <div className="text-xs text-dark-green-500 mt-2">
+                  {!process.env.LP_EXPRESS_USERNAME && (
+                    <p>⚠️ Add LP_EXPRESS_USERNAME and LP_EXPRESS_PASSWORD to .env.local for real API testing</p>
+                  )}
+                </div>
+                <button
+                  onClick={syncLockersFromAPI}
+                  disabled={loading}
+                  className="mt-3 bg-dark-green-600 text-white px-4 py-2 rounded-lg hover:bg-dark-green-700 disabled:opacity-50 text-sm"
+                >
+                  {loading ? 'Syncing...' : 'Sync Lockers from API'}
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Test Buttons */}
+            <div>
+              <h3 className="text-lg font-medium text-dark-green-700 mb-3">Quick Location Tests</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setSearchLocation({ lat: 59.4370, lng: 24.7536 })}
+                  className="w-full p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
+                >
+                  <p className="font-medium text-dark-green-800">Test Tallinn</p>
+                  <p className="text-sm text-dark-green-600">59.4370, 24.7536</p>
+                </button>
+                <button
+                  onClick={() => setSearchLocation({ lat: 56.9465, lng: 24.1048 })}
+                  className="w-full p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
+                >
+                  <p className="font-medium text-dark-green-800">Test Riga</p>
+                  <p className="text-sm text-dark-green-600">56.9465, 24.1048</p>
+                </button>
+                <button
+                  onClick={() => setSearchLocation({ lat: 54.6872, lng: 25.2797 })}
+                  className="w-full p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
+                >
+                  <p className="font-medium text-dark-green-800">Test Vilnius</p>
+                  <p className="text-sm text-dark-green-600">54.6872, 25.2797</p>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

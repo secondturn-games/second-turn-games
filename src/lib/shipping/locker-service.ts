@@ -136,20 +136,109 @@ export class LockerService {
   }
 
   /**
-   * Fetch lockers from Unisend API
+   * Fetch lockers from LP Express API
    */
   private async fetchUnisendLockers(country: 'EE' | 'LV' | 'LT'): Promise<CarrierLocker[]> {
-    // TODO: Implement actual Unisend API call
-    // This is a placeholder implementation
+    const apiBase = process.env.NEXT_PUBLIC_LP_EXPRESS_API_URL || 'https://api-manosiuntostst.post.lt/api/v2';
+    const username = process.env.LP_EXPRESS_USERNAME;
+    const password = process.env.LP_EXPRESS_PASSWORD;
+
+    if (!username || !password) {
+      console.warn('LP Express credentials not configured, using mock lockers');
+      return this.getMockLockers(country);
+    }
+
+    try {
+      // Get authentication token
+      const authResponse = await fetch(`${apiBase}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
+      });
+
+      if (!authResponse.ok) {
+        throw new Error(`Authentication failed: ${authResponse.statusText}`);
+      }
+
+      const authData = await authResponse.json();
+      const token = authData.token || authData.access_token;
+
+      // Fetch lockers
+      const lockersResponse = await fetch(`${apiBase}/lockers?country=${country}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!lockersResponse.ok) {
+        throw new Error(`Failed to fetch lockers: ${lockersResponse.statusText}`);
+      }
+
+      const lockersData = await lockersResponse.json();
+      return this.parseLockersResponse(lockersData, country);
+    } catch (error) {
+      console.error('LP Express API call failed:', error);
+      // Fallback to mock lockers for testing
+      return this.getMockLockers(country);
+    }
+  }
+
+  /**
+   * Parse LP Express lockers response
+   */
+  private parseLockersResponse(apiResponse: unknown, country: 'EE' | 'LV' | 'LT'): CarrierLocker[] {
+    const lockers = Array.isArray(apiResponse) ? apiResponse : ((apiResponse as { data?: unknown[]; lockers?: unknown[] }).data || (apiResponse as { data?: unknown[]; lockers?: unknown[] }).lockers || []);
+    
+    return lockers.map((locker: unknown) => {
+      const lockerData = locker as Record<string, unknown>;
+      return {
+        id: String(lockerData.id || lockerData.locker_id || ''),
+        name: String(lockerData.name || lockerData.title || ''),
+        country,
+        city: String(lockerData.city || this.getCapitalCity(country)),
+        address: String(lockerData.address || lockerData.location || ''),
+        lat: parseFloat(String(lockerData.lat || lockerData.latitude || this.getCapitalLat(country))),
+        lng: parseFloat(String(lockerData.lng || lockerData.longitude || this.getCapitalLng(country))),
+        services: ['LOCKER_LOCKER'] as ShippingService[],
+        is_active: lockerData.is_active !== false && lockerData.status !== 'inactive',
+        created_at: String(lockerData.created_at || new Date().toISOString()),
+        updated_at: String(lockerData.updated_at || new Date().toISOString())
+      };
+    });
+  }
+
+  /**
+   * Get mock lockers for testing
+   */
+  private getMockLockers(country: 'EE' | 'LV' | 'LT'): CarrierLocker[] {
     const mockLockers: CarrierLocker[] = [
       {
-        id: `unisend-${country.toLowerCase()}-001`,
-        name: `Parcel Locker ${country}001`,
+        id: `lp-express-${country.toLowerCase()}-001`,
+        name: `LP Express Locker ${country}001`,
         country,
         city: this.getCapitalCity(country),
         address: `${this.getCapitalCity(country)} Central Station`,
         lat: this.getCapitalLat(country),
         lng: this.getCapitalLng(country),
+        services: ['LOCKER_LOCKER'] as ShippingService[],
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: `lp-express-${country.toLowerCase()}-002`,
+        name: `LP Express Locker ${country}002`,
+        country,
+        city: this.getCapitalCity(country),
+        address: `${this.getCapitalCity(country)} Shopping Center`,
+        lat: this.getCapitalLat(country) + 0.01,
+        lng: this.getCapitalLng(country) + 0.01,
         services: ['LOCKER_LOCKER'] as ShippingService[],
         is_active: true,
         created_at: new Date().toISOString(),

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     // Get Supabase client
     const supabase = await createClient();
 
-    // Build the query
+    // Build the query - matching actual database schema
     let query = supabase
       .from('game_listings')
       .select(`
@@ -35,11 +35,15 @@ export async function GET(request: NextRequest) {
         game_name,
         version_name,
         custom_title,
-        game_condition,
-        shipping,
+        box_condition,
+        pickup_enabled,
+        pickup_country,
+        pickup_local_area,
         created_at,
         updated_at,
         views,
+        is_active,
+        user_id,
         user_profiles!inner(
           first_name,
           last_name,
@@ -54,16 +58,15 @@ export async function GET(request: NextRequest) {
       query = query.or(`title.ilike.%${search}%,game_name.ilike.%${search}%,custom_title.ilike.%${search}%`);
     }
 
-    // Apply category filter (based on game_condition or other fields)
-    if (category) {
-      // For now, we'll filter by game_condition.activeFilter or other criteria
-      // This could be expanded based on game categories from BGG data
-      query = query.eq('game_condition->>activeFilter', category);
-    }
+    // Apply category filter (disabled for now)
+    // if (category) {
+    //   // This could be expanded based on game categories from BGG data
+    //   query = query.eq('genre', category);
+    // }
 
     // Apply condition filter
     if (condition) {
-      query = query.eq('game_condition->>boxCondition', condition);
+      query = query.eq('box_condition', condition);
     }
 
     // Apply price filters
@@ -121,7 +124,7 @@ export async function GET(request: NextRequest) {
         title: listing.custom_title || listing.title || listing.game_name,
         price: listing.price,
         negotiable: listing.negotiable,
-        condition: listing.game_condition?.boxCondition || 'good',
+        condition: listing.box_condition || 'good',
         imageUrl: listing.game_image_url,
         seller: {
           name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Anonymous',
@@ -129,8 +132,17 @@ export async function GET(request: NextRequest) {
         },
         location: profile?.local_area || profile?.country || 'Unknown',
         category: 'Board Game', // Default category for now
-        gameDetails: listing.game_condition,
-        shipping: listing.shipping,
+        gameDetails: {
+          box_condition: listing.box_condition,
+          pickup_enabled: listing.pickup_enabled,
+          pickup_country: listing.pickup_country,
+          pickup_local_area: listing.pickup_local_area
+        },
+        shipping: {
+          pickup_enabled: listing.pickup_enabled,
+          pickup_country: listing.pickup_country,
+          pickup_local_area: listing.pickup_local_area
+        },
         views: listing.views || 0,
         createdAt: listing.created_at,
         updatedAt: listing.updated_at

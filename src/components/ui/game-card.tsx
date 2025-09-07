@@ -5,6 +5,7 @@ interface GameCardProps {
   id: string;
   title: string;
   price: number;
+  negotiable?: boolean;
   condition: 'new' | 'like-new' | 'good' | 'fair';
   imageUrl?: string;
   seller: {
@@ -29,7 +30,7 @@ const conditionLabels = {
   fair: 'Fair',
 };
 
-export function GameCard({ id, title, price, condition, imageUrl, seller, location, category }: GameCardProps) {
+export function GameCard({ id, title, price, negotiable, condition, imageUrl, seller, location, category }: GameCardProps) {
   return (
     <Link href={`/games/${id}`} className="group">
       <div className="bg-white rounded-lg shadow-soft hover:shadow-medium transition-all duration-200 hover:scale-[1.02] overflow-hidden border border-light-beige-200">
@@ -70,9 +71,16 @@ export function GameCard({ id, title, price, condition, imageUrl, seller, locati
 
           {/* Price */}
           <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-vibrant-orange-600">
-              €{price.toFixed(2)}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold text-vibrant-orange-600">
+                €{price.toFixed(2)}
+              </span>
+              {negotiable && (
+                <span className="text-xs bg-vibrant-orange-100 text-vibrant-orange-700 px-2 py-1 rounded-full">
+                  Negotiable
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-1">
               {[...Array(5)].map((_, i) => (
                 <svg

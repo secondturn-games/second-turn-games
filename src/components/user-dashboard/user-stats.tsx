@@ -30,16 +30,58 @@ interface Profile {
 interface Listing {
   id: string;
   title: string;
-  description?: string;
   price: number;
-  condition: string;
-  location?: string;
-  image_url?: string;
-  genre?: string;
-  player_count?: string;
-  age_range?: string;
-  language?: string;
-  expansion: boolean;
+  negotiable: boolean;
+  price_notes?: string;
+  bgg_game_id?: string;
+  bgg_version_id?: string;
+  game_name: string;
+  game_image_url?: string;
+  version_name?: string;
+  version_image_url?: string;
+  custom_title?: string;
+  suggested_alternate_name?: string;
+  game_details?: {
+    minPlayers?: string;
+    maxPlayers?: string;
+    playingTime?: string;
+    minAge?: string;
+    yearPublished?: string;
+    languages?: string[];
+    publishers?: string[];
+    designers?: string[];
+    rank?: string;
+    rating?: string;
+  };
+  game_condition?: {
+    activeFilter?: string;
+    boxCondition?: string;
+    boxDescription?: string;
+    completeness?: string;
+    missingDescription?: string;
+    componentCondition?: string;
+    componentConditionDescription?: string;
+    extras?: string[];
+    extrasDescription?: string;
+    photos?: string[];
+    photoNotes?: string;
+  };
+  shipping?: {
+    pickup?: {
+      enabled: boolean;
+      country?: string;
+      localArea?: string;
+      meetingDetails?: string;
+    };
+    parcelLocker?: {
+      enabled: boolean;
+      priceType?: string;
+      price?: string;
+      countries?: string[];
+      countryPrices?: Record<string, string>;
+    };
+    notes?: string;
+  };
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -221,15 +263,17 @@ export function UserStats({ profile, listings }: UserStatsProps) {
                       {index + 1}
                     </div>
                     <div className="w-8 h-8 bg-light-beige-200 rounded flex items-center justify-center">
-                      {listing.image_url ? (
-                        <img src={listing.image_url} alt={listing.title} className="w-6 h-6 rounded object-cover" />
+                      {listing.game_image_url ? (
+                        <img src={listing.game_image_url} alt={listing.title} className="w-6 h-6 rounded object-cover" />
                       ) : (
                         <Package className="w-4 h-4 text-dark-green-400" />
                       )}
                     </div>
                     <div className="flex-1">
                       <h4 className="text-sm font-medium text-dark-green-600">{listing.title}</h4>
-                      <p className="text-xs text-dark-green-500">€{listing.price} • {listing.condition}</p>
+                      <p className="text-xs text-dark-green-500">
+                        €{listing.price} • {listing.game_condition?.boxCondition || 'Unknown'}
+                      </p>
                     </div>
                     <div className="text-right">
                       <div className="text-xs font-medium text-dark-green-600">{listing.views} views</div>

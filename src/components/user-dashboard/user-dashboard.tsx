@@ -35,16 +35,58 @@ interface Profile {
 interface Listing {
   id: string;
   title: string;
-  description?: string;
   price: number;
-  condition: string;
-  location?: string;
-  image_url?: string;
-  genre?: string;
-  player_count?: string;
-  age_range?: string;
-  language?: string;
-  expansion: boolean;
+  negotiable: boolean;
+  price_notes?: string;
+  bgg_game_id?: string;
+  bgg_version_id?: string;
+  game_name: string;
+  game_image_url?: string;
+  version_name?: string;
+  version_image_url?: string;
+  custom_title?: string;
+  suggested_alternate_name?: string;
+  game_details?: {
+    minPlayers?: string;
+    maxPlayers?: string;
+    playingTime?: string;
+    minAge?: string;
+    yearPublished?: string;
+    languages?: string[];
+    publishers?: string[];
+    designers?: string[];
+    rank?: string;
+    rating?: string;
+  };
+  game_condition?: {
+    activeFilter?: string;
+    boxCondition?: string;
+    boxDescription?: string;
+    completeness?: string;
+    missingDescription?: string;
+    componentCondition?: string;
+    componentConditionDescription?: string;
+    extras?: string[];
+    extrasDescription?: string;
+    photos?: string[];
+    photoNotes?: string;
+  };
+  shipping?: {
+    pickup?: {
+      enabled: boolean;
+      country?: string;
+      localArea?: string;
+      meetingDetails?: string;
+    };
+    parcelLocker?: {
+      enabled: boolean;
+      priceType?: string;
+      price?: string;
+      countries?: string[];
+      countryPrices?: Record<string, string>;
+    };
+    notes?: string;
+  };
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -202,8 +244,8 @@ function UserOverview({ profile, listings }: { profile: Profile; listings: Listi
             {activeListings.slice(0, 3).map((listing) => (
               <div key={listing.id} className="flex items-center gap-3 p-2 bg-light-beige-50 rounded-lg">
                 <div className="w-8 h-8 bg-light-beige-200 rounded flex items-center justify-center">
-                  {listing.image_url ? (
-                    <img src={listing.image_url} alt={listing.title} className="w-6 h-6 rounded object-cover" />
+                  {listing.game_image_url ? (
+                    <img src={listing.game_image_url} alt={listing.title} className="w-6 h-6 rounded object-cover" />
                   ) : (
                     <Package className="w-4 h-4 text-dark-green-400" />
                   )}

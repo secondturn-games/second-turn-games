@@ -81,23 +81,26 @@ const hasInboundExpansion = inboundLinks.some(
 
 ## 🚀 Performance Features
 
-### Rate Limiting
+### Optimized API Calls
 
-- **Conservative approach**: 1 second between requests (vs. 500ms in previous)
-- **BGG-friendly**: Respects API guidelines to avoid 503 errors
-- **Configurable**: Easy to adjust based on needs
+- **Lightweight Search**: New `/api/bgg/search-light` route for fast, minimal results
+- **On-demand Enhancement**: Metadata fetched only when needed
+- **Batch Processing**: Parallel API calls using `Promise.all` for better performance
+- **Server-side Filtering**: Accurate type filtering on the server side
 
-### Caching Strategy
+### Advanced Caching
 
 - **Search results**: 30 minutes TTL with dynamic adjustment
 - **Game metadata**: 24 hours TTL for frequently accessed data
 - **Batch processing**: Up to 15 games per metadata request
+- **Cache Statistics**: Real-time monitoring with `/api/bgg/cache-stats`
 
 ### Smart Fallbacks
 
 - **Expired cache**: Returns expired results on API failure
 - **Partial failures**: Continues with available data
 - **User experience**: Never shows empty results without explanation
+- **HTML Entity Decoding**: Comprehensive text cleaning for better display
 
 ## 📊 Monitoring & Debugging
 
@@ -199,9 +202,10 @@ try {
 
 ### Phase 2: Game Listing Flow
 
-- 🔄 3-step listing creation process
-- 🔄 Version selection interface
-- 🔄 Title customization
+- ✅ 3-step listing creation process
+- ✅ Version selection interface with language filtering
+- ✅ Title customization with alternate names selection
+- ✅ Component-based architecture for maintainability
 - 🔄 Database integration
 
 ### Phase 3: Advanced Features

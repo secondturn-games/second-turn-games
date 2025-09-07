@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "powershell -ExecutionPolicy Bypass -File scripts/dev-restart.ps1",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -13,6 +14,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.4",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.3",
@@ -27,7 +29,8 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "svix": "^1.74.1",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

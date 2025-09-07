@@ -1,21 +1,71 @@
 'use client';
 
 import { useState } from 'react';
-import { Package, Eye, Heart, Edit3, Trash2, EyeOff, Eye as EyeIcon, Calendar } from 'lucide-react';
+import { Package, Eye, Heart, Edit3, Trash2, EyeOff, Eye as EyeIcon, Calendar, Copy, MoreVertical } from 'lucide-react';
+import { useListingManagement } from '@/hooks/useListingManagement';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface Listing {
   id: string;
   title: string;
-  description?: string;
   price: number;
-  condition: string;
-  location?: string;
-  image_url?: string;
-  genre?: string;
-  player_count?: string;
-  age_range?: string;
-  language?: string;
-  expansion: boolean;
+  negotiable: boolean;
+  price_notes?: string;
+  bgg_game_id?: string;
+  bgg_version_id?: string;
+  game_name: string;
+  game_image_url?: string;
+  version_name?: string;
+  version_image_url?: string;
+  custom_title?: string;
+  suggested_alternate_name?: string;
+  game_details?: {
+    minPlayers?: string;
+    maxPlayers?: string;
+    playingTime?: string;
+    minAge?: string;
+    yearPublished?: string;
+    languages?: string[];
+    publishers?: string[];
+    designers?: string[];
+    rank?: string;
+    rating?: string;
+  };
+  game_condition?: {
+    activeFilter?: string;
+    boxCondition?: string;
+    boxDescription?: string;
+    completeness?: string;
+    missingDescription?: string;
+    componentCondition?: string;
+    componentConditionDescription?: string;
+    extras?: string[];
+    extrasDescription?: string;
+    photos?: string[];
+    photoNotes?: string;
+  };
+  shipping?: {
+    pickup?: {
+      enabled: boolean;
+      country?: string;
+      localArea?: string;
+      meetingDetails?: string;
+    };
+    parcelLocker?: {
+      enabled: boolean;
+      priceType?: string;
+      price?: string;
+      countries?: string[];
+      countryPrices?: Record<string, string>;
+    };
+    notes?: string;
+  };
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -31,8 +81,30 @@ interface UserListingsProps {
 export function UserListings({ listings }: UserListingsProps) {
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'price-high' | 'price-low' | 'views'>('newest');
+  const [localListings, setLocalListings] = useState(listings);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  
+  const {
+    deleteListing,
+    toggleListingStatus,
+    duplicateListing,
+    isLoading,
+    error,
+    clearError
+  } = useListingManagement({
+    onSuccess: (message) => {
+      console.log('Success:', message);
+      // Refresh listings by updating local state
+      setLocalListings(prev => prev.filter(listing => listing.id !== deletingId));
+      setDeletingId(null);
+    },
+    onError: (error) => {
+      console.error('Error:', error);
+      setDeletingId(null);
+    }
+  });
 
-  const filteredListings = listings.filter(listing => {
+  const filteredListings = localListings.filter(listing => {
     if (filter === 'active') return listing.is_active;
     if (filter === 'inactive') return !listing.is_active;
     return true;
@@ -56,19 +128,42 @@ export function UserListings({ listings }: UserListingsProps) {
   });
 
   const handleToggleActive = async (listingId: string, currentStatus: boolean) => {
-    // TODO: Implement API call to toggle listing status
-    console.log(`Toggle listing ${listingId} to ${!currentStatus}`);
+    try {
+      await toggleListingStatus(listingId, !currentStatus);
+      // Update local state
+      setLocalListings(prev => 
+        prev.map(listing => 
+          listing.id === listingId 
+            ? { ...listing, is_active: !currentStatus }
+            : listing
+        )
+      );
+    } catch (error) {
+      console.error('Failed to toggle listing status:', error);
+    }
   };
 
   const handleEdit = (listingId: string) => {
-    // TODO: Navigate to edit listing page
-    console.log(`Edit listing ${listingId}`);
+    // Navigate to edit page with listing ID
+    window.location.href = `/list-game-version?edit=${listingId}`;
   };
 
   const handleDelete = async (listingId: string) => {
     if (confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
-      // TODO: Implement API call to delete listing
-      console.log(`Delete listing ${listingId}`);
+      setDeletingId(listingId);
+      try {
+        await deleteListing(listingId);
+      } catch (error) {
+        console.error('Failed to delete listing:', error);
+      }
+    }
+  };
+
+  const handleDuplicate = async () => {
+    try {
+      await duplicateListing();
+    } catch (error) {
+      console.error('Failed to duplicate listing:', error);
     }
   };
 
@@ -80,15 +175,33 @@ export function UserListings({ listings }: UserListingsProps) {
         <p className="text-sm text-dark-green-500">Manage your game listings and track their performance</p>
       </div>
 
+      {/* Error Display */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center gap-2 text-red-700">
+            <div className="w-4 h-4 rounded-full bg-red-200 flex items-center justify-center">
+              <span className="text-xs">!</span>
+            </div>
+            <span className="text-sm">{error}</span>
+            <button
+              onClick={clearError}
+              className="ml-auto text-red-500 hover:text-red-700"
+            >
+              <span className="text-xs">×</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Filters and Controls */}
       <div className="bg-white rounded-lg shadow-soft p-4 mb-4">
         <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between">
           {/* Filter Buttons */}
           <div className="flex gap-2">
             {[
-              { id: 'all', label: 'All Listings', count: listings.length },
-              { id: 'active', label: 'Active', count: listings.filter(l => l.is_active).length },
-              { id: 'inactive', label: 'Inactive', count: listings.filter(l => !l.is_active).length }
+              { id: 'all', label: 'All Listings', count: localListings.length },
+              { id: 'active', label: 'Active', count: localListings.filter(l => l.is_active).length },
+              { id: 'inactive', label: 'Inactive', count: localListings.filter(l => !l.is_active).length }
             ].map((filterOption) => (
               <button
                 key={filterOption.id}
@@ -129,9 +242,9 @@ export function UserListings({ listings }: UserListingsProps) {
             <div key={listing.id} className="bg-white rounded-lg shadow-soft overflow-hidden border border-light-beige-200 hover:shadow-medium transition-shadow duration-200">
               {/* Image */}
               <div className="relative h-32 bg-light-beige-100">
-                {listing.image_url ? (
+                {listing.game_image_url ? (
                   <img 
-                    src={listing.image_url} 
+                    src={listing.game_image_url} 
                     alt={listing.title}
                     className="w-full h-full object-cover"
                   />
@@ -154,15 +267,46 @@ export function UserListings({ listings }: UserListingsProps) {
                 <div className="absolute top-3 right-3 flex gap-2">
                   <button
                     onClick={() => handleToggleActive(listing.id, listing.is_active)}
+                    disabled={isLoading}
                     className={`p-2 rounded-full ${
                       listing.is_active 
                         ? 'bg-white/90 text-dark-green-600 hover:bg-white' 
                         : 'bg-white/90 text-gray-600 hover:bg-white'
-                    } transition-colors duration-200`}
+                    } transition-colors duration-200 disabled:opacity-50`}
                     title={listing.is_active ? 'Hide listing' : 'Show listing'}
                   >
                     {listing.is_active ? <EyeOff className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
                   </button>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className="p-2 rounded-full bg-white/90 text-gray-600 hover:bg-white transition-colors duration-200"
+                        title="More actions"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={() => handleEdit(listing.id)}>
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        Edit Listing
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleDuplicate}>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Duplicate
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem 
+                        onClick={() => handleDelete(listing.id)}
+                        className="text-red-600 focus:text-red-600"
+                        disabled={deletingId === listing.id}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        {deletingId === listing.id ? 'Deleting...' : 'Delete'}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
@@ -171,8 +315,15 @@ export function UserListings({ listings }: UserListingsProps) {
                 <h3 className="text-sm font-semibold text-dark-green-600 mb-2 line-clamp-2">{listing.title}</h3>
                 
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-lg font-bold text-vibrant-orange-600">€{listing.price}</div>
-                  <div className="text-xs text-dark-green-500">{listing.condition}</div>
+                  <div className="text-lg font-bold text-vibrant-orange-600">
+                    €{listing.price}
+                    {listing.negotiable && (
+                      <span className="text-xs text-gray-500 ml-1">(Negotiable)</span>
+                    )}
+                  </div>
+                  <div className="text-xs text-dark-green-500">
+                    {listing.game_condition?.boxCondition || 'Unknown'}
+                  </div>
                 </div>
 
                 {/* Stats */}
@@ -191,27 +342,30 @@ export function UserListings({ listings }: UserListingsProps) {
                   </div>
                 </div>
 
-                {/* Description */}
-                {listing.description && (
-                  <p className="text-xs text-dark-green-500 mb-3 line-clamp-2">{listing.description}</p>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(listing.id)}
-                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-light-beige-50 text-dark-green-600 rounded-lg hover:bg-light-beige-100 transition-colors duration-200 text-xs"
-                  >
-                    <Edit3 className="w-3 h-3" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(listing.id)}
-                    className="px-2 py-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
+                {/* Game Details */}
+                <div className="text-xs text-dark-green-500 mb-3">
+                  {listing.game_details && (
+                    <div className="space-y-1">
+                      {listing.game_details.minPlayers && listing.game_details.maxPlayers && (
+                        <div>{listing.game_details.minPlayers}-{listing.game_details.maxPlayers} players</div>
+                      )}
+                      {listing.game_details.playingTime && (
+                        <div>{listing.game_details.playingTime} min</div>
+                      )}
+                      {listing.version_name && (
+                        <div className="text-vibrant-orange-600 font-medium">{listing.version_name}</div>
+                      )}
+                    </div>
+                  )}
                 </div>
+
+                {/* Loading indicator for this listing */}
+                {deletingId === listing.id && (
+                  <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+                    <div className="animate-spin rounded-full h-3 w-3 border-b border-vibrant-orange"></div>
+                    Deleting...
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -229,37 +383,40 @@ export function UserListings({ listings }: UserListingsProps) {
             }
           </p>
           {filter === 'all' && (
-            <button className="px-4 py-2 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200 text-sm">
+            <a 
+              href="/list-game-version"
+              className="inline-block px-4 py-2 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 transition-colors duration-200 text-sm"
+            >
               Create Your First Listing
-            </button>
+            </a>
           )}
         </div>
       )}
 
       {/* Summary Stats */}
-      {listings.length > 0 && (
+      {localListings.length > 0 && (
         <div className="mt-4 bg-light-beige-50 rounded-lg p-4">
           <h3 className="text-base font-semibold text-dark-green-600 mb-3">Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="text-center">
-              <div className="text-lg font-bold text-dark-green-600">{listings.length}</div>
+              <div className="text-lg font-bold text-dark-green-600">{localListings.length}</div>
               <div className="text-xs text-dark-green-500">Total Listings</div>
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-dark-green-600">
-                {listings.filter(l => l.is_active).length}
+                {localListings.filter(l => l.is_active).length}
               </div>
               <div className="text-xs text-dark-green-500">Active</div>
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-dark-green-600">
-                {listings.reduce((sum, l) => sum + l.views, 0)}
+                {localListings.reduce((sum, l) => sum + l.views, 0)}
               </div>
               <div className="text-xs text-dark-green-500">Total Views</div>
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-dark-green-600">
-                €{listings.reduce((sum, l) => sum + l.price, 0).toFixed(2)}
+                €{localListings.reduce((sum, l) => sum + l.price, 0).toFixed(2)}
               </div>
               <div className="text-xs text-dark-green-500">Total Value</div>
             </div>

@@ -131,7 +131,7 @@ export default async function ProfilePage() {
   let userListings = [];
   if (profile) {
     const { data: listings } = await supabase
-      .from('listings')
+      .from('game_listings')
       .select('*')
       .eq('user_id', profile.id)
       .order('created_at', { ascending: false });

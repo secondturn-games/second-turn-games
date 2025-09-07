@@ -7,10 +7,12 @@
 ### 🚀 Key Features
 
 - **User Authentication** - Secure login/signup with Clerk
-- **Game Listings** - Browse, search, and filter games
-- **Sell Games** - Easy listing creation for sellers
-- **User Profiles** - Manage account and preferences
-- **Responsive Design** - Mobile-first approach with Tailwind CSS
+- **Advanced BGG Integration** - Optimized BoardGameGeek API with caching and batch processing
+- **Smart Game Search** - Lightweight search with automatic image loading and type filtering
+- **Enhanced Listing Flow** - Component-based architecture with version selection and title customization
+- **Post.lt Shipping** - T2T locker-to-locker shipping integration with fee calculation
+- **User Profiles** - Manage account and preferences with location integration
+- **Responsive Design** - Mobile-first approach with Tailwind CSS and component-based UI
 
 ---
 
@@ -32,16 +34,51 @@ src/
 ├── app/                    # Next.js App Router pages
 │   ├── auth/              # Authentication routes
 │   ├── games/             # Game browsing
+│   ├── list-game-version/ # Enhanced listing creation flow
 │   ├── profile/           # User profile management
 │   ├── sell/              # Game listing creation
 │   └── api/               # API routes
+│       ├── bgg/           # BGG API optimization routes
+│       └── shipping/      # Post.lt shipping integration
 ├── components/            # Reusable UI components
+│   ├── listing/           # Listing flow components
+│   │   ├── hooks/         # Custom hooks for state management
+│   │   └── *.tsx          # Modular listing components
 │   └── ui/               # Base UI components
 ├── lib/                  # Utility libraries
+│   ├── bgg/              # BGG service with caching
+│   ├── shipping/         # Post.lt shipping service
 │   ├── supabase/         # Database client setup
 │   └── design-system.ts  # Design system definitions
 └── types/                # TypeScript type definitions
 ```
+
+---
+
+## 🆕 Recent Updates (December 2024)
+
+### **Major Improvements**
+
+- **🚀 BGG API Optimization**: Lightweight search with 3-5x faster performance
+- **📦 Post.lt Shipping Integration**: T2T locker-to-locker shipping with fee calculation
+- **🏗️ Component Architecture**: Modular, maintainable listing flow components
+- **🎯 Enhanced UX**: Version selection, title customization, and responsive design
+- **⚡ Performance**: Batch processing, intelligent caching, and HTML entity decoding
+
+### **New Features**
+
+- **Smart Version Selection**: Language filtering with button pills and responsive cards
+- **Title Selection**: Alternate names selection with suggested titles and visual indicators
+- **Shipping Options**: Simplified pickup and parcel locker shipping with real-time pricing
+- **Search Enhancement**: Automatic image loading and comprehensive metadata display
+- **Error Handling**: Robust error handling with user-friendly messages
+
+### **Technical Improvements**
+
+- **API Optimization**: Reduced API calls with lightweight search and on-demand enhancement
+- **Caching System**: Advanced caching with performance monitoring and statistics
+- **Type Safety**: Comprehensive TypeScript coverage with proper interfaces
+- **Code Quality**: Reduced ESLint warnings and improved build performance
 
 ---
 

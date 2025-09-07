@@ -88,7 +88,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
   const [formData, setFormData] = useState({
     display_name: profile.display_name || '',
     country: (countryValue as string) || '',
-    local_area: profile.local_area || ''
+    local_area: profile.local_area || '',
+    phone: profile.phone || ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,6 +106,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           display_name: formData.display_name,
           country: formData.country,
           local_area: formData.local_area,
+          phone: formData.phone,
           updated_at: new Date().toISOString()
         })
         .eq('id', profile.id);
@@ -139,7 +141,8 @@ export function ProfileForm({ profile }: ProfileFormProps) {
     setFormData({
       display_name: profile.display_name || '',
       country: (countryValue as string) || '',
-      local_area: profile.local_area || ''
+      local_area: profile.local_area || '',
+      phone: profile.phone || ''
     });
     setIsEditing(false);
     setMessage('');
@@ -314,6 +317,25 @@ export function ProfileForm({ profile }: ProfileFormProps) {
                   className="w-full px-3 py-2 border border-dark-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange transition-all duration-200 text-sm"
                 />
                 <p className="text-xs text-dark-green-400 mt-1">Specify your city, suburb, or neighborhood for local pickup details</p>
+              </div>
+
+              {/* Phone Number */}
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-dark-green-600 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="+37126779625"
+                  pattern="^\+[1-9]\d{1,14}$"
+                  title="Please enter a valid phone number in E.164 format (e.g., +37126779625)"
+                  className="w-full px-3 py-2 border border-dark-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:border-vibrant-orange transition-all duration-200 text-sm"
+                />
+                <p className="text-xs text-dark-green-400 mt-1">Required for shipping. Use E.164 format: +37126779625</p>
               </div>
             </div>
 

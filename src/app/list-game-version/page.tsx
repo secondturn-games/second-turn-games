@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Search, Calendar, Package, Type, Languages, Building2, HelpCircle, Users, Clock, Cake, ChevronDown, ChevronUp, Box, CheckCircle, AlertTriangle, ThumbsUp, ExternalLink, Cog, PackageCheck, Archive, PackageX, AlertCircle, Sparkles, Smile, BookOpenCheck, Book, BookX, Lock, Gift, Camera, Cuboid, Puzzle, NotebookText, BookMinus, Globe, Euro, MessageCircleQuestion, Handshake, Container, Truck } from 'lucide-react'
 import Image from 'next/image'
 import { bggServiceClient } from '@/lib/bgg/bgg-service-client'
-import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion } from '@/lib/bgg'
+import type { BGGSearchResult, BGGGameDetails, LanguageMatchedVersion, LightweightSearchResult, EnhancedSearchResult } from '@/lib/bgg'
 
 interface ListingFormData {
   bggGameId: string | null
@@ -172,7 +172,7 @@ export default function ListGameVersionPage() {
 
     // Add mobile detection and enhanced logging
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    console.log('🔍 Search initiated:', { 
+    console.log('🔍 Lightweight search initiated:', { 
       searchTerm, 
       gameType, 
       isMobile, 
@@ -194,24 +194,28 @@ export default function ListGameVersionPage() {
     setHasSearched(true)
 
     try {
-      console.log('🔍 Calling BGG service...')
-      const searchResults = await bggServiceClient.searchGames(searchTerm, { gameType })
-      console.log('✅ BGG service returned:', { 
-        resultsCount: searchResults.length, 
-        results: searchResults,
-        isMobile 
+      console.log('🔍 Starting lightweight search...')
+      // Use exact matching for short search terms (likely specific game names)
+      const useExact = searchTerm.length <= 10 && !searchTerm.includes(' ')
+      const lightResults = await bggServiceClient.searchGames(searchTerm, { 
+        gameType, 
+        exact: useExact 
       })
-      setSearchResults(searchResults)
+      console.log('✅ Light search returned:', { 
+        resultsCount: lightResults.length, 
+        results: lightResults,
+        exact: useExact
+      })
+      setSearchResults(lightResults)
       
       // If only one result, auto-select it
-      if (searchResults.length === 1) {
-        await handleGameSelect(searchResults[0])
+      if (lightResults.length === 1) {
+        await handleGameSelect(lightResults[0])
       }
     } catch (err) {
-      console.error('❌ Search error:', { 
+      console.error('❌ Light search error:', { 
         error: err, 
         message: err instanceof Error ? err.message : 'Unknown error',
-        isMobile,
         searchTerm,
         gameType
       })
@@ -220,6 +224,7 @@ export default function ListGameVersionPage() {
       setIsSearching(false)
     }
   }
+
 
   const resetGameCondition = () => {
     updateFormData({
@@ -232,14 +237,13 @@ export default function ListGameVersionPage() {
     setShowShipping(false)
   }
 
-  const handleGameSelect = async (game: BGGSearchResult) => {
+  const handleGameSelect = async (game: LightweightSearchResult | EnhancedSearchResult) => {
     try {
       // Reset Game Condition data for new game
       resetGameCondition()
       
-      // Get full game details and versions
-          const gameDetails = await bggServiceClient.getGameDetails(game.id)
-    const gameVersions = await bggServiceClient.getLanguageMatchedVersions(game.id)
+      // Get full game details and versions in a single optimized API call
+      const { game: gameDetails, versions: gameVersions } = await bggServiceClient.getGameDetailsWithVersions(game.id)
       
       setSelectedGame(gameDetails)
       setVersions(gameVersions)
@@ -626,59 +630,61 @@ export default function ListGameVersionPage() {
 
                                                {/* Search Results */}
                 {searchResults.length > 0 && showSearchResults && (
-                  <div className="max-h-64 overflow-y-auto space-y-2">
-                    {searchResults.map((game) => {
-                      // Type assertion to help TypeScript
-                      const gameItem = game as BGGSearchResult
-                      return (
-                        <Card
-                          key={gameItem.id}
-                                                     className={`cursor-pointer transition-all hover:shadow-md hover:border-vibrant-orange ${
-                             selectedGame && (selectedGame as BGGGameDetails).id === gameItem.id ? 'border-2 border-vibrant-orange bg-vibrant-orange/5 shadow-md' : 'border border-gray-200 hover:border-vibrant-orange'
-                           }`}
-                          onClick={() => handleGameSelect(gameItem)}
-                        >
+                  <div className="space-y-3">
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {searchResults.map((game) => {
+                        // BGGSearchResult already has all the metadata we need
+                        const displayGame = game
+                        
+                        return (
+                          <Card
+                            key={game.id}
+                            className={`cursor-pointer transition-all hover:shadow-md hover:border-vibrant-orange ${
+                              selectedGame && (selectedGame as BGGGameDetails).id === game.id ? 'border-2 border-vibrant-orange bg-vibrant-orange/5 shadow-md' : 'border border-gray-200 hover:border-vibrant-orange'
+                            }`}
+                            onClick={() => handleGameSelect(displayGame)}
+                          >
                           <CardContent className="p-3">
                             <div className="flex items-center space-x-3">
-                                                             {gameItem.image || gameItem.thumbnail ? (
-                                 <Image 
-                                   src={gameItem.image || gameItem.thumbnail || ''} 
-                                   alt={gameItem.name}
-                                   width={56}
-                                   height={56}
-                                   className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
-                                 />
+                              {displayGame.thumbnail ? (
+                                <Image 
+                                  src={displayGame.thumbnail} 
+                                  alt={displayGame.name}
+                                  width={56}
+                                  height={56}
+                                  className="w-14 h-14 object-cover rounded-lg flex-shrink-0"
+                                />
                                ) : (
                                 <div className="w-14 h-14 bg-light-beige rounded-lg flex items-center justify-center flex-shrink-0">
                                   <Package className="w-6 h-6 text-dark-green" />
                                 </div>
                               )}
                               <div className="flex-1 min-w-0">
-                                                                 <h4 className={`font-medium text-sm leading-tight mb-1 ${
-                                   selectedGame && (selectedGame as BGGGameDetails).id === gameItem.id ? 'text-vibrant-orange' : 'text-dark-green'
-                                 }`}>
-                                  {gameItem.name}
+                                <h4 className={`font-medium text-sm leading-tight mb-1 ${
+                                  selectedGame && (selectedGame as BGGGameDetails).id === game.id ? 'text-vibrant-orange' : 'text-dark-green'
+                                }`}>
+                                  {displayGame.name}
                                 </h4>
                                 <div className="flex items-center space-x-2 text-xs text-gray-600">
-                                  {gameItem.yearpublished && (
+                                  {displayGame.yearpublished && (
                                     <span className="flex items-center gap-1">
                                       <Calendar className="w-3 h-3" />
-                                      {gameItem.yearpublished}
+                                      {displayGame.yearpublished}
                                     </span>
                                   )}
-                                  {gameItem.rank && (
+                                  {displayGame.rank && (
                                     <span className="flex items-center gap-1">
-                                      <span>#{gameItem.rank}</span>
+                                      <span>#{displayGame.rank}</span>
                                     </span>
                                   )}
                                   <a
-                                    href={`https://boardgamegeek.com/boardgame/${gameItem.id}`}
+                                    href={displayGame.bggLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-vibrant-orange hover:underline"
                                     onClick={(e) => e.stopPropagation()}
                                   >
-                                    BGG ID: {gameItem.id}
+                                    BGG ID: {game.id}
                                   </a>
                                 </div>
                               </div>
@@ -687,8 +693,9 @@ export default function ListGameVersionPage() {
                         </Card>
                       )
                     })}
-                 </div>
-               )}
+                    </div>
+                  </div>
+                )}
 
                {/* Empty State - No Search Results */}
                {hasSearched && !isSearching && searchResults.length === 0 && !searchError && (

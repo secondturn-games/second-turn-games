@@ -82,10 +82,18 @@ export function extractSearchItems(xmlText: string): BGGAPISearchItem[] {
       // Helper function to safely extract values from BGG XML structure
       const extractValue = (field: any): string => {
         if (!field) return ''
-        if (typeof field === 'string') return field
-        if (field.value) return String(field.value)
-        if (field['@value']) return String(field['@value'])
-        return ''
+        let value = ''
+        if (typeof field === 'string') {
+          value = field
+        } else if (field.value) {
+          value = String(field.value)
+        } else if (field['@value']) {
+          value = String(field['@value'])
+        } else {
+          return ''
+        }
+        // Decode HTML entities in the extracted value
+        return cleanAndDecodeText(value)
       }
 
       // Extract primary name properly
@@ -95,20 +103,20 @@ export function extractSearchItems(xmlText: string): BGGAPISearchItem[] {
           // Find the primary name (type="primary")
           const primaryName = item.name.find((n: any) => n['@type'] === 'primary')
           if (primaryName) {
-            name = String(primaryName['@value'] || primaryName.value || '')
+            name = extractValue(primaryName)
           } else {
             // Fallback to first name with a value
             for (const n of item.name) {
-              const value = n['@value'] || n.value
+              const value = extractValue(n)
               if (value) {
-                name = String(value)
+                name = value
                 break
               }
             }
           }
         } else {
           // Single name object
-          name = String(item.name['@value'] || item.name.value || item.name || 'Unknown')
+          name = extractValue(item.name) || 'Unknown'
         }
       }
       
@@ -191,10 +199,18 @@ function extractBasicMetadata(item: any): Partial<BGGAPIMetadata> {
   // Helper function to safely extract values from BGG XML structure
   const extractValue = (field: any): string => {
     if (!field) return ''
-    if (typeof field === 'string') return field
-    if (field.value) return String(field.value)
-    if (field['@value']) return String(field['@value'])
-    return ''
+    let value = ''
+    if (typeof field === 'string') {
+      value = field
+    } else if (field.value) {
+      value = String(field.value)
+    } else if (field['@value']) {
+      value = String(field['@value'])
+    } else {
+      return ''
+    }
+    // Decode HTML entities in the extracted value
+    return cleanAndDecodeText(value)
   }
 
 
@@ -320,7 +336,8 @@ function extractLinksFromItem(item: any, type: string): string[] {
     if (link && (link['@type'] === type || link.type === type) && (link['@value'] || link.value)) {
       const linkValue = link['@value'] || link.value
       if (linkValue) {
-        links.push(String(linkValue))
+        // Decode HTML entities in link values
+        links.push(cleanAndDecodeText(String(linkValue)))
       }
     }
   })
@@ -463,7 +480,7 @@ function extractPublishersFromItem(item: any): string[] {
     
     const directPublishers = publishers
       .filter((pub: any) => pub && (pub['@value'] || pub.value))
-      .map((pub: any) => String(pub['@value'] || pub.value))
+      .map((pub: any) => cleanAndDecodeText(String(pub['@value'] || pub.value)))
     
     if (directPublishers.length > 0) {
       return directPublishers
@@ -506,7 +523,7 @@ function extractLanguagesFromItem(item: any): string[] {
     
     const directLanguages = languages
       .filter((lang: any) => lang && (lang['@value'] || lang.value))
-      .map((lang: any) => String(lang['@value'] || lang.value))
+      .map((lang: any) => cleanAndDecodeText(String(lang['@value'] || lang.value)))
     
     if (directLanguages.length > 0) {
       return directLanguages
@@ -551,11 +568,11 @@ function extractVersionData(item: any): BGGGameVersion | null {
     if (typeof item.name === 'string') {
       versionName = item.name
     } else if (item.name['@value']) {
-      versionName = String(item.name['@value'])
+      versionName = cleanAndDecodeText(String(item.name['@value']))
     } else if (item.name.value) {
-      versionName = String(item.name.value)
+      versionName = cleanAndDecodeText(String(item.name.value))
     } else if (item.name['#text']) {
-      versionName = String(item.name['#text'])
+      versionName = cleanAndDecodeText(String(item.name['#text']))
     } else if (Array.isArray(item.name)) {
       // Handle case where name is an array
       const firstValidName = item.name.find((n: any) => {
@@ -611,7 +628,7 @@ function extractAlternateNamesFromItem(item: any): string[] {
     if (name && name['@type'] === 'alternate' && (name['@value'] || name.value)) {
       const nameValue = name['@value'] || name.value
       if (nameValue) {
-        alternates.push(String(nameValue))
+        alternates.push(cleanAndDecodeText(String(nameValue)))
       }
     }
   })
@@ -685,6 +702,45 @@ export function validateXML(xmlText: string): boolean {
 /**
  * Clean XML text for parsing
  */
+/**
+ * Decode HTML entities in text
+ */
+function decodeHTMLEntities(text: string): string {
+  if (!text) return ''
+  
+  // Common HTML entities mapping
+  const entityMap: Record<string, string> = {
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&apos;': "'",
+    '&#039;': "'",
+    '&#39;': "'",
+    '&nbsp;': ' ',
+    '&copy;': '©',
+    '&reg;': '®',
+    '&trade;': '™'
+  }
+  
+  // Replace named entities
+  let decoded = text
+  for (const [entity, char] of Object.entries(entityMap)) {
+    decoded = decoded.replace(new RegExp(entity, 'g'), char)
+  }
+  
+  // Replace numeric entities (&#123; and &#x1A;)
+  decoded = decoded.replace(/&#(\d+);/g, (match, dec) => {
+    return String.fromCharCode(parseInt(dec, 10))
+  })
+  
+  decoded = decoded.replace(/&#x([0-9a-fA-F]+);/g, (match, hex) => {
+    return String.fromCharCode(parseInt(hex, 16))
+  })
+  
+  return decoded
+}
+
 export function cleanXML(xmlText: string): string {
   if (!xmlText) return ''
   
@@ -692,6 +748,19 @@ export function cleanXML(xmlText: string): string {
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
     .replace(/&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;') // Fix unescaped ampersands
     .trim()
+}
+
+/**
+ * Clean and decode text content from BGG XML
+ */
+export function cleanAndDecodeText(text: string): string {
+  if (!text) return ''
+  
+  // First clean the XML
+  const cleaned = cleanXML(text)
+  
+  // Then decode HTML entities
+  return decodeHTMLEntities(cleaned)
 }
 
 

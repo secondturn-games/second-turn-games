@@ -1,23 +1,59 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { MapPin, Search, Package, Truck } from 'lucide-react';
+import { MapPin, Search, Package, Truck, User } from 'lucide-react';
 import { LockerService } from '@/lib/shipping/locker-service';
 import { ShipmentService } from '@/lib/shipping/shipment-service';
-import { CarrierLocker, Shipment } from '@/types/shipping';
+import { CarrierLocker, CreateShipmentResponse, ShippingRate } from '@/types/shipping';
+import { createClient } from '@/lib/supabase/client';
+import { useUser } from '@clerk/nextjs';
+
+interface UserProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string;
+}
 
 export default function ShippingTestPage() {
+  const { user } = useUser();
   const [lockers, setLockers] = useState<CarrierLocker[]>([]);
-  const [nearbyLockers, setNearbyLockers] = useState<CarrierLocker[]>([]);
   const [selectedFromLocker, setSelectedFromLocker] = useState<CarrierLocker | null>(null);
   const [selectedToLocker, setSelectedToLocker] = useState<CarrierLocker | null>(null);
-  const [searchLocation, setSearchLocation] = useState({ lat: 59.4370, lng: 24.7536 }); // Tallinn default
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [shipments, setShipments] = useState<Shipment[]>([]);
+  const [shipments, setShipments] = useState<CreateShipmentResponse[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [shippingRate, setShippingRate] = useState<ShippingRate | null>(null);
+  const [calculatingPrice, setCalculatingPrice] = useState(false);
 
   const lockerService = useMemo(() => new LockerService(), []);
   const shipmentService = useMemo(() => new ShipmentService(), []);
+
+  const loadUserProfile = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      const supabase = createClient();
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('id, first_name, last_name, email, phone')
+        .eq('clerk_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading user profile:', error);
+        return;
+      }
+
+      setUserProfile(profile);
+    } catch (err) {
+      console.error('Error loading user profile:', err);
+    }
+  }, [user]);
 
   const loadAllLockers = useCallback(async () => {
     try {
@@ -39,23 +75,24 @@ export default function ShippingTestPage() {
     }
   }, [lockerService]);
 
-  // Load all lockers on component mount
+  // Load user profile and lockers on component mount
   useEffect(() => {
+    loadUserProfile();
     loadAllLockers();
-  }, [loadAllLockers]);
+    
+    // Check if we're in demo mode
+    const hasCredentials = process.env.LP_EXPRESS_USERNAME && process.env.LP_EXPRESS_PASSWORD;
+    setIsDemoMode(!hasCredentials);
+  }, [loadUserProfile, loadAllLockers]);
 
-  const searchNearbyLockers = async () => {
+  const searchLockers = async () => {
     try {
       setLoading(true);
       setError(null);
-      const nearby = await lockerService.getNearbyLockers(
-        searchLocation.lat,
-        searchLocation.lng,
-        10 // 10km radius
-      );
-      setNearbyLockers(nearby);
+      const searchResults = await lockerService.searchLockers(''); // Search all lockers
+      setLockers(searchResults);
     } catch (err) {
-      setError('Failed to search nearby lockers: ' + (err as Error).message);
+      setError('Failed to search lockers: ' + (err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -82,9 +119,43 @@ export default function ShippingTestPage() {
     }
   };
 
+  const calculateShippingFee = async () => {
+    if (!selectedFromLocker || !selectedToLocker) {
+      setError('Please select both source and destination lockers');
+      return;
+    }
+
+    try {
+      setCalculatingPrice(true);
+      setError(null);
+
+      const rate = await shipmentService.calculateShippingFee({
+        from_country: selectedFromLocker.country,
+        to_country: selectedToLocker.country,
+        size_code: 'M' // Default to Medium size
+      });
+
+      setShippingRate(rate);
+    } catch (err) {
+      setError('Failed to calculate shipping fee: ' + (err as Error).message);
+    } finally {
+      setCalculatingPrice(false);
+    }
+  };
+
   const createTestShipment = async () => {
     if (!selectedFromLocker || !selectedToLocker) {
       setError('Please select both from and to lockers');
+      return;
+    }
+
+    if (!userProfile) {
+      setError('Please complete your profile first. Go to /profile to add your phone number.');
+      return;
+    }
+
+    if (!userProfile.phone) {
+      setError('Phone number is required for shipping. Please add it to your profile first.');
       return;
     }
 
@@ -100,13 +171,13 @@ export default function ShippingTestPage() {
         from_locker_id: selectedFromLocker.id,
         to_locker_id: selectedToLocker.id,
         sender: {
-          name: 'Test Sender',
-          phone: '+372 12345678',
-          email: 'sender@test.com'
+          name: `${userProfile.first_name} ${userProfile.last_name}`,
+          phone: userProfile.phone,
+          email: userProfile.email
         },
         recipient: {
           name: 'Test Recipient',
-          phone: '+371 87654321',
+          phone: '+37187654321',
           email: 'recipient@test.com'
         },
         parcel: {
@@ -145,6 +216,26 @@ export default function ShippingTestPage() {
           <p className="text-dark-green-600">
             Test the parcel locker integration and shipment creation
           </p>
+          
+          {/* Demo Mode Indicator */}
+          {isDemoMode && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-blue-800">🚀 Demo Mode Active</h3>
+                  <div className="mt-1 text-sm text-blue-700">
+                    <p>No LP Express credentials configured. Using mock data for testing.</p>
+                    <p className="mt-1 text-xs">To use real API: Add LP_EXPRESS_USERNAME and LP_EXPRESS_PASSWORD to .env.local</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -165,107 +256,55 @@ export default function ShippingTestPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Search Section */}
-          <div className="bg-white rounded-lg border border-dark-green-200 p-6">
-            <h2 className="text-xl font-semibold text-dark-green-800 mb-4 flex items-center gap-2">
-              <Search className="w-5 h-5" />
-              Search Nearby Lockers
-            </h2>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-dark-green-600 mb-1">
-                    Latitude
-                  </label>
-                  <input
-                    type="number"
-                    step="0.0001"
-                    value={searchLocation.lat}
-                    onChange={(e) => setSearchLocation(prev => ({ ...prev, lat: parseFloat(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-dark-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-orange"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-dark-green-600 mb-1">
-                    Longitude
-                  </label>
-                  <input
-                    type="number"
-                    step="0.0001"
-                    value={searchLocation.lng}
-                    onChange={(e) => setSearchLocation(prev => ({ ...prev, lng: parseFloat(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-dark-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-orange"
-                  />
-                </div>
+        {/* Locker Search and Selection */}
+        <div className="bg-white rounded-lg border border-dark-green-200 p-6">
+          <h2 className="text-xl font-semibold text-dark-green-800 mb-4 flex items-center gap-2">
+            <MapPin className="w-5 h-5" />
+            Select Lockers ({lockers.length} available)
+          </h2>
+          
+          <div className="space-y-4">
+            {/* Search Input */}
+            <div>
+              <label className="block text-sm font-medium text-dark-green-600 mb-1">
+                Search Lockers
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by locker name..."
+                  className="flex-1 px-3 py-2 border border-dark-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-orange"
+                />
+                <button
+                  onClick={searchLockers}
+                  disabled={loading}
+                  className="bg-vibrant-orange text-white px-4 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
+                >
+                  <Search className="w-4 h-4" />
+                  {loading ? 'Searching...' : 'Search'}
+                </button>
               </div>
-              
-              <button
-                onClick={searchNearbyLockers}
-                disabled={loading}
-                className="w-full bg-vibrant-orange text-white px-4 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                <Search className="w-4 h-4" />
-                {loading ? 'Searching...' : 'Search Nearby Lockers'}
-              </button>
             </div>
-
-            {/* Nearby Lockers Results */}
-            {nearbyLockers.length > 0 && (
-              <div className="mt-6">
-                <h3 className="text-lg font-medium text-dark-green-800 mb-3">
-                  Nearby Lockers ({nearbyLockers.length})
-                </h3>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {nearbyLockers.map((locker) => (
-                    <div
-                      key={locker.id}
-                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                        selectedFromLocker?.id === locker.id
-                          ? 'border-vibrant-orange bg-orange-50'
-                          : 'border-dark-green-200 hover:border-dark-green-300'
-                      }`}
-                      onClick={() => setSelectedFromLocker(locker)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-dark-green-800">{locker.name}</p>
-                          <p className="text-sm text-dark-green-600">{locker.address}</p>
-                          <p className="text-xs text-dark-green-500">
-                            {getCountryFlag(locker.country)} {locker.city}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-dark-green-700">
-                            {locker.distance_meters ? `${Math.round(locker.distance_meters)}m` : 'N/A'}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* All Lockers Section */}
-          <div className="bg-white rounded-lg border border-dark-green-200 p-6">
-            <h2 className="text-xl font-semibold text-dark-green-800 mb-4 flex items-center gap-2">
-              <MapPin className="w-5 h-5" />
-              All Lockers ({lockers.length})
-            </h2>
             
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+            {/* Lockers List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
               {lockers.map((locker) => (
                 <div
                   key={locker.id}
                   className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                    selectedToLocker?.id === locker.id
+                    selectedFromLocker?.id === locker.id || selectedToLocker?.id === locker.id
                       ? 'border-vibrant-orange bg-orange-50'
                       : 'border-dark-green-200 hover:border-dark-green-300'
                   }`}
-                  onClick={() => setSelectedToLocker(locker)}
+                  onClick={() => {
+                    if (!selectedFromLocker) {
+                      setSelectedFromLocker(locker);
+                    } else if (!selectedToLocker && locker.id !== selectedFromLocker.id) {
+                      setSelectedToLocker(locker);
+                    }
+                  }}
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -279,6 +318,12 @@ export default function ShippingTestPage() {
                       <p className="text-xs text-dark-green-500">
                         {locker.services.join(', ')}
                       </p>
+                      {selectedFromLocker?.id === locker.id && (
+                        <p className="text-xs text-vibrant-orange font-medium">FROM</p>
+                      )}
+                      {selectedToLocker?.id === locker.id && (
+                        <p className="text-xs text-blue-600 font-medium">TO</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -286,6 +331,77 @@ export default function ShippingTestPage() {
             </div>
           </div>
         </div>
+
+        {/* Shipping Fee Calculation */}
+        {selectedFromLocker && selectedToLocker && (
+          <div className="mt-6 bg-white rounded-lg border border-dark-green-200 p-6">
+            <h2 className="text-xl font-semibold text-dark-green-800 mb-4 flex items-center gap-2">
+              💰 Shipping Fee
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-medium text-dark-green-700 mb-2">Route Details</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-dark-green-600">From:</span>
+                    <span className="text-sm font-medium">{selectedFromLocker.name}</span>
+                    <span className="text-xs text-dark-green-500">({selectedFromLocker.country})</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-dark-green-600">To:</span>
+                    <span className="text-sm font-medium">{selectedToLocker.name}</span>
+                    <span className="text-xs text-dark-green-500">({selectedToLocker.country})</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-dark-green-600">Service:</span>
+                    <span className="text-sm font-medium">T2T (Terminal to Terminal)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium text-dark-green-700 mb-2">Pricing</h3>
+                {shippingRate ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-dark-green-600">Size:</span>
+                      <span className="text-sm font-medium">{shippingRate.size_code}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-dark-green-600">Price:</span>
+                      <span className="text-lg font-bold text-vibrant-orange">
+                        €{(shippingRate.price_cents / 100).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-dark-green-600">Currency:</span>
+                      <span className="text-sm font-medium">{shippingRate.currency}</span>
+                    </div>
+                    {isDemoMode && (
+                      <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                        💡 Demo pricing - Real rates may vary
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <button
+                      onClick={calculateShippingFee}
+                      disabled={calculatingPrice}
+                      className="w-full px-4 py-2 bg-vibrant-orange text-white rounded-lg hover:bg-vibrant-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                    >
+                      {calculatingPrice ? 'Calculating...' : 'Calculate Shipping Fee'}
+                    </button>
+                    <p className="text-xs text-dark-green-500">
+                      Click to see the actual shipping cost
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Selected Lockers & Shipment Creation */}
         <div className="mt-6 bg-white rounded-lg border border-dark-green-200 p-6">
@@ -348,28 +464,25 @@ export default function ShippingTestPage() {
             
             <div className="space-y-4">
               {shipments.map((shipment) => (
-                <div key={shipment.id} className="p-4 border border-dark-green-200 rounded-lg">
+                <div key={shipment.shipment_id} className="p-4 border border-dark-green-200 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <p className="font-medium text-dark-green-800">
-                      Shipment #{shipment.id.slice(0, 8)}
+                      Shipment #{shipment.shipment_id.slice(0, 8)}
                     </p>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      shipment.tracking_status === 'CREATED' ? 'bg-blue-100 text-blue-800' :
-                      shipment.tracking_status === 'IN_TRANSIT' ? 'bg-yellow-100 text-yellow-800' :
-                      shipment.tracking_status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {shipment.tracking_status || 'PENDING'}
+                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      CREATED
                     </span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-dark-green-600">From: {shipment.from_locker_id}</p>
-                      <p className="text-dark-green-600">To: {shipment.to_locker_id}</p>
+                      <p className="text-dark-green-600">Tracking: {shipment.tracking_number}</p>
+                      <p className="text-dark-green-600">Label: <a href={shipment.label_url} target="_blank" rel="noopener noreferrer" className="text-vibrant-orange hover:underline">Download PDF</a></p>
                     </div>
                     <div>
-                      <p className="text-dark-green-600">Carrier: {shipment.carrier}</p>
-                      <p className="text-dark-green-600">Size: {shipment.size_code}</p>
+                      <p className="text-dark-green-600">Estimated Delivery: {new Date(shipment.estimated_delivery).toLocaleString()}</p>
+                      {shipment.drop_off_code && (
+                        <p className="text-dark-green-600">Drop-off Code: {shipment.drop_off_code}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -377,6 +490,53 @@ export default function ShippingTestPage() {
             </div>
           </div>
         )}
+
+        {/* User Profile Status */}
+        <div className="mt-6 bg-white rounded-lg border border-dark-green-200 p-6">
+          <h2 className="text-xl font-semibold text-dark-green-800 mb-4 flex items-center gap-2">
+            <User className="w-5 h-5" />
+            User Profile Status
+          </h2>
+          
+          {userProfile ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${userProfile.phone ? 'bg-green-400' : 'bg-red-400'}`} />
+                <span className="text-sm text-dark-green-600">
+                  {userProfile.first_name} {userProfile.last_name}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${userProfile.phone ? 'bg-green-400' : 'bg-red-400'}`} />
+                <span className="text-sm text-dark-green-600">
+                  Phone: {userProfile.phone || 'Not set'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-400 rounded-full" />
+                <span className="text-sm text-dark-green-600">
+                  Email: {userProfile.email}
+                </span>
+              </div>
+              {!userProfile.phone && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-800">
+                    ⚠️ Phone number required for shipping. 
+                    <a href="/profile" className="text-vibrant-orange hover:underline ml-1">
+                      Complete your profile →
+                    </a>
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                Loading profile...
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* API Configuration & Testing */}
         <div className="mt-6 bg-white rounded-lg border border-dark-green-200 p-6">
@@ -412,30 +572,26 @@ export default function ShippingTestPage() {
               </div>
             </div>
 
-            {/* Quick Test Buttons */}
+            {/* Test Actions */}
             <div>
-              <h3 className="text-lg font-medium text-dark-green-700 mb-3">Quick Location Tests</h3>
+              <h3 className="text-lg font-medium text-dark-green-700 mb-3">Test Actions</h3>
               <div className="space-y-2">
                 <button
-                  onClick={() => setSearchLocation({ lat: 59.4370, lng: 24.7536 })}
+                  onClick={() => setSearchQuery('')}
                   className="w-full p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
                 >
-                  <p className="font-medium text-dark-green-800">Test Tallinn</p>
-                  <p className="text-sm text-dark-green-600">59.4370, 24.7536</p>
+                  <p className="font-medium text-dark-green-800">Clear Search</p>
+                  <p className="text-sm text-dark-green-600">Show all lockers</p>
                 </button>
                 <button
-                  onClick={() => setSearchLocation({ lat: 56.9465, lng: 24.1048 })}
+                  onClick={() => {
+                    setSelectedFromLocker(null);
+                    setSelectedToLocker(null);
+                  }}
                   className="w-full p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
                 >
-                  <p className="font-medium text-dark-green-800">Test Riga</p>
-                  <p className="text-sm text-dark-green-600">56.9465, 24.1048</p>
-                </button>
-                <button
-                  onClick={() => setSearchLocation({ lat: 54.6872, lng: 25.2797 })}
-                  className="w-full p-3 border border-dark-green-200 rounded-lg hover:bg-dark-green-50 text-left"
-                >
-                  <p className="font-medium text-dark-green-800">Test Vilnius</p>
-                  <p className="text-sm text-dark-green-600">54.6872, 25.2797</p>
+                  <p className="font-medium text-dark-green-800">Clear Selection</p>
+                  <p className="text-sm text-dark-green-600">Reset from/to lockers</p>
                 </button>
               </div>
             </div>

@@ -18,6 +18,30 @@ export interface BGGSearchResult {
   searchScore: number
 }
 
+// Lightweight search result for initial search - minimal data
+export interface LightweightSearchResult {
+  id: string
+  name: string
+  yearpublished?: string
+  type: 'boardgame' | 'boardgameexpansion'
+  thumbnail?: string
+  bggLink: string
+  isExpansion: boolean
+  hasInboundExpansionLink: boolean
+  // Metadata loaded on demand
+  hasMetadata?: boolean
+}
+
+// Enhanced search result with full metadata
+export interface EnhancedSearchResult extends LightweightSearchResult {
+  rank?: string
+  bayesaverage?: string
+  average?: string
+  image?: string
+  searchScore: number
+  hasMetadata: true
+}
+
 export interface BGGGameDetails {
   id: string
   name: string
@@ -128,6 +152,7 @@ export interface BGGAPIMetadata {
 
 export interface SearchFilters {
   gameType?: 'base-game' | 'expansion'
+  exact?: boolean
   minPlayers?: number
   maxPlayers?: number
   minRating?: number

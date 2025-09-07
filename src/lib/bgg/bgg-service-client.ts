@@ -7,7 +7,9 @@ import type {
   BGGGameDetails, 
   SearchFilters,
   BGGSearchError,
-  LanguageMatchedVersion
+  LanguageMatchedVersion,
+  LightweightSearchResult,
+  EnhancedSearchResult
 } from './types'
 
 export class BGGServiceClient {
@@ -19,7 +21,104 @@ export class BGGServiceClient {
   }
 
   /**
-   * Main search method - calls our Next.js API route
+   * Lightweight search method - returns minimal data for fast initial results
+   */
+  async searchGamesLight(query: string, filters?: SearchFilters): Promise<LightweightSearchResult[]> {
+    const startTime = Date.now()
+    
+    if (!query || query.trim().length < 2) {
+      return []
+    }
+
+    const cleanQuery = query.trim()
+    console.log(`🔍 Light Search: Starting lightweight search for "${cleanQuery}" with filters:`, filters)
+
+    try {
+      // Build query parameters
+      const params = new URLSearchParams({
+        q: cleanQuery
+      })
+
+      if (filters?.gameType) {
+        if (filters.gameType === 'base-game') {
+          params.append('type', 'boardgame')
+        } else if (filters.gameType === 'expansion') {
+          params.append('type', 'boardgameexpansion')
+        }
+      }
+
+      if (filters?.exact) {
+        params.append('exact', 'true')
+      }
+
+      // Call lightweight search API
+      const response = await fetch(`${this.baseUrl}/search-light?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      const results = data.results || []
+      
+      console.log('✅ Light Search: API returned', results.length, 'lightweight results')
+      
+      const duration = Date.now() - startTime
+      console.log(`⚡ Light Search completed in ${duration}ms`)
+      
+      return results
+      
+    } catch (error) {
+      console.error('❌ Light Search failed:', error)
+      throw new Error(`Search failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * Enhance search results with metadata - call after lightweight search
+   */
+  async enhanceSearchResults(gameIds: string[]): Promise<EnhancedSearchResult[]> {
+    if (!gameIds || gameIds.length === 0) {
+      return []
+    }
+
+    console.log(`🔍 Enhance Search: Enhancing ${gameIds.length} search results`)
+
+    try {
+      const response = await fetch(`${this.baseUrl}/enhance-search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gameIds })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      const results = data.results || []
+      
+      console.log('✅ Enhance Search: API returned', results.length, 'enhanced results')
+      
+      return results
+      
+    } catch (error) {
+      console.error('❌ Enhance Search failed:', error)
+      throw new Error(`Enhancement failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  /**
+   * Main search method - calls our Next.js API route (legacy method)
    */
   async searchGames(query: string, filters?: SearchFilters): Promise<BGGSearchResult[]> {
     const startTime = Date.now()
@@ -118,6 +217,81 @@ export class BGGServiceClient {
     } catch (error) {
       console.error(`Failed to get game details for ${gameId}:`, error)
       return null
+    }
+  }
+
+  /**
+   * Get game details and versions in a single API call - optimized for performance
+   */
+  async getGameDetailsWithVersions(gameId: string): Promise<{ game: BGGGameDetails | null; versions: LanguageMatchedVersion[] }> {
+    if (!gameId) return { game: null, versions: [] }
+
+    try {
+      console.log(`🔍 Client BGG Service: Getting game details + versions for: ${gameId}`)
+
+      // Call our new combined Next.js API route
+      const response = await fetch(`${this.baseUrl}/game-with-versions?id=${gameId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log(`❌ Game not found: ${gameId}`)
+          return { game: null, versions: [] }
+        }
+        
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      console.log(`✅ Client BGG Service: Game details + versions completed for: ${gameId}`)
+      
+      return {
+        game: data.game || null,
+        versions: data.versions || []
+      }
+
+    } catch (error) {
+      console.error(`❌ Client BGG Service: Failed to get game details + versions for ${gameId}:`, error)
+      throw this.createSearchError(error, gameId)
+    }
+  }
+
+  /**
+   * Get game details for multiple games in parallel - optimized batch operation
+   */
+  async getBatchGameDetails(gameIds: string[]): Promise<{ gameId: string; game: BGGGameDetails | null; error?: string }[]> {
+    if (!gameIds || gameIds.length === 0) return []
+
+    try {
+      console.log(`🔍 Client BGG Service: Getting batch game details for ${gameIds.length} games`)
+
+      // Call our new batch Next.js API route
+      const response = await fetch(`${this.baseUrl}/batch-game-details`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gameIds })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      console.log(`✅ Client BGG Service: Batch game details completed for ${gameIds.length} games`)
+      
+      return data.results || []
+
+    } catch (error) {
+      console.error(`❌ Client BGG Service: Failed to get batch game details:`, error)
+      throw this.createSearchError(error, gameIds.join(','))
     }
   }
 

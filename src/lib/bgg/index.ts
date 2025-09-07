@@ -44,5 +44,7 @@ export type {
   CacheStats,
   BGGSearchError,
   LanguageMatchedVersion,
-  AlternateName
+  AlternateName,
+  LightweightSearchResult,
+  EnhancedSearchResult
 } from './types'

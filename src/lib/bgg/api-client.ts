@@ -137,18 +137,19 @@ export class BGGAPIClient {
       batches.push(gameIds.slice(i, i + batchSize))
     }
 
-    const allResponses: string[] = []
-
-    for (const batch of batches) {
+    // Process batches in parallel for better performance
+    const batchPromises = batches.map(async (batch) => {
       const params: Record<string, string> = {
         id: batch.join(','),
         stats: '1',
         versions: '1'
       }
 
-      const response = await this.get(BGG_ENDPOINTS.THING, params)
-      allResponses.push(response)
-    }
+      return this.get(BGG_ENDPOINTS.THING, params)
+    })
+
+    // Wait for all batches to complete in parallel
+    const allResponses = await Promise.all(batchPromises)
 
     return this.combineXMLResponses(allResponses)
   }

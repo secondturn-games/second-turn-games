@@ -10,9 +10,11 @@ interface Profile {
   email: string;
   first_name: string;
   last_name: string;
+  display_name?: string;
   avatar_url: string;
   bio?: string;
-  location?: string;
+  country?: string;
+  local_area?: string;
   phone?: string;
   created_at: string;
   updated_at: string;
@@ -30,8 +32,10 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
   const [formData, setFormData] = useState({
     first_name: profile.first_name || '',
     last_name: profile.last_name || '',
+    display_name: profile.display_name || '',
     bio: profile.bio || '',
-    location: profile.location || '',
+    country: profile.country || '',
+    local_area: profile.local_area || '',
     phone: profile.phone || ''
   });
 
@@ -65,7 +69,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -131,6 +135,76 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
         </div>
 
         <div>
+          <label htmlFor="display_name" className="block text-sm font-medium text-dark-green-600 mb-2">
+            Display Name
+          </label>
+          <input
+            type="text"
+            id="display_name"
+            name="display_name"
+            value={formData.display_name}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange-500 focus:border-transparent transition-all duration-200"
+            placeholder="How you'd like to be called"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-dark-green-600 mb-2">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange-500 focus:border-transparent transition-all duration-200"
+            placeholder="+37126779625"
+            pattern="^\+[1-9]\d{1,14}$"
+            title="Please enter a valid phone number in E.164 format (e.g., +37126779625)"
+          />
+          <p className="text-xs text-dark-green-500 mt-1">
+            Required for shipping. Use E.164 format: +37126779625
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="country" className="block text-sm font-medium text-dark-green-600 mb-2">
+              Country
+            </label>
+            <select
+              id="country"
+              name="country"
+              value={formData.country}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange-500 focus:border-transparent transition-all duration-200"
+            >
+              <option value="">Select Country</option>
+              <option value="EE">Estonia</option>
+              <option value="LV">Latvia</option>
+              <option value="LT">Lithuania</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="local_area" className="block text-sm font-medium text-dark-green-600 mb-2">
+              Local Area
+            </label>
+            <input
+              type="text"
+              id="local_area"
+              name="local_area"
+              value={formData.local_area}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange-500 focus:border-transparent transition-all duration-200"
+              placeholder="City, District"
+            />
+          </div>
+        </div>
+
+        <div>
           <label htmlFor="bio" className="block text-sm font-medium text-dark-green-600 mb-2">
             Bio
           </label>
@@ -145,37 +219,6 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium text-dark-green-600 mb-2">
-              Location
-            </label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange-500 focus:border-transparent transition-all duration-200"
-              placeholder="City, Country"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-dark-green-600 mb-2">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-dark-green-200 rounded-xl focus:ring-2 focus:ring-vibrant-orange-500 focus:border-transparent transition-all duration-200"
-              placeholder="+1234567890"
-            />
-          </div>
-        </div>
 
         {/* Message Display */}
         {message && (

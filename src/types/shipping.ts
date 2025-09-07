@@ -61,7 +61,7 @@ export interface ShippingRate {
   id: string;
   carrier: 'UNISEND' | 'LP_EXPRESS';
   service_code: string;
-  size_code: 'S' | 'M' | 'L';
+  size_code: 'XS' | 'S' | 'M' | 'L';
   from_country: 'EE' | 'LV' | 'LT';
   to_country: 'EE' | 'LV' | 'LT';
   price_cents: number;

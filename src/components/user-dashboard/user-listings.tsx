@@ -140,6 +140,8 @@ export function UserListings({ listings }: UserListingsProps) {
       );
     } catch (error) {
       console.error('Failed to toggle listing status:', error);
+      // Show error to user
+      alert(`Failed to update listing: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 

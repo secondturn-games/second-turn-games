@@ -29,7 +29,15 @@ export function useListingManagement(options: ListingManagementOptions = {}) {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to update listing');
+        if (response.status === 401) {
+          throw new Error('You must be logged in to update listings');
+        } else if (response.status === 403) {
+          throw new Error('You are not authorized to update this listing');
+        } else if (response.status === 404) {
+          throw new Error('Listing not found');
+        } else {
+          throw new Error(result.error || `Failed to update listing (${response.status})`);
+        }
       }
 
       options.onSuccess?.('Listing updated successfully');
@@ -56,7 +64,15 @@ export function useListingManagement(options: ListingManagementOptions = {}) {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to delete listing');
+        if (response.status === 401) {
+          throw new Error('You must be logged in to delete listings');
+        } else if (response.status === 403) {
+          throw new Error('You are not authorized to delete this listing');
+        } else if (response.status === 404) {
+          throw new Error('Listing not found');
+        } else {
+          throw new Error(result.error || `Failed to delete listing (${response.status})`);
+        }
       }
 
       options.onSuccess?.('Listing deleted successfully');
